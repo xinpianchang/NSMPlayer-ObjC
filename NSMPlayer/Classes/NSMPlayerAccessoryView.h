@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NSMPlayerAccessoryViewProtocol.h"
 
-@interface NSMPlayerAccessoryView : UIView
+@interface NSMPlayerAccessoryView : UIView <NSMPlayerAccessoryViewProtocol>
 
 @end

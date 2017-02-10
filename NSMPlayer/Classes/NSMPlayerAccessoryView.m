@@ -10,12 +10,15 @@
 
 @implementation NSMPlayerAccessoryView
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
+@synthesize delegate = _delegate;
+@synthesize progress = _progress;
+
+- (void)show:(BOOL)animated {
+    
 }
-*/
+
+- (void)hide:(BOOL)animated {
+    
+}
 
 @end

@@ -1,18 +1,17 @@
 {
   "name": "NSMPlayer",
   "version": "0.1.0",
-  "summary": "A short description of NSMPlayer.",
-  "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/migrant/NSMPlayer",
+  "summary": "NSMPlayer is a library of playing video.",
+  "homepage": "https://git.vmovier.cc/projects/NSM/repos/nsmplayer",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
   },
   "authors": {
-    "migrant": "tomigrant@gmail.com"
+    "Lin Lin": "linlin@vmovier.com"
   },
   "source": {
-    "git": "https://github.com/migrant/NSMPlayer.git",
+    "git": "https://git.vmovier.cc/scm/nsm/nsmplayer.git",
     "tag": "0.1.0"
   },
   "platforms": {

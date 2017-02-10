@@ -1,0 +1,22 @@
+{
+  "name": "NSMPlayer",
+  "version": "0.1.0",
+  "summary": "A short description of NSMPlayer.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/migrant/NSMPlayer",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "migrant": "tomigrant@gmail.com"
+  },
+  "source": {
+    "git": "https://github.com/migrant/NSMPlayer.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "NSMPlayer/Classes/**/*"
+}

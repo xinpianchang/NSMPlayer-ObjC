@@ -21,6 +21,9 @@
   "dependencies": {
     "Bolts": [
 
+    ],
+    "TBStateMachine": [
+
     ]
   }
 }

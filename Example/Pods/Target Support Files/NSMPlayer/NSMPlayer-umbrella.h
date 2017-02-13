@@ -10,9 +10,15 @@
 #endif
 #endif
 
+#import "NSMVideoPlayerController.h"
+#import "NSMVideoAssetInfo.h"
+#import "NSMVideoPlayer.h"
 #import "NSMPlayerAccessoryView.h"
 #import "NSMPlayerAccessoryViewDelegate.h"
 #import "NSMPlayerAccessoryViewProtocol.h"
+#import "NSMAVPlayerView.h"
+#import "NSMAVPlayer.h"
+#import "NSMUnderlyingPlayer.h"
 
 FOUNDATION_EXPORT double NSMPlayerVersionNumber;
 FOUNDATION_EXPORT const unsigned char NSMPlayerVersionString[];

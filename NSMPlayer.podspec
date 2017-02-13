@@ -13,4 +13,6 @@ Pod::Spec.new do |s|
   s.source_files = 'NSMPlayer/Classes/**/*'
 
   s.dependency 'Bolts'
+
+  s.dependency 'TBStateMachine'
 end

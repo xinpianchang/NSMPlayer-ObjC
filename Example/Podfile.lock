@@ -5,6 +5,14 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
+  - CocoaLumberjack (3.0.0):
+    - CocoaLumberjack/Default (= 3.0.0)
+    - CocoaLumberjack/Extensions (= 3.0.0)
+  - CocoaLumberjack/Core (3.0.0)
+  - CocoaLumberjack/Default (3.0.0):
+    - CocoaLumberjack/Core
+  - CocoaLumberjack/Extensions (3.0.0):
+    - CocoaLumberjack/Default
   - Expecta (1.0.5)
   - Expecta+Snapshots (3.0.1):
     - Expecta (~> 1.0)
@@ -17,11 +25,10 @@ PODS:
     - FBSnapshotTestCase/Core
   - NSMPlayer (0.1.0):
     - Bolts
-    - TBStateMachine
-  - Specta (1.0.5)
-  - TBStateMachine (6.1.0):
-    - TBStateMachine/Core (= 6.1.0)
-  - TBStateMachine/Core (6.1.0)
+    - NSMStateMachine
+  - NSMStateMachine (0.1.2):
+    - CocoaLumberjack
+  - Specta (1.0.6)
 
 DEPENDENCIES:
   - Expecta
@@ -36,13 +43,14 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
+  CocoaLumberjack: c823149bccc5519a9447aeb433be7b1212a7d6a5
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
   Expecta+Snapshots: aee0487f8bbb9df7e0b7735380565ac06207e959
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  NSMPlayer: e71003d5c71ceaed83d63c6ee067db0f2194e5b0
-  Specta: ac94d110b865115fe60ff2c6d7281053c6f8e8a2
-  TBStateMachine: e16500b53825a7c4673782c5988fabe30f21e6f1
+  NSMPlayer: 5f48af2d6937c9a6606ce6012049c0426ed3d9f3
+  NSMStateMachine: 2d4279eefb452a03c48779ca80faeaeb56b319bb
+  Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465
 
-PODFILE CHECKSUM: 33e163be36171cbac199fff3b0f85e6fe27e5a90
+PODFILE CHECKSUM: b5bfce22bcb986e9abec5fb7ee3a6c91536bd0db
 
 COCOAPODS: 1.2.0

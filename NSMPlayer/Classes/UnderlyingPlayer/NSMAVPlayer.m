@@ -114,7 +114,9 @@
     [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionInitial context:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
+    //AVPlayerItemPlaybackStalledNotification -> waitingBufferToPlay
     [self.player replaceCurrentItemWithPlayerItem:playerItem];
+    
 //    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
     // Invoke callback every half second
     //    __weak __typeof(self) weakself = self;

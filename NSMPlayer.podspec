@@ -14,5 +14,6 @@ Pod::Spec.new do |s|
 
   s.dependency 'Bolts'
 
-  s.dependency 'TBStateMachine'
+  s.dependency 'NSMStateMachine'
+
 end

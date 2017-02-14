@@ -12,6 +12,7 @@
 
 #import "NSMVideoPlayerController.h"
 #import "NSMVideoAssetInfo.h"
+#import "NSMVideoPlayerControllerDataSource.h"
 #import "NSMVideoPlayer.h"
 #import "NSMPlayerAccessoryView.h"
 #import "NSMPlayerAccessoryViewDelegate.h"

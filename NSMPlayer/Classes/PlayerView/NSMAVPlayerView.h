@@ -9,10 +9,16 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface NSMAVPlayerView : UIView
+@class NSMUnderlyingPlayer;
 
-- (AVPlayer *)player;
-- (void)setPlayer:(AVPlayer *)player;
-- (AVPlayerLayer *)playerLayer;
+@protocol NSMVideoPlayerViewProtocol <NSObject>
+
+@property (nonatomic, strong) NSMUnderlyingPlayer *player;
 
 @end
+
+@interface NSMAVPlayerView : UIView <NSMVideoPlayerViewProtocol>
+
+
+@end
+

@@ -16,4 +16,6 @@ Pod::Spec.new do |s|
 
   s.dependency 'NSMStateMachine'
 
+  s.dependency 'Masonry'
+
 end

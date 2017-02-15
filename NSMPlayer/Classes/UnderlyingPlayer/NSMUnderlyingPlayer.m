@@ -7,6 +7,7 @@
 //
 
 #import "NSMUnderlyingPlayer.h"
+#import "NSMVideoPlayerControllerDataSource.h"
 
 NSString * const NSMUnderlyingPlayerErrorDomain = @"NSMUnderlyingPlayerErrorDomain";
 
@@ -15,6 +16,17 @@ NSString * const NSMUnderlyingPlayerErrorDomain = @"NSMUnderlyingPlayerErrorDoma
 
 @implementation NSMUnderlyingPlayer
 
+- (instancetype)initWithAssetURL:(NSURL *)assetURL {
+    self = [super init];
+    if (self) {
+        _playerURL = assetURL;
+    }
+    return self;
+}
+
+- (void)setPlayerSource:(NSMVideoPlayerControllerDataSource *)playerSource {
+    _playerURL = playerSource.assetURL;
+}
 #pragma clang diagnostic pop
 
 @end

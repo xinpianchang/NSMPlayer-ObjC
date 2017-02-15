@@ -23,6 +23,5 @@
 
 @property (nonatomic, strong) AVPlayer *player;
 
-@property (nonatomic, strong) NSURL *playerURL;
 
 @end

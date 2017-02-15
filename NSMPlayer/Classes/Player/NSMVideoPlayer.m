@@ -8,20 +8,68 @@
 
 #import "NSMVideoPlayer.h"
 #import "NSMVideoPlayerControllerDataSource.h"
-
+#import "NSMAVPlayer.h"
+#import <Bolts/Bolts.h>
 
 @implementation NSMPlayerState
+
+- (NSMVideoPlayer *)videoPlayer {
+    return (NSMVideoPlayer *)self.stateMachine;
+}
+
++ (instancetype)playerStateWithVideoPlayer:(NSMVideoPlayer *)videoPlayer {
+    return [[self alloc] initWithVideoPlayer:videoPlayer];
+}
+
+- (instancetype)initWithVideoPlayer:(NSMVideoPlayer *)videoPlayer {
+    self = [super initWithStateMachine:videoPlayer];
+    if (self) {
+    }
+    return self;
+}
 
 @end
 
 @implementation NSMPlayerInitialState
 
+- (BOOL)processMessage:(NSMMessage *)message {
+    switch (message.messageType) {
+        case NSMVideoPlayerActionReplacePlayerItem : {
+            [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+        }
+        return YES;
+        
+        case NSMVideoPlayerEventFailure : {
+            [self.videoPlayer transitionToState:self.videoPlayer.errorState];
+        }
+        return YES;
+        
+        default:
+        
+        return NO;
+    }
+}
 @end
 
 @implementation NSMPlayerUnWorkingState
+
 @end
 
 @implementation NSMPlayerIdleState
+
+//- (BOOL)processMessage:(NSMMessage *)message {
+//    switch (message.messageType) {
+//        
+//        case NSMVideoPlayerActionPlay : {
+//            [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+//        }
+//        return YES;
+//        
+//        default:
+//        break;
+//    }
+//    return NO;
+//}
 
 @end
 
@@ -31,6 +79,34 @@
 
 @implementation NSMPlayerPreparingState
 
+- (void)enter {
+    [super enter];
+    [[self.videoPlayer.underlyingPlayer prepare] continueWithBlock:^id _Nullable(BFTask * _Nonnull t) {
+        if (t.result) {
+//            [self.videoPlayer play];
+            NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReadyToPlay];
+            [self.stateMachine sendMessage:msg];
+        } else if (t.error) {
+            NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure];
+            [self.stateMachine sendMessage:msg];
+        }
+        return nil;
+    }];
+}
+
+- (BOOL)processMessage:(NSMMessage *)message {
+    switch (message.messageType) {
+        case NSMVideoPlayerEventReadyToPlay : {
+            [self.videoPlayer transitionToState:self.videoPlayer.playedState];
+        }
+        
+        break;
+        
+        default:
+        break;
+    }
+    return NO;
+}
 @end
 
 @implementation NSMPlayerReayToPlayState
@@ -38,6 +114,11 @@
 @end
 
 @implementation NSMPlayerPlayedState
+
+- (void)enter {
+    [super enter];
+    [self.videoPlayer.underlyingPlayer play];
+}
 
 @end
 
@@ -64,24 +145,13 @@
 
 @interface NSMVideoPlayer ()
 
-@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *videoPlayerDataSource;
+@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *dataSource;
 @property (nonatomic, strong) NSThread *stateMachineRunLoopThread;
-
+@property (nonatomic, strong) NSMutableDictionary *players;
 
 @end
 
 @implementation NSMVideoPlayer
-
-
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        _stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];
-        [_stateMachineRunLoopThread start];
-        self.smHandler.runloopThread = _stateMachineRunLoopThread;
-    }
-    return self;
-}
 
 - (void)stateMachineRunLoopThreadThreadEntry {
     @autoreleasepool {
@@ -93,36 +163,55 @@
     }
 }
 
-- (NSMVideoPlayerControllerDataSource *)dataSource {
-    return _videoPlayerDataSource;
+
+- (NSMVideoPlayerControllerDataSource *)videoPlayerDataSource {
+    return _dataSource;
+}
+- (void)setVideoPlayerDataSource:(NSMVideoPlayerControllerDataSource *)dataSource {
+    _dataSource = dataSource;
+    [self.underlyingPlayer setPlayerSource:dataSource];
 }
 
-- (void)setDataSource:(NSMVideoPlayerControllerDataSource *)dataSource {
-    _videoPlayerDataSource = dataSource;
-}
 
-
-#pragma mark - Action
+#pragma mark - NSMVideoPlayerProtocol
 
 - (void)play {
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionPlay];
-    [self.stateMachine sendMessage:msg];
+    [self sendMessage:msg];
 }
 
 - (void)pause {
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionPlay];
-    [self.stateMachine sendMessage:msg];
+    [self sendMessage:msg];
 }
 
 - (void)releasePlayer {
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionReleasePlayer];
-    [self.stateMachine sendMessage:msg];
+    [self sendMessage:msg];
 }
 
 - (void)seekToTime:(NSTimeInterval)time {
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionSeek];
     msg.userInfo = @(time);
-    [self.stateMachine sendMessage:msg];
+    [self sendMessage:msg];
+}
+
+- (void)choosePlayerWithType:(NSMVideoPlayerType)type {
+    self.playerType = type;
+}
+
+- (void)retry {
+    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionRetry];
+    [self sendMessage:msg];
+}
+
+- (void)replaceItem {
+    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionReplacePlayerItem];
+    [self sendMessage:msg];
+}
+
+- (void)setVideoPlayerRenderView:(id<NSMVideoPlayerViewProtocol>)videoPlayerRenderView {
+    [self.underlyingPlayer setPlayerRenderView:videoPlayerRenderView];
 }
 
 - (void)start {
@@ -140,11 +229,11 @@
     self.preparingState = [[NSMPlayerPreparingState alloc] initWithStateMachine:self];
     [self addState:self.preparingState parentState:self.initialState];
     
-    self.preparedState = [[NSMPlayerReayToPlayState alloc] initWithStateMachine:self];
-    [self addState:self.preparedState parentState:self.initialState];
+    self.readyToPlayState = [[NSMPlayerReayToPlayState alloc] initWithStateMachine:self];
+    [self addState:self.readyToPlayState parentState:self.initialState];
 
     self.playedState = [[NSMPlayerPlayedState alloc] initWithStateMachine:self];
-    [self addState:self.playedState parentState:self.preparedState];
+    [self addState:self.playedState parentState:self.readyToPlayState];
     
     self.playingState = [[NSMPlayerPlayingState alloc] initWithStateMachine:self];
     self.waitBufferingToPlayState = [[NSMPlayerWaitBufferingToPlayState alloc] initWithStateMachine:self];
@@ -153,7 +242,7 @@
     
     
     self.pausedState = [[NSMPlayerPausedState alloc] initWithStateMachine:self];
-    [self addState:self.pausedState parentState:self.preparedState];
+    [self addState:self.pausedState parentState:self.readyToPlayState];
     self.pausingState = [[NSMPlayerPausingState alloc] initWithStateMachine:self];
     self.completedState = [[NSMPlayerCompletedState alloc] initWithStateMachine:self];
     [self addState:self.pausingState parentState:self.pausedState];
@@ -161,7 +250,40 @@
 
     // Player 的 State 需要记在内存中吗？我们的播放器在页面切换的时候需要主动的 Release Player 吗？如果需要就需要 RestoreState
     // 还有状态机的生命周期？
-    [self setInitialState:self.idleState];
+    self.smHandler.initialState = self.idleState;
+    [super start];
 }
+
+
+- (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType {
+    if (self = [super init]) {
+        self.players = [NSMutableDictionary dictionary];
+        self.stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];
+        [self.stateMachineRunLoopThread start];
+        self.smHandler.runloopThread = self.stateMachineRunLoopThread;
+        self.playerType = playerType;
+        [self start];
+    }
+    return self;
+}
+
+- (void)setPlayerType:(NSMVideoPlayerType)playerType {
+    
+    if (_playerType != playerType) {
+        NSMUnderlyingPlayer * player = self.players[@(playerType)];
+        if (!player) {
+            if (NSMVideoPlayerAVPlayer == playerType) {
+                player = [[NSMAVPlayer alloc] initWithAssetURL:self.dataSource.assetURL];
+            } else if (NSMVideoPlayerIJKPlayer == playerType) {
+                
+            }
+        }
+        self.players[@(playerType)] = player;
+        self.underlyingPlayer = player;
+        _playerType = playerType;
+        //切换播放器内核
+    }
+}
+
 
 @end

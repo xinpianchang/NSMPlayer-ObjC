@@ -9,14 +9,29 @@
 #import <UIKit/UIKit.h>
 #import "NSMVideoPlayerControllerDataSource.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSUInteger, NSMVideoPlayerType) {
+    NSMVideoPlayerAVPlayer = 1,
+    NSMVideoPlayerIJKPlayer,
+};
+
+@protocol NSMVideoPlayerViewProtocol;
+
+@class NSMVideoPlayerControllerDataSource;
+
 @protocol NSMVideoPlayerProtocol <NSObject>
 
-@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *dataSource;
+@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *videoPlayerDataSource;
+@property (nonatomic, strong) id<NSMVideoPlayerViewProtocol> videoPlayerRenderView;
 
+- (void)choosePlayerWithType:(NSMVideoPlayerType)type;
 - (void)play;
 - (void)pause;
 - (void)releasePlayer;
 - (void)seekToTime:(NSTimeInterval)time;
+- (void)retry;
+- (void)replaceItem;
 
 @end
 
@@ -24,5 +39,9 @@
 
 @property (nonatomic, strong) id <NSMVideoPlayerProtocol> videoPlayer;
 
+@property (nonatomic, strong) NSURL *assetURL;
+
+- (instancetype)initWithURL:(NSURL *)assetURL;
 @end
 
+NS_ASSUME_NONNULL_END

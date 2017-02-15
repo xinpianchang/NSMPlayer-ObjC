@@ -9,14 +9,19 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 FOUNDATION_EXPORT NSString * const NSMUnderlyingPlayerErrorDomain;
 
-@class NSMVideoAssetInfo, BFTask;
+@protocol NSMVideoPlayerViewProtocol;
+
+@class NSMVideoAssetInfo, BFTask, NSMVideoPlayerControllerDataSource;
 
 @protocol NSMUnderlyingPlayerProtocol <NSObject>
-
+@property (nonatomic, strong) id<NSMVideoPlayerViewProtocol> playerRenderView;
+@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *playerSource;
 - (BFTask *)prepare;
-- (void)start;
+- (void)play;
 - (void)pause;
 - (void)seekToTime:(NSTimeInterval)seconds;
 - (void)releasePlayer;
@@ -36,11 +41,15 @@ FOUNDATION_EXPORT NSString * const NSMUnderlyingPlayerErrorDomain;
  */
 - (void)adjustRate:(CGFloat)rate;
 
-- (void)replacePlayerItemWithURL:(NSURL *)url;
+//- (void)replacePlayerItemWithURL:(NSURL *)url;
 
 @end
 
 @interface NSMUnderlyingPlayer : NSObject <NSMUnderlyingPlayerProtocol>
 
+@property (nonatomic, strong) NSURL *playerURL;
+- (instancetype)initWithAssetURL:(NSURL *)assetURL NS_DESIGNATED_INITIALIZER;
+
 @end
 
+NS_ASSUME_NONNULL_END

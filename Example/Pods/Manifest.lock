@@ -23,8 +23,10 @@ PODS:
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
+  - Masonry (1.0.2)
   - NSMPlayer (0.1.0):
     - Bolts
+    - Masonry
     - NSMStateMachine
   - NSMStateMachine (0.1.2):
     - CocoaLumberjack
@@ -47,7 +49,8 @@ SPEC CHECKSUMS:
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
   Expecta+Snapshots: aee0487f8bbb9df7e0b7735380565ac06207e959
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  NSMPlayer: 5f48af2d6937c9a6606ce6012049c0426ed3d9f3
+  Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
+  NSMPlayer: f697120239f7f6ba2ba63c84a99d3d1ec344f77f
   NSMStateMachine: 2d4279eefb452a03c48779ca80faeaeb56b319bb
   Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465
 

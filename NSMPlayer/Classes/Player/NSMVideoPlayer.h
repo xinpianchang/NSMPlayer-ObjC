@@ -12,17 +12,24 @@
 #import "NSMUnderlyingPlayer.h"
 #import "NSMVideoPlayerController.h"
 
+NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
+    NSMVideoPlayerEventReadyToPlay,
     NSMVideoPlayerEventPlay,
     NSMVideoPlayerEventPause,
     NSMVideoPlayerEventReleasePlayer,
     NSMVideoPlayerEventSeek,
+    NSMVideoPlayerEventFailure,
+    NSMVideoPlayerEventRetry,
+    NSMVideoPlayerEventNetworkConnectionChange,
     
     NSMVideoPlayerActionPlay,
     NSMVideoPlayerActionPause,
     NSMVideoPlayerActionReleasePlayer,
-    NSMVideoPlayerActionSeek
+    NSMVideoPlayerActionSeek,
+    NSMVideoPlayerActionRetry,
+    NSMVideoPlayerActionReplacePlayerItem,
 };
 
 typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
@@ -35,9 +42,14 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
     NSMVideoPlayerStatusPlayToEndTime = 1 << 6,//PlayBack to end time
 };
 
-@class NSMStateMachine;
+@class NSMStateMachine, NSMVideoPlayer;
 
 @interface NSMPlayerState : NSMState
+
+@property (readonly, nonatomic, weak) NSMVideoPlayer *videoPlayer;
+
++ (instancetype)playerStateWithVideoPlayer:(NSMVideoPlayer *)videoPlayer;
+- (instancetype)initWithVideoPlayer:(NSMVideoPlayer *)videoPlayer;
 
 @end
 
@@ -103,7 +115,7 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
 
 @property (nonatomic, strong) NSMPlayerState *preparingState;
 
-@property (nonatomic, strong) NSMPlayerState *preparedState;
+@property (nonatomic, strong) NSMPlayerState *readyToPlayState;
 
 @property (nonatomic, strong) NSMPlayerState *playedState;
 @property (nonatomic, strong) NSMPlayerState *playingState;
@@ -115,4 +127,11 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
 
 @property (nonatomic, assign) NSMVideoPlayerStatus currentStatus;
 
+@property (nonatomic, assign) NSMVideoPlayerType playerType;
+
+- (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType NS_DESIGNATED_INITIALIZER;
+
+
 @end
+
+NS_ASSUME_NONNULL_END

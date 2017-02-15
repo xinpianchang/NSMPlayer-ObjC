@@ -9,6 +9,7 @@
 #import "NSMAVPlayer.h"
 #import <Bolts/Bolts.h>
 #import "NSMVideoAssetInfo.h"
+#import "NSMAVPlayerView.h"
 
 @interface NSMAVPlayer ()
 
@@ -110,11 +111,17 @@
     // ensure that this is done before the playerItem is associated with the player
     [playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:nil];
     [playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionInitial context:nil];
+    
+    //waitingBufferToPlay
     [playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionInitial context:nil];
     [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionInitial context:nil];
     
+    //playToEndTime
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
-    //AVPlayerItemPlaybackStalledNotification -> waitingBufferToPlay
+
+    [self removeTimeObserverToken];
+    [self removeCurrentItemObserver];
+    
     [self.player replaceCurrentItemWithPlayerItem:playerItem];
     
 //    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
@@ -130,7 +137,7 @@
 
 // MARK: - NSMUnderlyingPlayerProtocol
 
-- (void)start {
+- (void)play {
     [self.player play];
 }
 
@@ -144,8 +151,9 @@
 }
 
 - (void)releasePlayer {
-    self.player = nil;
+    [self removeCurrentItemObserver];
     [self removeTimeObserverToken];
+    self.player = nil;
 }
 
 - (void)adjustVolume:(CGFloat)volum {
@@ -159,6 +167,7 @@
 - (void)adjustRate:(CGFloat)rate {
     self.player.rate = rate;
 }
+
 
 // MARK: - NSKeyValueObserving
 
@@ -178,6 +187,7 @@
             
         }
     } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
+        //The array contains NSValue objects containing a CMTimeRange value indicating the times ranges for which the player item has media data readily available. The time ranges returned may be discontinuous.
         NSArray *loadedTimeRanges = self.player.currentItem.loadedTimeRanges;
         CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
         CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
@@ -198,6 +208,7 @@
 
 - (void)dealloc {
     [self removeTimeObserverToken];
+    [self removeCurrentItemObserver];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -209,6 +220,19 @@
         [self.player removeTimeObserver:self.timeObserverToken];
         self.timeObserverToken = nil;
     }
+}
+
+- (void)removeCurrentItemObserver {
+    if (self.player.currentItem) {
+        [self.player.currentItem removeObserver:self forKeyPath:@"status" context:nil];
+        [self.player.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:nil];
+        [self.player.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty" context:nil];
+        [self.player.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
+    }
+}
+
+- (void)setPlayerRenderView:(id<NSMVideoPlayerViewProtocol>)playerRenderView {
+    [playerRenderView setPlayer:self];
 }
 
 - (UIImage *)thumnailImageWithTime:(CMTime)requestTime {
@@ -225,5 +249,6 @@
     }
     return nil;
 }
+
 
 @end

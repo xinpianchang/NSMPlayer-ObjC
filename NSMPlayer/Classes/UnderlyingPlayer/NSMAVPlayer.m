@@ -10,6 +10,7 @@
 #import <Bolts/Bolts.h>
 #import "NSMVideoAssetInfo.h"
 #import "NSMAVPlayerView.h"
+#import "NSMPlayerProtocol.h"
 
 @interface NSMAVPlayer ()
 
@@ -23,11 +24,11 @@
 
 // MARK: - Properties
 
-- (AVPlayer *)player {
-    if (!_player) {
-        _player = [[AVPlayer alloc] init];
+- (AVPlayer *)avplayer {
+    if (!_avplayer) {
+        _avplayer = [[AVPlayer alloc] init];
     }
-    return _player;
+    return _avplayer;
 }
 
 // Will attempt load and test these asset keys before playing
@@ -122,13 +123,13 @@
     [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
     
-    [self.player replaceCurrentItemWithPlayerItem:playerItem];
+    [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
     
 //    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
     // Invoke callback every half second
     //    __weak __typeof(self) weakself = self;
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
-    self.timeObserverToken = [self.player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
+    self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
         NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
         NSLog(@"currenTimeInterval : %.2f",currenTimeInterval);
     }];
@@ -138,34 +139,34 @@
 // MARK: - NSMUnderlyingPlayerProtocol
 
 - (void)play {
-    [self.player play];
+    [self.avplayer play];
 }
 
 - (void)pause {
-    [self.player pause];
+    [self.avplayer pause];
 }
 
 - (void)seekToTime:(NSTimeInterval)seconds {
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
-    [self.player seekToTime:time];
+    [self.avplayer seekToTime:time];
 }
 
 - (void)releasePlayer {
     [self removeCurrentItemObserver];
     [self removeTimeObserverToken];
-    self.player = nil;
+    self.avplayer = nil;
 }
 
 - (void)adjustVolume:(CGFloat)volum {
-    self.player.volume = volum;
+    self.avplayer.volume = volum;
 }
 
 - (void)switchMuted:(BOOL)on {
-    self.player.muted = on;
+    self.avplayer.muted = on;
 }
 
 - (void)adjustRate:(CGFloat)rate {
-    self.player.rate = rate;
+    self.avplayer.rate = rate;
 }
 
 
@@ -174,21 +175,21 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"status"]) {
         //POST
-        if (self.player.currentItem.status == AVPlayerItemStatusReadyToPlay){
+        if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
             //Prepared finish
             if (self.prepareSouce && !self.prepareSouce.task.isCompleted) {
                 NSMVideoAssetInfo *assetInfo = [[NSMVideoAssetInfo alloc] init];
-                assetInfo.duration = CMTimeGetSeconds(self.player.currentItem.duration);
+                assetInfo.duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
                 [self.prepareSouce setResult:assetInfo];
             }
         } else {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
-            NSLog(@"AVPlayerStatusFailed error:%@",self.player.error);
+            NSLog(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
             
         }
     } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
         //The array contains NSValue objects containing a CMTimeRange value indicating the times ranges for which the player item has media data readily available. The time ranges returned may be discontinuous.
-        NSArray *loadedTimeRanges = self.player.currentItem.loadedTimeRanges;
+        NSArray *loadedTimeRanges = self.avplayer.currentItem.loadedTimeRanges;
         CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
         CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
         CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
@@ -217,17 +218,17 @@
         /*
          * 只能保证调用下面方法的时候，只能保证这个方法 - (id)addPeriodicTimeObserverForInterval:(CMTime)interval queue:(dispatch_queue_t)queue usingBlock:(void (^)(CMTime time))block 中的block不会被再次触发，而不能保证已经触发的 block 中断执行，可以用这个做到 dispatch_sync(queue, ^{} 。
          */
-        [self.player removeTimeObserver:self.timeObserverToken];
+        [self.avplayer removeTimeObserver:self.timeObserverToken];
         self.timeObserverToken = nil;
     }
 }
 
 - (void)removeCurrentItemObserver {
-    if (self.player.currentItem) {
-        [self.player.currentItem removeObserver:self forKeyPath:@"status" context:nil];
-        [self.player.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:nil];
-        [self.player.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty" context:nil];
-        [self.player.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
+    if (self.avplayer.currentItem) {
+        [self.avplayer.currentItem removeObserver:self forKeyPath:@"status" context:nil];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:nil];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty" context:nil];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
     }
 }
 
@@ -250,5 +251,7 @@
     return nil;
 }
 
-
+- (id)player {
+    return self.avplayer;
+}
 @end

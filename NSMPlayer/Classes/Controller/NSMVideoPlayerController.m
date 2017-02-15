@@ -44,7 +44,7 @@
     [playerView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.view);
     }];
-    [self.videoPlayer setVideoPlayerRenderView:playerView];
+    [playerView setPlayer:self.videoPlayer.player];
 }
 
 

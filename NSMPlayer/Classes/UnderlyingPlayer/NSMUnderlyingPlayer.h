@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
+#import "NSMPlayerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,8 +18,7 @@ FOUNDATION_EXPORT NSString * const NSMUnderlyingPlayerErrorDomain;
 
 @class NSMVideoAssetInfo, BFTask, NSMVideoPlayerControllerDataSource;
 
-@protocol NSMUnderlyingPlayerProtocol <NSObject>
-@property (nonatomic, strong) id<NSMVideoPlayerViewProtocol> playerRenderView;
+@protocol NSMUnderlyingPlayerProtocol <NSMPlayerProtocol>
 @property (nonatomic, strong) NSMVideoPlayerControllerDataSource *playerSource;
 - (BFTask *)prepare;
 - (void)play;

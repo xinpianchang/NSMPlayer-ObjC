@@ -28,7 +28,7 @@ PODS:
     - Bolts
     - Masonry
     - NSMStateMachine
-  - NSMStateMachine (0.1.2):
+  - NSMStateMachine (0.1.3):
     - CocoaLumberjack
   - Specta (1.0.6)
 
@@ -51,7 +51,7 @@ SPEC CHECKSUMS:
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
   NSMPlayer: f697120239f7f6ba2ba63c84a99d3d1ec344f77f
-  NSMStateMachine: 2d4279eefb452a03c48779ca80faeaeb56b319bb
+  NSMStateMachine: 2ae1c0cb3860653913bba75f3708aabd88fbc0bc
   Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465
 
 PODFILE CHECKSUM: b5bfce22bcb986e9abec5fb7ee3a6c91536bd0db

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "NSMVideoPlayerControllerDataSource.h"
+#import "NSMPlayerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,10 +21,10 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerType) {
 
 @class NSMVideoPlayerControllerDataSource;
 
-@protocol NSMVideoPlayerProtocol <NSObject>
+@protocol NSMVideoPlayerProtocol <NSMPlayerProtocol>
 
 @property (nonatomic, strong) NSMVideoPlayerControllerDataSource *videoPlayerDataSource;
-@property (nonatomic, strong) id<NSMVideoPlayerViewProtocol> videoPlayerRenderView;
+@property (nonatomic, strong) id videoPlayerRenderView;
 
 - (void)choosePlayerWithType:(NSMVideoPlayerType)type;
 - (void)play;

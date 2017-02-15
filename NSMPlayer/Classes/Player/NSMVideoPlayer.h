@@ -38,7 +38,7 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
     NSMVideoPlayerStatusPreparing = 1 << 2, // loadTracks
     NSMVideoPlayerStatusPlaying = 1 << 3, // Playing but not waitBuffering
     NSMVideoPlayerStatusWaitBufferingToPlay = 1 << 4,
-    NSMVideoPlayerStatusPausing = 1 << 5, // Paused
+    NSMVideoPlayerStatusPaused = 1 << 5, // Paused
     NSMVideoPlayerStatusPlayToEndTime = 1 << 6,//PlayBack to end time
 };
 

@@ -18,6 +18,7 @@
 #import "NSMPlayerAccessoryViewDelegate.h"
 #import "NSMPlayerAccessoryViewProtocol.h"
 #import "NSMAVPlayerView.h"
+#import "NSMPlayerProtocol.h"
 #import "NSMAVPlayer.h"
 #import "NSMUnderlyingPlayer.h"
 

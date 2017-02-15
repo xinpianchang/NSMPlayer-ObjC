@@ -29,14 +29,10 @@
 
 #pragma mark - State
 
--(void)enter {
-    NSString *desc = [NSString stringWithFormat:@"%@ ENTER.....",self.getName];
-    NSMSMLogDebug(@"%@",desc);
+- (void)enter {
 }
 
--(void)exit {
-    NSString *desc = [NSString stringWithFormat:@"%@ EXIT....",self.getName];
-    NSMSMLogDebug(@"%@",desc);
+- (void)exit {
 }
 
 - (BOOL)processMessage:(NSMMessage *)message {

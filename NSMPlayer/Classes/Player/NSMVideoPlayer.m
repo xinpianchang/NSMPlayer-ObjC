@@ -34,21 +34,22 @@
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-        case NSMVideoPlayerActionReplacePlayerItem : {
+        case NSMVideoPlayerActionReplacePlayerItem: {
             [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+            return YES;
         }
-        return YES;
         
-        case NSMVideoPlayerEventFailure : {
+        case NSMVideoPlayerEventFailure: {
             [self.videoPlayer transitionToState:self.videoPlayer.errorState];
+            return YES;
         }
-        return YES;
         
         default:
         
-        return NO;
+            return NO;
     }
 }
+
 @end
 
 @implementation NSMPlayerUnWorkingState
@@ -56,15 +57,18 @@
 @end
 
 @implementation NSMPlayerIdleState
-
+- (void)enter {
+    [super enter];
+    self.videoPlayer.currentStatus = NSMVideoPlayerStatusIdle;
+}
 //- (BOOL)processMessage:(NSMMessage *)message {
 //    switch (message.messageType) {
-//        
+//
 //        case NSMVideoPlayerActionPlay : {
 //            [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
 //        }
 //        return YES;
-//        
+//
 //        default:
 //        break;
 //    }
@@ -75,15 +79,21 @@
 
 @implementation NSMPlayerFailedState
 
+- (void)enter {
+    [super enter];
+    self.videoPlayer.currentStatus = NSMVideoPlayerStatusFailed;
+}
+
 @end
 
 @implementation NSMPlayerPreparingState
 
 - (void)enter {
     [super enter];
+    self.videoPlayer.currentStatus = NSMVideoPlayerStatusPreparing;
     [[self.videoPlayer.underlyingPlayer prepare] continueWithBlock:^id _Nullable(BFTask * _Nonnull t) {
         if (t.result) {
-//            [self.videoPlayer play];
+            //            [self.videoPlayer play];
             NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReadyToPlay];
             [self.stateMachine sendMessage:msg];
         } else if (t.error) {
@@ -96,17 +106,16 @@
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-        case NSMVideoPlayerEventReadyToPlay : {
+        case NSMVideoPlayerEventReadyToPlay: {
             [self.videoPlayer transitionToState:self.videoPlayer.playedState];
+            return YES;
         }
-        
-        break;
-        
         default:
-        break;
+            return NO;
     }
     return NO;
 }
+
 @end
 
 @implementation NSMPlayerReayToPlayState
@@ -123,10 +132,19 @@
 @end
 
 @implementation NSMPlayerPlayingState
+- (void)enter {
+    [super enter];
+    self.videoPlayer.currentStatus = NSMVideoPlayerStatusPlaying;
+}
 
 @end
 
 @implementation NSMPlayerWaitBufferingToPlayState
+
+- (void)enter {
+    [super enter];
+    self.videoPlayer.currentStatus = NSMVideoPlayerStatusWaitBufferingToPlay;
+}
 
 @end
 
@@ -136,9 +154,19 @@
 
 @implementation NSMPlayerPausingState
 
+- (void)enter {
+    [super enter];
+    self.videoPlayer.currentStatus = NSMVideoPlayerStatusPaused;
+}
+
 @end
 
 @implementation NSMPlayerCompletedState
+
+- (void)enter {
+    [super enter];
+    self.videoPlayer.currentStatus = NSMVideoPlayerStatusPlayToEndTime;
+}
 
 @end
 
@@ -210,9 +238,6 @@
     [self sendMessage:msg];
 }
 
-- (void)setVideoPlayerRenderView:(id<NSMVideoPlayerViewProtocol>)videoPlayerRenderView {
-    [self.underlyingPlayer setPlayerRenderView:videoPlayerRenderView];
-}
 
 - (void)start {
     self.initialState = [[NSMPlayerInitialState alloc] initWithStateMachine:self];
@@ -231,7 +256,7 @@
     
     self.readyToPlayState = [[NSMPlayerReayToPlayState alloc] initWithStateMachine:self];
     [self addState:self.readyToPlayState parentState:self.initialState];
-
+    
     self.playedState = [[NSMPlayerPlayedState alloc] initWithStateMachine:self];
     [self addState:self.playedState parentState:self.readyToPlayState];
     
@@ -247,7 +272,7 @@
     self.completedState = [[NSMPlayerCompletedState alloc] initWithStateMachine:self];
     [self addState:self.pausingState parentState:self.pausedState];
     [self addState:self.completedState parentState:self.pausedState];
-
+    
     // Player 的 State 需要记在内存中吗？我们的播放器在页面切换的时候需要主动的 Release Player 吗？如果需要就需要 RestoreState
     // 还有状态机的生命周期？
     self.smHandler.initialState = self.idleState;
@@ -285,5 +310,7 @@
     }
 }
 
-
+- (id)player {
+    return self.underlyingPlayer.player;
+}
 @end

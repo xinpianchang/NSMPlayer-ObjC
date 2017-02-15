@@ -21,7 +21,7 @@
 
 @interface NSMAVPlayer : NSMUnderlyingPlayer
 
-@property (nonatomic, strong) AVPlayer *player;
+@property (nonatomic, strong) AVPlayer *avplayer;
 
 
 @end

@@ -11,9 +11,11 @@
 #endif
 
 #import "NSMVideoPlayerController.h"
+#import "NSMPlayerLogging.h"
 #import "NSMVideoAssetInfo.h"
 #import "NSMVideoPlayerControllerDataSource.h"
 #import "NSMVideoPlayer.h"
+#import "NSMVideoPlayerConfig.h"
 #import "NSMPlayerAccessoryView.h"
 #import "NSMPlayerAccessoryViewDelegate.h"
 #import "NSMPlayerAccessoryViewProtocol.h"

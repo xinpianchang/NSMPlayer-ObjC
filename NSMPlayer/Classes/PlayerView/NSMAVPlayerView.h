@@ -12,6 +12,7 @@
 @protocol NSMVideoPlayerViewProtocol <NSObject>
 
 - (void)setPlayer:(id)player;
+- (id)player;
 
 @end
 

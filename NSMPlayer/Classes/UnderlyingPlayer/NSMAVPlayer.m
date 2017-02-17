@@ -17,12 +17,13 @@
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) id timeObserverToken;
 @property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
+@property (nonatomic, assign) BOOL shouldLoopPlayback;
 
 @end
 
 @implementation NSMAVPlayer
 
-// MARK: - Properties
+#pragma mark - Properties
 
 - (AVPlayer *)avplayer {
     if (!_avplayer) {
@@ -36,18 +37,8 @@
     return @[@"tracks", @"playable", @"hasProtectedContent"];
 }
 
-/**
- Preparing an Asset for Use
- If you want to prepare an asset for playback, you should load its tracks property
- */
-- (BFTask *)prepare {
-    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.playerURL options:nil];
-    self.asset = asset;
-    return [self asynchronouslyLoadURLAsset:asset];
-}
 
-
-// MARK: - Asset Loading
+#pragma mark - Asset Loading
 
 - (BFTask *)asynchronouslyLoadURLAsset:(AVURLAsset *)newAsset {
     BFTaskCompletionSource *source = [BFTaskCompletionSource taskCompletionSource];
@@ -108,8 +99,12 @@
 }
 
 - (void)setupAVPlayerWithAsset:(AVAsset *)asset {
+    NSAssert([NSThread currentThread] == [NSThread mainThread], @"You should register for KVO change notifications and unregister from KVO change notifications on the main thread. ");
+    
     AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:asset];
     // ensure that this is done before the playerItem is associated with the player
+    //inspect whether if paused <rate == 0>
+    [playerItem addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionInitial context:nil];
     [playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:nil];
     [playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionInitial context:nil];
     
@@ -118,25 +113,40 @@
     [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionInitial context:nil];
     
     //playToEndTime
+    /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemFailedToPlayToEndTime:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:playerItem];
+    
+    
     [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
     
     [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
     
-//    AVPlayer *player = [AVPlayer playerWithPlayerItem:playerItem];
-    // Invoke callback every half second
-    //    __weak __typeof(self) weakself = self;
+    
+    // Invoke callback every one second
+    __weak __typeof(self) weakself = self;
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
     self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
         NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
         NSLog(@"currenTimeInterval : %.2f",currenTimeInterval);
+        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
     }];
 }
 
 
-// MARK: - NSMUnderlyingPlayerProtocol
+#pragma mark - NSMUnderlyingPlayerProtocol
+
+/**
+ Preparing an Asset for Use
+ If you want to prepare an asset for playback, you should load its tracks property
+ */
+- (BFTask *)prepare {
+    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.playerURL options:nil];
+    self.asset = asset;
+    return [self asynchronouslyLoadURLAsset:asset];
+}
+
 
 - (void)play {
     [self.avplayer play];
@@ -151,30 +161,55 @@
     [self.avplayer seekToTime:time];
 }
 
+
+/**
+ You should register for KVO change notifications and unregister from KVO change notifications on the main thread.
+ * so releasePlayer method should invoke on the main thread
+ */
 - (void)releasePlayer {
-    [self removeCurrentItemObserver];
-    [self removeTimeObserverToken];
-    self.avplayer = nil;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self removeCurrentItemObserver];
+        [self removeTimeObserverToken];
+        self.avplayer = nil;
+    });
 }
 
-- (void)adjustVolume:(CGFloat)volum {
-    self.avplayer.volume = volum;
+- (void)setVolume:(CGFloat)volume {
+    self.avplayer.volume = volume;
 }
 
-- (void)switchMuted:(BOOL)on {
+- (void)setMuted:(BOOL)on {
     self.avplayer.muted = on;
 }
 
-- (void)adjustRate:(CGFloat)rate {
+- (void)setRate:(CGFloat)rate {
     self.avplayer.rate = rate;
 }
 
+- (long)duration {
+    return CMTimeGetSeconds(self.avplayer.currentItem.duration);
+}
 
-// MARK: - NSKeyValueObserving
+- (id)player {
+    return self.avplayer;
+}
 
+- (void)setLoopPlayback:(BOOL)loopPlayback {
+    self.shouldLoopPlayback = loopPlayback;
+}
+
+- (BOOL)isLoopPlayback {
+    return self.shouldLoopPlayback;
+}
+
+#pragma mark - - NSKeyValueObserving
+
+// AV Foundation does not specify what thread that the notification is sent on
+// if you want to update the user interface, you must make sure that any relevant code is invoked on the main thread
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"status"]) {
         //POST
+        NSLog(@"currentItem status %@",@(self.avplayer.currentItem.status));
         if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
             //Prepared finish
             if (self.prepareSouce && !self.prepareSouce.task.isCompleted) {
@@ -182,29 +217,44 @@
                 assetInfo.duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
                 [self.prepareSouce setResult:assetInfo];
             }
-        } else {
+        } else if (AVPlayerItemStatusFailed == self.avplayer.currentItem.status) {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
             NSLog(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
-            
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : self.avplayer.error}];
         }
     } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
         //The array contains NSValue objects containing a CMTimeRange value indicating the times ranges for which the player item has media data readily available. The time ranges returned may be discontinuous.
         NSArray *loadedTimeRanges = self.avplayer.currentItem.loadedTimeRanges;
-        CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
-        CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
-        CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
-        NSLog(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
+        if (loadedTimeRanges) {
+            CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
+            CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
+            CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
+            NSLog(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
+        }
+        
     } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
         //indicates that playback has consumed all buffered media and that playback will stall or end
+        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:@(self.avplayer.currentItem.playbackBufferEmpty)];
+        
     } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
         //Indicates whether the item will likely play through without stalling
+        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:@(self.avplayer.currentItem.playbackLikelyToKeepUp)];
     }
 }
 
-// MARK: - NSNotification
+#pragma mark - NSNotification
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
-    
+    [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerDidPlayToEndTimeNotification object:self userInfo:nil];
+    if (self.shouldLoopPlayback) {
+        [self.avplayer seekToTime:kCMTimeZero];
+    }
+}
+
+- (void)playerItemFailedToPlayToEndTime:(NSNotification *)notification {
+    [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
+    NSLog(@"%@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
 }
 
 - (void)dealloc {
@@ -225,10 +275,12 @@
 
 - (void)removeCurrentItemObserver {
     if (self.avplayer.currentItem) {
+        NSAssert([NSThread currentThread] == [NSThread mainThread], @"You should register for KVO change notifications and unregister from KVO change notifications on the main thread. ");
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"status" context:nil];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:nil];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty" context:nil];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:@"rate" context:nil];
     }
 }
 
@@ -251,7 +303,5 @@
     return nil;
 }
 
-- (id)player {
-    return self.avplayer;
-}
+
 @end

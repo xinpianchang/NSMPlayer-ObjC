@@ -11,6 +11,7 @@
 #import <Masonry/Masonry.h>
 #import "NSMVideoSourceController.h"
 #import "NSMVideoPlayerControllerDataSource.h"
+#import "NSMVideoPlayer.h"
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 
@@ -72,17 +73,31 @@
     }
 }
 
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        //should add observer before initilize NSMVideoPlayerController object
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(videoPlayerStatusDidChange) name:NSMVideoPlayerStatusDidChange object:nil];
+    }
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.loadProgress.progress = 0.5;
+    
+    
 }
 
+- (void)videoPlayerStatusDidChange {
+    self.playerStateLabel.text = NSMVideoPlayerStatusDescription(self.playerController.videoPlayer.currentStatus);
+}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"videoPlayer"]) {
         NSMVideoPlayerController *playerController = segue.destinationViewController;
         if ([playerController isKindOfClass:[NSMVideoPlayerController class]]) {
-            self.playerController.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
+            playerController.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
             self.playerController = playerController;
         }
     }
@@ -91,9 +106,8 @@
 #pragma mark - NSMVideoSourceControllerDelegate
 
 - (void)videoSourceControllerDidSelectedVideoDataSource:(NSMVideoPlayerControllerDataSource *)dataSource {
-    [self.playerController.videoPlayer setVideoPlayerDataSource:dataSource];
-    [self.playerController.videoPlayer replaceItem];
-
+    
+    [self.playerController.videoPlayer setPlayerSource:dataSource];
 }
 
 @end

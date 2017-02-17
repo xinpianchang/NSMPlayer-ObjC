@@ -14,32 +14,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 FOUNDATION_EXPORT NSString * const NSMUnderlyingPlayerErrorDomain;
 
+// item has played to its end time
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerDidPlayToEndTimeNotification;
+
+// item has played to its end time
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerFailedNotification;
+
+// item has played to its end time
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification;
+
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyNotification;
+
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification;
+
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlayheadDidChangeNotification;
+
+// notification userInfo key                                                                    type
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey;
+
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerErrorKey;//NSError
+
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey;//NSValue[CMTimeRange]
+
+//AVF_EXPORT NSString *const AVPlayerItemDidPlayToEndTimeNotification      NS_AVAILABLE(10_7, 4_0);
+//AVF_EXPORT NSString *const AVPlayerItemFailedToPlayToEndTimeNotification NS_AVAILABLE(10_7, 4_3);   // item has failed to play to its end time
+//AVF_EXPORT NSString *const AVPlayerItemPlaybackStalledNotification       NS_AVAILABLE(10_9, 6_0);    // media did not arrive in time to continue playback
+//AVF_EXPORT NSString *const AVPlayerItemNewAccessLogEntryNotification	 NS_AVAILABLE(10_9, 6_0);	// a new access log entry has been added
+//AVF_EXPORT NSString *const AVPlayerItemNewErrorLogEntryNotification		 NS_AVAILABLE(10_9, 6_0);	// a new error log entry has been added
+//
+//// notification userInfo key                                                                    type
+//AVF_EXPORT NSString *const AVPlayerItemFailedToPlayToEndTimeErrorKey     NS_AVAILABLE(10_7, 4_3);   // NSError
+
 @protocol NSMVideoPlayerViewProtocol;
 
 @class NSMVideoAssetInfo, BFTask, NSMVideoPlayerControllerDataSource;
 
 @protocol NSMUnderlyingPlayerProtocol <NSMPlayerProtocol>
-@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *playerSource;
-- (BFTask *)prepare;
-- (void)play;
-- (void)pause;
-- (void)seekToTime:(NSTimeInterval)seconds;
-- (void)releasePlayer;
 
-/* Indicates the current audio volume of the player; 0.0 means "silence all audio", 1.0 means "play at the full volume of the current item".
- 
- iOS note: Do not use this property to implement a volume slider for media playback. For that purpose, use MPVolumeView, which is customizable in appearance and provides standard media playback behaviors that users expect.
- This property is most useful on iOS to control the volume of the AVPlayer relative to other audio output, not for volume control by end users. */
-
-- (void)adjustVolume:(CGFloat)volum;
-
-/* indicates whether or not audio output of the player is muted. Only affects audio muting for the player instance and not for the device. */
-- (void)switchMuted:(BOOL)on;
-
-/**
- adjust rate of playback
- */
-- (void)adjustRate:(CGFloat)rate;
 
 //- (void)replacePlayerItemWithURL:(NSURL *)url;
 
@@ -48,7 +59,7 @@ FOUNDATION_EXPORT NSString * const NSMUnderlyingPlayerErrorDomain;
 @interface NSMUnderlyingPlayer : NSObject <NSMUnderlyingPlayerProtocol>
 
 @property (nonatomic, strong) NSURL *playerURL;
-- (instancetype)initWithAssetURL:(NSURL *)assetURL NS_DESIGNATED_INITIALIZER;
+//- (instancetype)initWithAssetURL:(NSURL *)assetURL NS_DESIGNATED_INITIALIZER;
 
 @end
 

@@ -18,11 +18,11 @@
 
 @implementation NSMVideoPlayerController
 
-
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
         _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
+        [_videoPlayer setAutoPlay:YES];
     }
     return self;
 }
@@ -31,6 +31,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
+        [_videoPlayer setAutoPlay:YES];
     }
     return self;
 }
@@ -47,5 +48,10 @@
     [playerView setPlayer:self.videoPlayer.player];
 }
 
-
+- (void)setAssetURL:(NSURL *)assetURL {
+    NSMVideoPlayerControllerDataSource *playerSource = [[NSMVideoPlayerControllerDataSource alloc] init];
+    playerSource.assetURL = assetURL;
+    [self.videoPlayer setPlayerSource:playerSource];
+    _assetURL = assetURL;
+}
 @end

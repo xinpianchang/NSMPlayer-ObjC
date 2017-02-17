@@ -39,4 +39,8 @@
     ((AVPlayerLayer *)[self layer]).player = (AVPlayer *)player;
 }
 
+- (id)player {
+    return ((AVPlayerLayer *)[self layer]).player;
+}
+
 @end

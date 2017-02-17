@@ -11,35 +11,37 @@
 #import <NSMStateMachine/NSMStateMachine.h>
 #import "NSMUnderlyingPlayer.h"
 #import "NSMVideoPlayerController.h"
+#import "NSMVideoPlayerConfig.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+FOUNDATION_EXPORT NSString *NSMVideoPlayerStatusDescription (NSMVideoPlayerStatus status);
+
+FOUNDATION_EXPORT NSString * const NSMVideoPlayerStatusDidChange;
+
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
+    NSMVideoPlayerEventReplacePlayerItem,
+    NSMVideoPlayerEventTryToPrepared,
     NSMVideoPlayerEventReadyToPlay,
     NSMVideoPlayerEventPlay,
     NSMVideoPlayerEventPause,
+    NSMVideoPlayerEventCompleted,
+    NSMVideoPlayerEventLoopPlayback,
+    NSMVideoPlayerEventWaitingBufferToPlay,
+    NSMVideoPlayerEventEnoughBufferToPlay,
     NSMVideoPlayerEventReleasePlayer,
     NSMVideoPlayerEventSeek,
     NSMVideoPlayerEventFailure,
     NSMVideoPlayerEventRetry,
-    NSMVideoPlayerEventNetworkConnectionChange,
+    NSMVideoPlayerEventAllowWWANChange,
+    NSMVideoPlayerEventPlayerTypeChange,
     
     NSMVideoPlayerActionPlay,
     NSMVideoPlayerActionPause,
     NSMVideoPlayerActionReleasePlayer,
     NSMVideoPlayerActionSeek,
     NSMVideoPlayerActionRetry,
-    NSMVideoPlayerActionReplacePlayerItem,
-};
-
-typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
-    NSMVideoPlayerStatusIdle = 1 << 0,// for poster?
-    NSMVideoPlayerStatusFailed = 1 << 1, // 随时都可能进入到 Error ,Playing -> error, Preparing -> error,
-    NSMVideoPlayerStatusPreparing = 1 << 2, // loadTracks
-    NSMVideoPlayerStatusPlaying = 1 << 3, // Playing but not waitBuffering
-    NSMVideoPlayerStatusWaitBufferingToPlay = 1 << 4,
-    NSMVideoPlayerStatusPaused = 1 << 5, // Paused
-    NSMVideoPlayerStatusPlayToEndTime = 1 << 6,//PlayBack to end time
+    
 };
 
 @class NSMStateMachine, NSMVideoPlayer;
@@ -103,6 +105,8 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
 
 @interface NSMVideoPlayer : NSMStateMachine <NSMVideoPlayerProtocol>
 
+@property (nonatomic, strong) NSMVideoPlayerConfig *videoPlayerConfig;
+
 @property (nonatomic, strong) id<NSMUnderlyingPlayerProtocol> underlyingPlayer;
 @property (nonatomic, strong) NSMStateMachine *stateMachine;
 
@@ -125,12 +129,19 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
 @property (nonatomic, strong) NSMPlayerState *pausingState;
 @property (nonatomic, strong) NSMPlayerState *completedState;
 
-@property (nonatomic, assign) NSMVideoPlayerStatus currentStatus;
-
 @property (nonatomic, assign) NSMVideoPlayerType playerType;
 
-- (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType NS_DESIGNATED_INITIALIZER;
+@property (nonatomic, readonly, strong) NSError *playerError;
 
+- (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType NS_DESIGNATED_INITIALIZER;
+- (void)setupUnderlyingPlayerWithPlayerType:(NSMVideoPlayerType)playerType;
+
+- (BOOL)shouldPlayWithWWAN;
+
+/**
+ 在 preparing 的时候接受到 Play/Pause 等 Event 时，需要记录用户<测试人员的>的 是否最终想要播放的一种意图。
+ */
+@property (nonatomic, assign) BOOL intentToPlay;
 
 @end
 

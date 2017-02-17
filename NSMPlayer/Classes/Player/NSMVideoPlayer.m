@@ -58,6 +58,68 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 
 @implementation NSMPlayerUnWorkingState
 
+- (BOOL)processMessage:(NSMMessage *)message {
+    switch (message.messageType) {
+        case NSMVideoPlayerEventReplacePlayerItem: {
+            if (self.videoPlayer.videoPlayerConfig.isAutoPlay) {
+                self.videoPlayer.intentToPlay = YES;
+                [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
+            } else if (self.videoPlayer.videoPlayerConfig.isPreload) {
+                [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
+            } else {
+                /*to do*/
+            }
+            return YES;
+        }
+        
+        case NSMVideoPlayerActionPlay: {
+            if (self.videoPlayer.playerSource != nil) {
+                [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
+            } else {
+                [self.videoPlayer transitionToState:self.videoPlayer.errorState];
+                [self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"播放器还没有设定播放URL"}]];
+            }
+            return YES;
+        }
+        
+        case NSMVideoPlayerEventPlayerRestore: {
+            switch (self.videoPlayer.videoPlayerConfig.restoredStatus) {
+                case NSMVideoPlayerStatusIdle: {
+                    [self.videoPlayer transitionToState:self.videoPlayer.idleState];
+                    //
+                    self.videoPlayer.videoPlayerConfig.restoring = NO;
+                    break;
+                }
+                
+                case NSMVideoPlayerStatusFailed: {
+                    [self.videoPlayer transitionToState:self.videoPlayer.errorState];
+                    self.videoPlayer.videoPlayerConfig.restoring = NO;
+                    break;
+                }
+                
+                case NSMVideoPlayerStatusPaused:
+                case NSMVideoPlayerStatusPlayToEndTime:
+                case NSMVideoPlayerStatusPlaying: {
+                    if (self.videoPlayer.videoPlayerConfig.playerSource != nil) {
+                        [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+                        self.videoPlayer.videoPlayerConfig.restoring = NO;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            return YES;
+        }
+        
+        default:
+            return NO;
+    }
+}
+
 @end
 
 @implementation NSMPlayerIdleState
@@ -69,30 +131,6 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-        case NSMVideoPlayerActionPlay: {
-            if (self.videoPlayer.playerSource != nil) {
-                [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
-                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
-            } else {
-                [self.videoPlayer transitionToState:self.videoPlayer.errorState];
-                [self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"播放器还没有设定播放URL"}]];
-            }
-            return YES;
-        }
-        case NSMVideoPlayerEventTryToPrepared:
-        case NSMVideoPlayerEventReplacePlayerItem: {
-            if (self.videoPlayer.isAutoPlay) {
-                self.videoPlayer.intentToPlay = YES;
-                [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
-                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
-            } else if (self.videoPlayer.isPreload) {
-                [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
-                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
-            } else {
-                /*to do*/
-            }
-            return YES;
-        }
         
         default:
             return NO;
@@ -107,6 +145,7 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
     [super enter];
     self.videoPlayer.currentStatus = NSMVideoPlayerStatusFailed;
 }
+
 
 @end
 
@@ -130,6 +169,7 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
             return YES;
         }
 
+        case NSMVideoPlayerEventReplacePlayerItem:
         case NSMVideoPlayerEventTryToPrepared: {
             if (self.videoPlayer.playerSource == nil) {
                 [self.videoPlayer transitionToState:self.videoPlayer.idleState];
@@ -142,6 +182,12 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
                     [self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
                 }
             }
+            return YES;
+        }
+        
+        case NSMVideoPlayerActionSeek: {
+            [self.videoPlayer removeDeferredMessage:NSMVideoPlayerActionSeek];
+            [self.videoPlayer deferredMessage:message];
             return YES;
         }
         
@@ -167,12 +213,23 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
         }
         
         case NSMVideoPlayerEventCompleted: {
-            if (self.videoPlayer.isLoopPlayback) {
+            if (self.videoPlayer.videoPlayerConfig.isLoopPlayback) {
                 // 循环播放
                 [self.videoPlayer transitionToState:self.videoPlayer.playingState];
             } else {
                 [self.videoPlayer transitionToState:self.videoPlayer.completedState];
             }
+            return YES;
+        }
+        
+        case NSMVideoPlayerEventReplacePlayerItem: {
+            [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
+            [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
+            return YES;
+        }
+        
+        case NSMVideoPlayerActionSeek: {
+            [self.videoPlayer seekToTime:[message.userInfo doubleValue]];
             return YES;
         }
         
@@ -210,6 +267,17 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
     self.videoPlayer.currentStatus = NSMVideoPlayerStatusPlaying;
 }
 
+- (BOOL)processMessage:(NSMMessage *)message {
+    switch (message.messageType) {
+        case NSMVideoPlayerEventWaitingBufferToPlay: {
+            [self.videoPlayer transitionToState:self.videoPlayer.waitBufferingToPlayState];
+            return YES;
+        }
+        
+        default:
+            return NO;
+    }
+}
 @end
 
 @implementation NSMPlayerWaitBufferingToPlayState
@@ -219,6 +287,16 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
     self.videoPlayer.currentStatus = NSMVideoPlayerStatusWaitBufferingToPlay;
 }
 
+- (BOOL)processMessage:(NSMMessage *)message {
+    switch (message.messageType) {
+        case NSMVideoPlayerEventEnoughBufferToPlay: {
+            [self.videoPlayer transitionToState:self.videoPlayer.playingState];
+            return YES;
+        }
+        default:
+            return NO;
+    }
+}
 @end
 
 @implementation NSMPlayerPausedState
@@ -233,6 +311,11 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
         case NSMVideoPlayerActionPlay: {
             [self.videoPlayer transitionToState:self.videoPlayer.playingState];
             return YES;
+        }
+        
+        case NSMVideoPlayerActionSeek: {
+            [self.videoPlayer transitionToState:self.videoPlayer.playingState];
+            [self sendMessageWithType:message.messageType userInfo:message.userInfo];
         }
         
         default:
@@ -277,16 +360,13 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 
 @property (nonatomic, strong) NSThread *stateMachineRunLoopThread;
 @property (nonatomic, strong) NSMutableDictionary *players;
+@property (nonatomic, readwrite, strong) NSMVideoPlayerConfig *videoPlayerConfig;
 
 @end
 
 @implementation NSMVideoPlayer
 
-@synthesize playerSource = _playerSource;
-@synthesize preload = _preload;
-@synthesize autoPlay = _autoPlay;
 @synthesize duration = _duration;
-@synthesize loopPlayback = _loopPlayback;
 @synthesize currentStatus = _currentStatus;
 
 - (void)stateMachineRunLoopThreadThreadEntry {
@@ -299,20 +379,21 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
     }
 }
 
+
+#pragma mark - NSMVideoPlayerProtocol
+
 - (void)setPlayerSource:(NSMVideoPlayerControllerDataSource *)playerSource {
     NSAssert(playerSource.assetURL, @"playerSource.assetURL is nil");
-    if (![_playerSource.assetURL.absoluteString isEqualToString:playerSource.assetURL.absoluteString]) {
-        _playerSource = playerSource;
+    if (![self.videoPlayerConfig.playerSource.assetURL.absoluteString isEqualToString:playerSource.assetURL.absoluteString]) {
+        self.videoPlayerConfig.playerSource = playerSource;
         NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReplacePlayerItem];
         [self sendMessage:msg];
     }
 }
 
 - (NSMVideoPlayerControllerDataSource *)playerSource {
-    return _playerSource;
+    return self.videoPlayerConfig.playerSource;
 }
-
-#pragma mark - NSMVideoPlayerProtocol
 
 - (BFTask *)prepare {
     [self.underlyingPlayer setPlayerSource:self.playerSource];
@@ -377,39 +458,62 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
     [self.underlyingPlayer setRate:rate];
 }
 
-- (void)setAllowAllowWWAN:(BOOL)allow {
-    self.videoPlayerConfig.allowWWAN = allow;
+- (void)setAllowWWAN:(BOOL)allowWWAN {
     NSMMessage *msg = [[NSMMessage alloc] init];
     msg.messageType = NSMVideoPlayerEventAllowWWANChange;
     [self sendMessage:msg];
 }
 
 - (void)setLoopPlayback:(BOOL)loopPlayback {
-    if (_loopPlayback != loopPlayback) {
+    if (self.videoPlayerConfig.isLoopPlayback != loopPlayback) {
         [self.underlyingPlayer setLoopPlayback:loopPlayback];
         [self sendMessageType:NSMVideoPlayerEventLoopPlayback];
     }
 }
 
 - (void)setAutoPlay:(BOOL)autoPlay {
-    if (_autoPlay != autoPlay) {
-        _autoPlay = autoPlay;
+    if (self.videoPlayerConfig.isAutoPlay != autoPlay) {
+        self.videoPlayerConfig.autoPlay = autoPlay;
         [self sendMessageType:NSMVideoPlayerEventTryToPrepared];
     }
 }
 
 - (void)setPreload:(BOOL)preload {
-    if (_preload != preload) {
-        _preload = preload;
+    if (self.videoPlayerConfig.isPreload != preload) {
+        self.videoPlayerConfig.preload = preload;
         [self sendMessageType:NSMVideoPlayerEventTryToPrepared];
     }
 }
-- (void)resotrePlayerWithConfig:(NSMVideoPlayerConfig *)config {
+
+- (void)restorePlayerWithConfig:(NSMVideoPlayerConfig *)config {
     
+    if (!self.videoPlayerConfig.isRestoring) {
+        self.videoPlayerConfig.restoring = YES;
+        
+    } else {
+        // 正在恢复
+        self.videoPlayerConfig.playerSource = config.playerSource;
+        self.videoPlayerConfig.playerType = config.playerType;
+        self.videoPlayerConfig.autoPlay = config.isAutoPlay;
+        self.videoPlayerConfig.preload = config.isPreload;
+        self.videoPlayerConfig.loopPlayback = config.isLoopPlayback;
+        self.videoPlayerConfig.allowWWAN = config.isAllowWWAN;
+        self.videoPlayerConfig.muted = config.isMuted;
+        
+        [self sendMessageType:NSMVideoPlayerEventPlayerRestore];
+    }
 }
 
 - (NSMVideoPlayerConfig *)savePlayerState {
-    
+    if (self.videoPlayerConfig.restoring) {
+        return self.videoPlayerConfig;
+    } else {
+        NSMVideoPlayerConfig *config = [[NSMVideoPlayerConfig alloc] init];
+        if ([self isOnCurrentLevelWithLevel:NSMVideoPlayerStatusLevelReadyToPlay]) {
+            config.restoredStatus = self.intentToPlay ? NSMVideoPlayerStatusPlaying : NSMVideoPlayerStatusPaused;
+            
+        }
+    }
 }
 
 - (void)start {
@@ -456,7 +560,6 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 - (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType {
     if (self = [super init]) {
         self.videoPlayerConfig = [NSMVideoPlayerConfig videoPlayerConfig];
-        self.videoPlayerConfig.autoPlay = YES;
         self.players = [NSMutableDictionary dictionary];
         self.stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];
         [self.stateMachineRunLoopThread start];
@@ -531,10 +634,14 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 
 - (BOOL)shouldPlayWithWWAN {
     return YES;
-    if ([AFNetworkReachabilityManager sharedManager].isReachableViaWWAN && self.videoPlayerConfig.allowWWAN) {
+    if ([AFNetworkReachabilityManager sharedManager].isReachableViaWWAN && self.allowWWAN) {
         return YES;
     }
     return NO;
+}
+
+- (BOOL)isOnCurrentLevelWithLevel:(NSMVideoPlayerStatusLevel)level {
+    return (self.currentStatus & level);
 }
 
 - (void)setCurrentStatus:(NSMVideoPlayerStatus)currentStatus {

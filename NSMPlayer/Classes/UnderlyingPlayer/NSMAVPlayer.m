@@ -17,12 +17,13 @@
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) id timeObserverToken;
 @property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
-@property (nonatomic, assign) BOOL shouldLoopPlayback;
+//@property (nonatomic, assign) BOOL shouldLoopPlayback;
 
 @end
 
 @implementation NSMAVPlayer
 
+@synthesize loopPlayback = _loopPlayback;
 #pragma mark - Properties
 
 - (AVPlayer *)avplayer {
@@ -194,13 +195,6 @@
     return self.avplayer;
 }
 
-- (void)setLoopPlayback:(BOOL)loopPlayback {
-    self.shouldLoopPlayback = loopPlayback;
-}
-
-- (BOOL)isLoopPlayback {
-    return self.shouldLoopPlayback;
-}
 
 #pragma mark - - NSKeyValueObserving
 
@@ -247,7 +241,7 @@
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerDidPlayToEndTimeNotification object:self userInfo:nil];
-    if (self.shouldLoopPlayback) {
+    if (self.loopPlayback) {
         [self.avplayer seekToTime:kCMTimeZero];
     }
 }

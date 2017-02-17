@@ -7,8 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NSMVideoPlayerController.h"
 
 @protocol NSMVideoPlayerProtocol;
+
+@class NSMVideoPlayerControllerDataSource;
 
 @interface NSMVideoPlayerConfig : NSObject
 
@@ -24,5 +27,14 @@
 
 @property (assign, nonatomic, getter=isMuted) BOOL muted;
 
+@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *playerSource;
+
+@property (nonatomic, assign) NSMVideoPlayerType playerType;
+
+@property (nonatomic, strong) NSError *playerError;
+
+@property (nonatomic, assign) NSMVideoPlayerStatus restoredStatus;
+
+@property (assign, nonatomic, getter=isRestoring) BOOL restoring;
 
 @end

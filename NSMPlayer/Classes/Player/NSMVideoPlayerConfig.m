@@ -41,5 +41,4 @@ static NSString * const NSMVideoPlayerAllowMeteredNetworkKey = @"NSMVideoPlayerA
     return self;
 }
 
-
 @end

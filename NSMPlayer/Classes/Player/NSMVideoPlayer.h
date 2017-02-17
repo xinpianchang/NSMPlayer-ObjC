@@ -35,6 +35,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventRetry,
     NSMVideoPlayerEventAllowWWANChange,
     NSMVideoPlayerEventPlayerTypeChange,
+    NSMVideoPlayerEventPlayerRestore,
     
     NSMVideoPlayerActionPlay,
     NSMVideoPlayerActionPause,
@@ -105,7 +106,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
 
 @interface NSMVideoPlayer : NSMStateMachine <NSMVideoPlayerProtocol>
 
-@property (nonatomic, strong) NSMVideoPlayerConfig *videoPlayerConfig;
+@property (nonatomic, readonly, strong) NSMVideoPlayerConfig *videoPlayerConfig;
 
 @property (nonatomic, strong) id<NSMUnderlyingPlayerProtocol> underlyingPlayer;
 @property (nonatomic, strong) NSMStateMachine *stateMachine;
@@ -142,6 +143,12 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
  在 preparing 的时候接受到 Play/Pause 等 Event 时，需要记录用户<测试人员的>的 是否最终想要播放的一种意图。
  */
 @property (nonatomic, assign) BOOL intentToPlay;
+
+
+/**
+ 判断播放器是否处在某个状态层级中
+ */
+- (BOOL)isOnCurrentLevelWithLevel:(NSMVideoPlayerStatusLevel)level;
 
 @end
 

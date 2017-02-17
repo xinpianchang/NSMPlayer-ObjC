@@ -21,6 +21,20 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
     NSMVideoPlayerStatusPlayToEndTime = 1 << 7,//PlayBack to end time
 };
 
+typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
+    /** 播放器正在不能工作的状态下 */
+    NSMVideoPlayerStatusLevelUnworking = NSMVideoPlayerStatusFailed | NSMVideoPlayerStatusIdle,
+    
+    /** 播放器正在播放或者马上可以开始播放的状态下 */
+    NSMVideoPlayerStatusLevelPlayed = NSMVideoPlayerStatusPlaying | NSMVideoPlayerStatusWaitBufferingToPlay,
+    
+    /** 播放器正在停止播放状态 */
+    NSMVideoPlayerStatusLevelPaused = NSMVideoPlayerStatusPaused | NSMVideoPlayerStatusPlayToEndTime,
+    
+    /** 播放器处于初始化完成的状态下 */
+    NSMVideoPlayerStatusLevelReadyToPlay = NSMVideoPlayerStatusLevelPlayed | NSMVideoPlayerStatusLevelPaused,
+};
+
 @class BFTask, NSMVideoPlayerControllerDataSource;
 
 @protocol NSMPlayerProtocol <NSObject>
@@ -32,6 +46,7 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
 @property (assign, nonatomic, getter=isAutoPlay) BOOL autoPlay;
 @property (assign, nonatomic, getter=isLoopPlayback) BOOL loopPlayback;
 @property (nonatomic, assign) NSMVideoPlayerStatus currentStatus;
+@property (assign, nonatomic, getter=isAllowWWAN) BOOL allowWWAN;
 
 
 - (BFTask *)prepare;
@@ -55,11 +70,6 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
  */
 - (void)setRate:(CGFloat)rate;
 
-
-/**
- 是否允许3G网络进行播放
- */
-- (void)setAllowAllowWWAN:(BOOL)allow;
 
 @end
 

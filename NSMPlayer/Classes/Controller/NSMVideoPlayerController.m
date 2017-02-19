@@ -21,7 +21,8 @@
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
+        _videoPlayer = [[NSMVideoPlayer alloc] init];
+        [_videoPlayer setPlayerType:NSMVideoPlayerAVPlayer];
         [_videoPlayer setAutoPlay:YES];
     }
     return self;
@@ -30,7 +31,8 @@
 - (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
+        _videoPlayer = [[NSMVideoPlayer alloc] init];
+        [_videoPlayer setPlayerType:NSMVideoPlayerAVPlayer];
         [_videoPlayer setAutoPlay:YES];
     }
     return self;

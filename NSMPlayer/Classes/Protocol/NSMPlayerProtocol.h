@@ -10,6 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSUInteger, NSMVideoPlayerType) {
+    NSMVideoPlayerAVPlayer = 1,
+    NSMVideoPlayerIJKPlayer,
+};
+
 typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
     NSMVideoPlayerStatusInit = 1 << 0,
     NSMVideoPlayerStatusIdle = 1 << 1,// for poster?
@@ -19,6 +24,7 @@ typedef NS_OPTIONS(NSUInteger, NSMVideoPlayerStatus) {
     NSMVideoPlayerStatusWaitBufferingToPlay = 1 << 5,
     NSMVideoPlayerStatusPaused = 1 << 6, // Paused
     NSMVideoPlayerStatusPlayToEndTime = 1 << 7,//PlayBack to end time
+    NSMVideoPlayerStatusUnknown = 1 << 8,
 };
 
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
@@ -64,6 +70,8 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 
 @property (nonatomic, assign) NSMVideoPlayerStatus currentStatus;
 
+@property (nonatomic, assign) NSMVideoPlayerType playerType;
+
 @property (nonatomic, assign, getter=isAllowWWAN) BOOL allowWWAN;
 
 
@@ -72,7 +80,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 - (void)pause;
 - (void)seekToTime:(NSTimeInterval)seconds;
 - (void)releasePlayer;
-
 
 @end
 

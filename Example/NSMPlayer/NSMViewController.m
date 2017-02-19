@@ -59,7 +59,8 @@
 
 
 - (IBAction)retry:(UIButton *)sender {
-    [self.playerController.videoPlayer retry];
+    // resume
+//    [self.playerController.videoPlayer retry];
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
@@ -68,7 +69,7 @@
 
 - (IBAction)playerTypeChange:(UISwitch *)sender {
     if (sender.isOn) {
-        [self.playerController.videoPlayer choosePlayerWithType:NSMVideoPlayerAVPlayer];
+        self.playerController.videoPlayer.playerType = NSMVideoPlayerAVPlayer;
     } else {
         NSMPlayerLogDebug(@"IJKPlayer还没有添加");
     }
@@ -86,8 +87,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.loadProgress.progress = 0.5;
-    
-    
 }
 
 - (void)videoPlayerStatusDidChange {

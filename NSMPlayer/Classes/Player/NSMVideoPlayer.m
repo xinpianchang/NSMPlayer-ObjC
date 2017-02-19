@@ -14,6 +14,11 @@
 
 NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange";
 
+NSString * const NSMVideoPlayerOldStatusKey = @"NSMVideoPlayerOldStatusKey";
+
+NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
+
+
 @implementation NSMPlayerState
 
 - (NSMVideoPlayer *)videoPlayer {
@@ -451,6 +456,7 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 @synthesize volume = _volume;
 @synthesize allowWWAN = _allowWWAN;
 @synthesize playHeadTime = _playHeadTime;
+@synthesize playerType = _playerType;
 
 - (void)stateMachineRunLoopThreadThreadEntry {
     @autoreleasepool {
@@ -523,12 +529,6 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 - (void)choosePlayerWithType:(NSMVideoPlayerType)type {
     self.playerType = type;
 }
-
-- (void)retry {
-    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionRetry];
-    [self sendMessage:msg];
-}
-
 
 - (id)player {
     return self.underlyingPlayer.player;
@@ -696,10 +696,10 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
     [super start];
 }
 
-
-- (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType {
-    if (self = [super init]) {
-//        self.videoPlayerConfig = [NSMVideoPlayerConfig videoPlayerConfig];
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _currentStatus =  NSMVideoPlayerStatusUnknown;
         self.players = [NSMutableDictionary dictionary];
         self.stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];
         [self.stateMachineRunLoopThread start];
@@ -707,10 +707,10 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
         [self start];
         
         [self registerObserver];
-        self.playerType = playerType;
     }
     return self;
 }
+
 
 - (void)setPlayerType:(NSMVideoPlayerType)playerType {
     if (_playerType != playerType) {
@@ -786,9 +786,10 @@ NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange
 
 - (void)setCurrentStatus:(NSMVideoPlayerStatus)currentStatus {
     if (_currentStatus != currentStatus) {
+        NSMVideoPlayerStatus oldStatus = _currentStatus;
         _currentStatus = currentStatus;
         dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:NSMVideoPlayerStatusDidChange object:self userInfo:@(currentStatus)];
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMVideoPlayerStatusDidChange object:self userInfo:@{NSMVideoPlayerOldStatusKey : @(oldStatus), NSMVideoPlayerNewStatusKey : @(currentStatus)}];
         });
     }
 }
@@ -819,11 +820,82 @@ inline NSString *NSMVideoPlayerStatusDescription (NSMVideoPlayerStatus status) {
         case NSMVideoPlayerStatusPlayToEndTime: {
             return @"PlayToEndTime";
         }
+        
+        case NSMVideoPlayerStatusUnknown: {
+            return @"Unknown";
+        }
     }
 }
 
 inline NSString * NSMVideoPlayerMessageName (NSMVideoPlayerMessageType messageType) {
-    
+    switch (messageType) {
+        case NSMVideoPlayerEventReplacePlayerItem:
+            return @"EventReplacePlayerItem";
+        
+        case NSMVideoPlayerEventReadyToPlay:
+            return @"EventReadyToPlay";
+        
+        case NSMVideoPlayerEventPlay:
+            return @"EventPlay";
+        
+        case NSMVideoPlayerEventAdjustVolume:
+            return @"EventAdjustVolume";
+        
+        case NSMVideoPlayerEventAdjustRate:
+            return @"EventAdjustRate";
+        
+        case NSMVideoPlayerEventSetMuted:
+            return @"EventSetMuted";
+        
+        case NSMVideoPlayerEventPause:
+            return @"EventPause";
+        
+        case NSMVideoPlayerEventCompleted:
+            return @"EventCompleted";
+        
+        case NSMVideoPlayerEventLoopPlayback:
+            return @"EventLoopPlayback";
+        
+        case NSMVideoPlayerEventWaitingBufferToPlay:
+            return @"EventWaitingBufferToPlay";
+        
+        case NSMVideoPlayerEventEnoughBufferToPlay:
+            return @"EventEnoughBufferToPlay";
+        
+        case NSMVideoPlayerEventReleasePlayer:
+            return @"EventReleasePlayer";
+        
+        case NSMVideoPlayerEventSeek:
+            return @"EventSeek";
+        
+        case NSMVideoPlayerEventFailure:
+            return @"EventFailure";
+        
+        case NSMVideoPlayerEventAllowWWANChange:
+            return @"EventAllowWWANChange";
+        
+        case NSMVideoPlayerEventPlayerTypeChange:
+            return @"EventPlayerTypeChange";
+        
+        case NSMVideoPlayerEventPlayerRestore:
+            return @"EventPlayerRestore";
+
+        case NSMVideoPlayerEventPlayerRestorePrepare:
+            return @"EventPlayerRestorePrepare";
+
+        case NSMVideoPlayerActionPlay:
+            return @"ActionPlay";
+
+        case NSMVideoPlayerActionPause:
+            return @"ActionPause";
+
+        case NSMVideoPlayerActionReleasePlayer:
+            return @"ActionReleasePlayer";
+
+        case NSMVideoPlayerActionSeek:
+            return @"ActionSeek";
+        
+    }
 }
 
 @end

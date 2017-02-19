@@ -19,16 +19,20 @@ FOUNDATION_EXPORT NSString * NSMVideoPlayerStatusDescription (NSMVideoPlayerStat
 
 FOUNDATION_EXPORT NSString * const NSMVideoPlayerStatusDidChange;
 
+FOUNDATION_EXPORT NSString * const NSMVideoPlayerOldStatusKey;
+
+FOUNDATION_EXPORT NSString * const NSMVideoPlayerNewStatusKey;
+
 
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventReplacePlayerItem,
     NSMVideoPlayerEventTryToPrepared,
     NSMVideoPlayerEventReadyToPlay,
     NSMVideoPlayerEventPlay,
+    NSMVideoPlayerEventPause,
     NSMVideoPlayerEventAdjustVolume,
     NSMVideoPlayerEventAdjustRate,
     NSMVideoPlayerEventSetMuted,
-    NSMVideoPlayerEventPause,
     NSMVideoPlayerEventCompleted,
     NSMVideoPlayerEventLoopPlayback,
     NSMVideoPlayerEventWaitingBufferToPlay,
@@ -36,7 +40,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventReleasePlayer,
     NSMVideoPlayerEventSeek,
     NSMVideoPlayerEventFailure,
-    NSMVideoPlayerEventRetry,
     NSMVideoPlayerEventAllowWWANChange,
     NSMVideoPlayerEventPlayerTypeChange,
     NSMVideoPlayerEventPlayerRestore,
@@ -46,7 +49,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerActionPause,
     NSMVideoPlayerActionReleasePlayer,
     NSMVideoPlayerActionSeek,
-    NSMVideoPlayerActionRetry,
     
 };
 
@@ -115,31 +117,22 @@ FOUNDATION_EXPORT NSString * NSMVideoPlayerMessageName (NSMVideoPlayerMessageTyp
 
 @property (nonatomic, strong) id<NSMUnderlyingPlayerProtocol> underlyingPlayer;
 @property (nonatomic, strong) NSMStateMachine *stateMachine;
-
 @property (nonatomic, strong) NSMPlayerState *initialState;
-
 @property (nonatomic, strong) NSMPlayerState *unworkingState;
-
 @property (nonatomic, strong) NSMPlayerState *idleState;
 @property (nonatomic, strong) NSMPlayerState *errorState;
-
 @property (nonatomic, strong) NSMPlayerState *preparingState;
-
 @property (nonatomic, strong) NSMPlayerState *readyToPlayState;
-
 @property (nonatomic, strong) NSMPlayerState *playedState;
 @property (nonatomic, strong) NSMPlayerState *playingState;
 @property (nonatomic, strong) NSMPlayerState *waitBufferingToPlayState;
-
 @property (nonatomic, strong) NSMPlayerState *pausedState;
 @property (nonatomic, strong) NSMPlayerState *pausingState;
 @property (nonatomic, strong) NSMPlayerState *completedState;
 
-@property (nonatomic, assign) NSMVideoPlayerType playerType;
 
 @property (nonatomic, strong) NSError *playerError;
 
-- (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType NS_DESIGNATED_INITIALIZER;
 - (void)setupUnderlyingPlayerWithPlayerType:(NSMVideoPlayerType)playerType;
 
 - (BOOL)shouldPlayWithWWAN;
@@ -155,7 +148,6 @@ FOUNDATION_EXPORT NSString * NSMVideoPlayerMessageName (NSMVideoPlayerMessageTyp
  */
 - (BOOL)isOnCurrentLevelWithLevel:(NSMVideoPlayerStatusLevel)level;
 
-//@property (nonatomic, assign, getter = isRestoring) BOOL restoring;
 @property (nonatomic, strong) NSMVideoPlayerConfig *tempRestoringConfig;
 
 @end

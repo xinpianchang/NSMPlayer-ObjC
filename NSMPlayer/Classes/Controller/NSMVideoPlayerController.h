@@ -12,10 +12,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, NSMVideoPlayerType) {
-    NSMVideoPlayerAVPlayer = 1,
-    NSMVideoPlayerIJKPlayer,
-};
 
 @protocol NSMVideoPlayerViewProtocol;
 
@@ -23,8 +19,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerType) {
 
 @protocol NSMVideoPlayerProtocol <NSMPlayerProtocol>
 
-- (void)choosePlayerWithType:(NSMVideoPlayerType)type;
-- (void)retry;
 - (void)restorePlayerWithConfig:(NSMVideoPlayerConfig *)config;
 - (NSMVideoPlayerConfig *)savePlayerState;
 

@@ -17,15 +17,15 @@
 
 + (instancetype)videoPlayerConfig;
 
-@property (assign, nonatomic, getter=isAllowWWAN) BOOL allowWWAN;
+@property (nonatomic, assign, getter=isAllowWWAN) BOOL allowWWAN;
 
-@property (assign, nonatomic, getter=isLoopPlayback) BOOL loopPlayback;
+@property (nonatomic, assign, getter=isLoopPlayback) BOOL loopPlayback;
 
-@property (assign, nonatomic, getter=isAutoPlay) BOOL autoPlay;
+@property (nonatomic, assign, getter=isAutoPlay) BOOL autoPlay;
 
-@property (assign, nonatomic, getter=isPreload) BOOL preload;
+@property (nonatomic, assign, getter=isPreload) BOOL preload;
 
-@property (assign, nonatomic, getter=isMuted) BOOL muted;
+@property (nonatomic, assign, getter=isMuted) BOOL muted;
 
 @property (nonatomic, strong) NSMVideoPlayerControllerDataSource *playerSource;
 
@@ -35,6 +35,15 @@
 
 @property (nonatomic, assign) NSMVideoPlayerStatus restoredStatus;
 
-@property (assign, nonatomic, getter=isRestoring) BOOL restoring;
+@property (nonatomic, assign, getter=isRestoring) BOOL restoring;
+
+@property (nonatomic, assign, getter=isIntentToPlay) BOOL intentToPlay;
+
+@property (nonatomic, assign) long playHeadTime;
+
+@property (nonatomic, assign) CGFloat rate;
+
+@property (nonatomic, assign) CGFloat volume;
+
 
 @end

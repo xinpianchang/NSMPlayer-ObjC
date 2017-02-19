@@ -21,14 +21,11 @@ static const DDLogLevel NSMPlayerLogLevel = DDLogLevelVerbose;
 
 #define NSM_PLAYER_LOG_CONTEXT 1025
 
-#define NSMSMLogError(frmt, ...)   LOG_MAYBE(NO,                LOG_LEVEL_DEF, DDLogFlagError,   NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
-#define NSMSMLogWarn(frmt, ...)    LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagWarning, NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
-#define NSMSMLogInfo(frmt, ...)    LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagInfo,    NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
-#define NSMSMLogDebug(frmt, ...)   LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagDebug,   NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
-#define NSMSMLogVerbose(frmt, ...) LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagVerbose, NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
+#define NSMPlayerLogError(frmt, ...)   LOG_MAYBE(NO,                LOG_LEVEL_DEF, DDLogFlagError,   NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
+#define NSMPlayerLogWarn(frmt, ...)    LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagWarning, NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
+#define NSMPlayerLogInfo(frmt, ...)    LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagInfo,    NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
+#define NSMPlayerLogDebug(frmt, ...)   LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagDebug,   NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
+#define NSMPlayerLogVerbose(frmt, ...) LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagVerbose, NSM_PLAYER_LOG_CONTEXT, nil, __PRETTY_FUNCTION__, LOG_PREFIX frmt, ##__VA_ARGS__)
 
 #endif /* NSMPlayerLogging_h */
 
-@interface NSMPlayerLogging : NSObject
-
-@end

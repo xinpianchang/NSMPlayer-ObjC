@@ -7,12 +7,16 @@
 //
 
 #import "NSMAppDelegate.h"
+#import "NSMPlayerLogging.h"
+#import <CocoaLumberjack/CocoaLumberjack.h>
 
 @implementation NSMAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    NSMPlayerLogDebug(@"didFinishLaunchingWithOptions");
+    
     return YES;
 }
 

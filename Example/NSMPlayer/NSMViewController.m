@@ -12,6 +12,7 @@
 #import "NSMVideoSourceController.h"
 #import "NSMVideoPlayerControllerDataSource.h"
 #import "NSMVideoPlayer.h"
+#import "NSMPlayerLogging.h"
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 
@@ -69,7 +70,7 @@
     if (sender.isOn) {
         [self.playerController.videoPlayer choosePlayerWithType:NSMVideoPlayerAVPlayer];
     } else {
-        NSLog(@"IJKPlayer还没有添加");
+        NSMPlayerLogDebug(@"IJKPlayer还没有添加");
     }
 }
 

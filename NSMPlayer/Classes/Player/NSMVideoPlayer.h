@@ -15,15 +15,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-FOUNDATION_EXPORT NSString *NSMVideoPlayerStatusDescription (NSMVideoPlayerStatus status);
+FOUNDATION_EXPORT NSString * NSMVideoPlayerStatusDescription (NSMVideoPlayerStatus status);
 
 FOUNDATION_EXPORT NSString * const NSMVideoPlayerStatusDidChange;
+
 
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventReplacePlayerItem,
     NSMVideoPlayerEventTryToPrepared,
     NSMVideoPlayerEventReadyToPlay,
     NSMVideoPlayerEventPlay,
+    NSMVideoPlayerEventAdjustVolume,
+    NSMVideoPlayerEventAdjustRate,
+    NSMVideoPlayerEventSetMuted,
     NSMVideoPlayerEventPause,
     NSMVideoPlayerEventCompleted,
     NSMVideoPlayerEventLoopPlayback,
@@ -36,6 +40,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventAllowWWANChange,
     NSMVideoPlayerEventPlayerTypeChange,
     NSMVideoPlayerEventPlayerRestore,
+    NSMVideoPlayerEventPlayerRestorePrepare,
     
     NSMVideoPlayerActionPlay,
     NSMVideoPlayerActionPause,
@@ -44,6 +49,8 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerActionRetry,
     
 };
+
+FOUNDATION_EXPORT NSString * NSMVideoPlayerMessageName (NSMVideoPlayerMessageType messageType);
 
 @class NSMStateMachine, NSMVideoPlayer;
 
@@ -106,8 +113,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
 
 @interface NSMVideoPlayer : NSMStateMachine <NSMVideoPlayerProtocol>
 
-@property (nonatomic, readonly, strong) NSMVideoPlayerConfig *videoPlayerConfig;
-
 @property (nonatomic, strong) id<NSMUnderlyingPlayerProtocol> underlyingPlayer;
 @property (nonatomic, strong) NSMStateMachine *stateMachine;
 
@@ -132,7 +137,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
 
 @property (nonatomic, assign) NSMVideoPlayerType playerType;
 
-@property (nonatomic, readonly, strong) NSError *playerError;
+@property (nonatomic, strong) NSError *playerError;
 
 - (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType NS_DESIGNATED_INITIALIZER;
 - (void)setupUnderlyingPlayerWithPlayerType:(NSMVideoPlayerType)playerType;
@@ -149,6 +154,9 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
  判断播放器是否处在某个状态层级中
  */
 - (BOOL)isOnCurrentLevelWithLevel:(NSMVideoPlayerStatusLevel)level;
+
+//@property (nonatomic, assign, getter = isRestoring) BOOL restoring;
+@property (nonatomic, strong) NSMVideoPlayerConfig *tempRestoringConfig;
 
 @end
 

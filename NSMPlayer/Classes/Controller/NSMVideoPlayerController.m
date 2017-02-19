@@ -54,4 +54,5 @@
     [self.videoPlayer setPlayerSource:playerSource];
     _assetURL = assetURL;
 }
+
 @end

@@ -11,13 +11,13 @@
 #import "NSMVideoAssetInfo.h"
 #import "NSMAVPlayerView.h"
 #import "NSMPlayerProtocol.h"
+#import "NSMPlayerLogging.h"
 
 @interface NSMAVPlayer ()
 
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) id timeObserverToken;
 @property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
-//@property (nonatomic, assign) BOOL shouldLoopPlayback;
 
 @end
 
@@ -130,7 +130,7 @@
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
     self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
         NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
-        NSLog(@"currenTimeInterval : %.2f",currenTimeInterval);
+        NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
         [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
     }];
 }
@@ -179,12 +179,24 @@
     self.avplayer.volume = volume;
 }
 
+- (CGFloat)volume {
+    return self.avplayer.volume;
+}
+
 - (void)setMuted:(BOOL)on {
     self.avplayer.muted = on;
 }
 
+- (BOOL)isMuted {
+    return self.avplayer.isMuted;
+}
+
 - (void)setRate:(CGFloat)rate {
     self.avplayer.rate = rate;
+}
+
+- (CGFloat)rate {
+    return self.avplayer.rate;
 }
 
 - (long)duration {
@@ -203,7 +215,7 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"status"]) {
         //POST
-        NSLog(@"currentItem status %@",@(self.avplayer.currentItem.status));
+        NSMPlayerLogDebug(@"currentItem status %@",@(self.avplayer.currentItem.status));
         if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
             //Prepared finish
             if (self.prepareSouce && !self.prepareSouce.task.isCompleted) {
@@ -213,7 +225,7 @@
             }
         } else if (AVPlayerItemStatusFailed == self.avplayer.currentItem.status) {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
-            NSLog(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
+            NSMPlayerLogDebug(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : self.avplayer.error}];
         }
     } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
@@ -223,7 +235,7 @@
             CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
             CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
             CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
-            NSLog(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
+            NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
         }
         
@@ -248,7 +260,7 @@
 
 - (void)playerItemFailedToPlayToEndTime:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
-    NSLog(@"%@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
+    NSMPlayerLogDebug(@"%@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
 }
 
 - (void)dealloc {
@@ -297,5 +309,8 @@
     return nil;
 }
 
+- (long)playHeadTime {
+    return CMTimeGetSeconds(self.avplayer.currentTime);
+}
 
 @end

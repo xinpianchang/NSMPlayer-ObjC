@@ -1,5 +1,5 @@
 //
-//  NSMVideoPlayerConfig.h
+//  NSMPlayerRestoration.h
 //  Pods
 //
 //  Created by chengqihan on 2017/2/16.
@@ -11,11 +11,11 @@
 
 @protocol NSMVideoPlayerProtocol;
 
-@class NSMVideoPlayerControllerDataSource;
+@class NSMPlayerAsset;
 
-@interface NSMVideoPlayerConfig : NSObject
+@interface NSMPlayerRestoration : NSObject
 
-+ (instancetype)videoPlayerConfig;
+//+ (instancetype)videoPlayerRestoration;
 
 @property (nonatomic, assign, getter=isAllowWWAN) BOOL allowWWAN;
 
@@ -27,7 +27,7 @@
 
 @property (nonatomic, assign, getter=isMuted) BOOL muted;
 
-@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *playerSource;
+@property (nonatomic, strong) NSMPlayerAsset *playerAsset;
 
 @property (nonatomic, assign) NSMVideoPlayerType playerType;
 

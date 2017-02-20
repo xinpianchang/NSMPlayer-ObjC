@@ -34,6 +34,7 @@
 
 @property (nonatomic, assign) NSInteger messageType;
 @property (nonatomic, strong) id userInfo;
+@property (nonatomic, copy) NSString *messageDescription;
 
 + (instancetype)messageWithType:(NSInteger)type;
 + (instancetype)messageWithType:(NSInteger)type userInfo:(id)userInfo;

@@ -85,6 +85,7 @@
     [self setupInitialStateStack];
     
     NSMMessage *msg = [NSMMessage messageWithType:NSMMessageTypeActionInit];
+    msg.messageDescription = @"Init";
     [self addOperationAtFrontOfQueue:msg];
 }
 
@@ -129,7 +130,7 @@
         //        VMStateMachineLogger(@"未初始化");
     }
     [self performTransitions:msgProcessedState message:message];
-    NSMSMLogDebug(@">>>>>>>>>>>>>>>>>>任务%@------------结束------------\n\n",@(message.messageType));
+    NSMSMLogDebug(@">>>>>>>>>>>>>>>>>>任务%@------------结束------------\n\n",message.messageDescription);
     
 //    NSAssert(self.handlerDelegate != nil, @"StateMachine is nil");
     if ([self.handlerDelegate respondsToSelector:@selector(smHandlerProcessFinalMessage:)]) {
@@ -162,7 +163,7 @@
             if (tempDestState != self.destState) {
                 tempDestState = self.destState;
             } else {
-                NSMSMLogDebug(@"状态切换成 %@",[self.destState getName]);
+                NSMSMLogDebug(@"状态切换成 %@", self.destState);
                 break;
             }
         }
@@ -232,12 +233,12 @@
     NSString *log = @"构建需要Enter的State的临时状态栈:\n[";
     do {
         //2、首先将目的状态存放至临时状态栈中
-        log = [log stringByAppendingFormat:@"index:%zd state:%@,\n active:%@",_tempStateStackCount,[destStateInfo.state getName],destStateInfo.active?@"激活过了":@"未激活"];
+        log = [log stringByAppendingFormat:@"index:%zd state:%@,\n active:%@",_tempStateStackCount, destStateInfo.state, destStateInfo.active ? @"激活过了" : @"未激活"];
         self.tempStateStack[_tempStateStackCount++] = destStateInfo;
         destStateInfo = destStateInfo.parentStateInfo;
         //3、如果目的状态有父状态,并且父状态没有active的话,继续做第二步的事情
     } while (destStateInfo != nil && !(destStateInfo.active));
-    NSMSMLogDebug(@"%@ destStateInfo:%@ state:%@ active:%@]\n",log,destStateInfo,[destStateInfo.state getName],[destStateInfo active]?@"激活过了":@"未激活");
+    NSMSMLogDebug(@"%@ destStateInfo:%@ state:%@ active:%@]\n", log, destStateInfo, destStateInfo.state, [destStateInfo active] ? @"激活过了" : @"未激活");
     return destStateInfo;
     
 }
@@ -249,7 +250,7 @@
         NSMMessage *msg = self.deferredMessages[i];
         
         NSMStateInfo *topStackStateInfo = self.stateStack[_stateStackTopIndex];
-        NSMSMLogDebug(@"currentState: %@ ------即将优先处理的消息---%@",[[topStackStateInfo state] getName], @(msg.messageType));
+        NSMSMLogDebug(@"currentState: %@ ------即将优先处理的消息---%@", topStackStateInfo.state, msg.messageDescription);
         [self addOperationAtFrontOfQueue:msg];
     }
     [self.deferredMessages removeAllObjects];
@@ -260,7 +261,7 @@
  */
 - (NSMState *)processMsg:(NSMMessage *)msg {
     NSMStateInfo *curStateInfo = self.stateStack[_stateStackTopIndex];
-    NSMSMLogDebug(@">>>>curState:%@------EVENT:---%@",[[curStateInfo state] getName], @(msg.messageType));
+    NSMSMLogDebug(@">>>>curState:%@------EVENT:---%@", curStateInfo.state, msg.messageDescription);
     if ([self isQuit:msg]) {
         NSAssert(self.handlerDelegate != nil, @"StateMachine is nil");
         [self transitionToState:self.handlerDelegate.quittingState];
@@ -268,7 +269,7 @@
         while (![curStateInfo.state processMessage:msg]) {
             if (curStateInfo.parentStateInfo != nil) {
                 curStateInfo = curStateInfo.parentStateInfo;
-                NSMSMLogDebug(@">>>>>>curState's ParentState:%@------EVENT:---%@",[[curStateInfo state] getName], @(msg.messageType));
+                NSMSMLogDebug(@">>>>>>curState's ParentState:%@------EVENT:---%@", curStateInfo.state, msg.messageDescription);
             }else {
                 [self unhandledMessage:msg];
                 break;
@@ -355,7 +356,7 @@
  *  @param state 目的状态
  */
 - (void)transitionToState:(NSMState *)state {
-    NSMSMLogDebug(@"状态机的目的状态切换成 %@",[state getName]);
+    NSMSMLogDebug(@"状态机的目的状态切换成 %@", state);
     self.destState = state;
 }
 
@@ -364,6 +365,7 @@
  */
 - (void)quitNow {
     NSMMessage *msg = [NSMMessage messageWithType:NSMMessageTypeActionQuit userInfo:self];
+    msg.messageDescription = @"Quit";
     [self addOperationAtFrontOfQueue:msg];
 }
 

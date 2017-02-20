@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "NSMPlayerProtocol.h"
+#import "NSMUnderlyingPlayerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,21 +45,9 @@ FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey;//NSVal
 //// notification userInfo key                                                                    type
 //AVF_EXPORT NSString *const AVPlayerItemFailedToPlayToEndTimeErrorKey     NS_AVAILABLE(10_7, 4_3);   // NSError
 
-@protocol NSMVideoPlayerViewProtocol;
-
-@class NSMVideoAssetInfo, BFTask, NSMVideoPlayerControllerDataSource;
-
-@protocol NSMUnderlyingPlayerProtocol <NSMPlayerProtocol>
-
-
-//- (void)replacePlayerItemWithURL:(NSURL *)url;
-
-@end
 
 @interface NSMUnderlyingPlayer : NSObject <NSMUnderlyingPlayerProtocol>
 
-@property (nonatomic, strong) NSURL *playerURL;
-//- (instancetype)initWithAssetURL:(NSURL *)assetURL NS_DESIGNATED_INITIALIZER;
 
 @end
 

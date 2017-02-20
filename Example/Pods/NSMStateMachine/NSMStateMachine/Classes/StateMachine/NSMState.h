@@ -20,8 +20,8 @@
 - (void)enter;
 - (void)exit;
 - (BOOL)processMessage:(NSMMessage *)message;
-- (NSString *)getName;
 
+- (void)sendMessage:(NSMMessage *)message;
 - (void)sendMessageWithType:(NSInteger)type;
 - (void)sendMessageWithType:(NSInteger)type userInfo:(id)obj;
 - (void)deferredMessage:(NSMMessage *)message;

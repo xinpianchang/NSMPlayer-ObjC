@@ -1,14 +1,14 @@
 //
-//  NSMStateMachineLogging.m
+//  NSMPlayerLogging.m
 //  Pods
 //
-//  Created by chengqihan on 2017/2/14.
+//  Created by chengqihan on 2017/2/20.
 //
 //
 
-#import "NSMStateMachineLogging.h"
+#import "NSMPlayerLogging.h"
 
-@implementation NSMStateMachineLogging
+@implementation NSMPlayerLogging
 
 + (DDLog *)sharedLog {
     static DDLog *sharedLog = nil;

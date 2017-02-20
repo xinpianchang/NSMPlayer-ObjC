@@ -12,15 +12,16 @@
 
 #import "NSMVideoPlayerController.h"
 #import "NSMPlayerLogging.h"
+#import "NSMPlayerAsset.h"
 #import "NSMVideoAssetInfo.h"
-#import "NSMVideoPlayerControllerDataSource.h"
+#import "NSMPlayerRestoration.h"
 #import "NSMVideoPlayer.h"
-#import "NSMVideoPlayerConfig.h"
 #import "NSMPlayerAccessoryView.h"
 #import "NSMPlayerAccessoryViewDelegate.h"
 #import "NSMPlayerAccessoryViewProtocol.h"
 #import "NSMAVPlayerView.h"
 #import "NSMPlayerProtocol.h"
+#import "NSMVideoPlayerProtocol.h"
 #import "NSMAVPlayer.h"
 #import "NSMUnderlyingPlayer.h"
 

@@ -7,7 +7,7 @@
 //
 
 #import "NSMVideoSourceController.h"
-#import "NSMVideoPlayerControllerDataSource.h"
+#import "NSMPlayerAsset.h"
 
 @interface NSMVideoSourceController ()
 
@@ -92,11 +92,11 @@
 */
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    if ([self.delegate respondsToSelector:@selector(videoSourceControllerDidSelectedVideoDataSource:)]) {
+    if ([self.delegate respondsToSelector:@selector(videoSourceControllerDidSelectedPlayerItem:)]) {
         NSString *urlstring = self.urls[indexPath.row];
-        NSMVideoPlayerControllerDataSource *videoSource = [[NSMVideoPlayerControllerDataSource alloc] init];
-        videoSource.assetURL = [NSURL URLWithString:urlstring];
-        [self.delegate videoSourceControllerDidSelectedVideoDataSource:videoSource];
+        NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
+        playerAsset.assetURL = [NSURL URLWithString:urlstring];
+        [self.delegate videoSourceControllerDidSelectedPlayerItem:playerAsset];
         [self dismissViewControllerAnimated:YES completion:nil];
     }
 }

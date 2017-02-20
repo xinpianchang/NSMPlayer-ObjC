@@ -11,18 +11,9 @@
 #import <NSMStateMachine/NSMStateMachine.h>
 #import "NSMUnderlyingPlayer.h"
 #import "NSMVideoPlayerController.h"
-#import "NSMVideoPlayerConfig.h"
+#import "NSMPlayerRestoration.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-FOUNDATION_EXPORT NSString * NSMVideoPlayerStatusDescription (NSMVideoPlayerStatus status);
-
-FOUNDATION_EXPORT NSString * const NSMVideoPlayerStatusDidChange;
-
-FOUNDATION_EXPORT NSString * const NSMVideoPlayerOldStatusKey;
-
-FOUNDATION_EXPORT NSString * const NSMVideoPlayerNewStatusKey;
-
 
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventReplacePlayerItem,
@@ -52,7 +43,16 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     
 };
 
-FOUNDATION_EXPORT NSString * NSMVideoPlayerMessageName (NSMVideoPlayerMessageType messageType);
+FOUNDATION_EXPORT NSString * NSMVideoPlayerStatusDescription (NSMVideoPlayerStatus status);
+
+FOUNDATION_EXPORT  NSString * NSMVideoPlayerMessageDescription (NSMVideoPlayerMessageType messageType);
+
+FOUNDATION_EXPORT NSString * const NSMVideoPlayerStatusDidChange;
+
+FOUNDATION_EXPORT NSString * const NSMVideoPlayerOldStatusKey;
+
+FOUNDATION_EXPORT NSString * const NSMVideoPlayerNewStatusKey;
+
 
 @class NSMStateMachine, NSMVideoPlayer;
 
@@ -129,13 +129,10 @@ FOUNDATION_EXPORT NSString * NSMVideoPlayerMessageName (NSMVideoPlayerMessageTyp
 @property (nonatomic, strong) NSMPlayerState *pausedState;
 @property (nonatomic, strong) NSMPlayerState *pausingState;
 @property (nonatomic, strong) NSMPlayerState *completedState;
-
-
 @property (nonatomic, strong) NSError *playerError;
+@property (nullable, nonatomic, strong) NSMPlayerRestoration *tempRestoringConfig;
 
-- (void)setupUnderlyingPlayerWithPlayerType:(NSMVideoPlayerType)playerType;
 
-- (BOOL)shouldPlayWithWWAN;
 
 /**
  在 preparing 的时候接受到 Play/Pause 等 Event 时，需要记录用户<测试人员的>的 是否最终想要播放的一种意图。
@@ -148,7 +145,11 @@ FOUNDATION_EXPORT NSString * NSMVideoPlayerMessageName (NSMVideoPlayerMessageTyp
  */
 - (BOOL)isOnCurrentLevelWithLevel:(NSMVideoPlayerStatusLevel)level;
 
-@property (nonatomic, strong) NSMVideoPlayerConfig *tempRestoringConfig;
+- (void)setupUnderlyingPlayerWithPlayerType:(NSMVideoPlayerType)playerType;
+
+- (BOOL)shouldPlayWithWWAN;
+
+- (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType NS_DESIGNATED_INITIALIZER;
 
 @end
 

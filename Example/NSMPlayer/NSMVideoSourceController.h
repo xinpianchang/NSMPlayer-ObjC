@@ -8,11 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@class NSMVideoPlayerControllerDataSource;
+@class NSMPlayerAsset;
 
 @protocol NSMVideoSourceControllerDelegate <NSObject>
 
-- (void)videoSourceControllerDidSelectedVideoDataSource:(NSMVideoPlayerControllerDataSource *)url;
+- (void)videoSourceControllerDidSelectedPlayerItem:(NSMPlayerAsset *)url;
 
 @end
 

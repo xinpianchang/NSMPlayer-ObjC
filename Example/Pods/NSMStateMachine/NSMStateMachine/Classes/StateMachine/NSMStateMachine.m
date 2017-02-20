@@ -34,7 +34,7 @@ NSInteger const NSMMessageTypeActionInit = -2;
 
 @implementation NSMStateMachine
 
-- (void) initialState:(NSMState *)state {
+- (void)initialState:(NSMState *)state {
     [self.smHandler setInitialState:state];
 }
 
@@ -108,11 +108,9 @@ NSInteger const NSMMessageTypeActionInit = -2;
 
 - (void)sendMessageFront:(NSMMessage *)message {
     [self.smHandler addOperationAtFrontOfQueue:message];
-    
 }
 
 - (void)sendMessageFrontType:(NSInteger)type {
-    
     [self.smHandler addOperationAtFrontOfQueue:[NSMMessage messageWithType:type]];
 }
 

@@ -10,7 +10,7 @@
 #import <NSMPlayer/NSMVideoPlayerController.h>
 #import <Masonry/Masonry.h>
 #import "NSMVideoSourceController.h"
-#import "NSMVideoPlayerControllerDataSource.h"
+#import "NSMPlayerAsset.h"
 #import "NSMVideoPlayer.h"
 #import "NSMPlayerLogging.h"
 
@@ -22,10 +22,12 @@
 @property (weak, nonatomic) IBOutlet UISlider *volumSlider;
 @property (weak, nonatomic) IBOutlet UISlider *playHeadSlider;
 @property (weak, nonatomic) IBOutlet UIProgressView *loadProgress;
+@property (nonatomic, strong) NSMPlayerRestoration *saveConfig;
 
 @end
 
 @implementation NSMViewController
+
 - (IBAction)chooseSource:(UIBarButtonItem *)sender {
     NSMVideoSourceController *meauVC = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"source"];
     meauVC.delegate = self;
@@ -37,17 +39,20 @@
 }
 
 - (IBAction)allowMobileNetworkChange:(UISwitch *)sender {
+    [self.playerController.videoPlayer setAllowWWAN:sender.isOn];
 }
 
 - (IBAction)ciclePlayChange:(UISwitch *)sender {
+    [self.playerController.videoPlayer setLoopPlayback:sender.isOn];
 }
 
 - (IBAction)mutedChange:(UISwitch *)sender {
+    [self.playerController.videoPlayer setMuted:sender.isOn];
 }
 
 
 - (IBAction)volumChange:(UISlider *)sender {
-    
+    [self.playerController.videoPlayer setVolume:sender.value];
 }
 - (IBAction)play:(UIButton *)sender {
     [self.playerController.videoPlayer play];
@@ -58,9 +63,14 @@
 }
 
 
-- (IBAction)retry:(UIButton *)sender {
-    // resume
-//    [self.playerController.videoPlayer retry];
+- (IBAction)releasePlayer:(UIButton *)sender {
+    NSMPlayerRestoration *saveConfig = [self.playerController.videoPlayer savePlayerState];
+    self.saveConfig = saveConfig;
+    [self.playerController.videoPlayer releasePlayer];
+}
+
+- (IBAction)restore:(UIButton *)sender {
+    [self.playerController.videoPlayer restorePlayerWithConfig:self.saveConfig];
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
@@ -71,7 +81,7 @@
     if (sender.isOn) {
         self.playerController.videoPlayer.playerType = NSMVideoPlayerAVPlayer;
     } else {
-        NSMPlayerLogDebug(@"IJKPlayer还没有添加");
+        NSLog(@"IJKPlayer还没有添加");
     }
 }
 
@@ -97,7 +107,9 @@
     if ([segue.identifier isEqualToString:@"videoPlayer"]) {
         NSMVideoPlayerController *playerController = segue.destinationViewController;
         if ([playerController isKindOfClass:[NSMVideoPlayerController class]]) {
-            playerController.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
+            NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
+            playerAsset.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
+            [playerController.videoPlayer setPlayerAsset:playerAsset];
             self.playerController = playerController;
         }
     }
@@ -105,9 +117,8 @@
 
 #pragma mark - NSMVideoSourceControllerDelegate
 
-- (void)videoSourceControllerDidSelectedVideoDataSource:(NSMVideoPlayerControllerDataSource *)dataSource {
-    
-    [self.playerController.videoPlayer setPlayerSource:dataSource];
+- (void)videoSourceControllerDidSelectedPlayerItem:(NSMPlayerAsset *)playerAsset {
+    [self.playerController.videoPlayer setPlayerAsset:playerAsset];
 }
 
 @end

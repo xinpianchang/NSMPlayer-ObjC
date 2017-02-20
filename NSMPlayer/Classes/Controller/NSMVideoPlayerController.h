@@ -7,29 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "NSMVideoPlayerControllerDataSource.h"
-#import "NSMPlayerProtocol.h"
+#import "NSMPlayerAsset.h"
+#import "NSMVideoPlayerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-
-@protocol NSMVideoPlayerViewProtocol;
-
-@class NSMVideoPlayerControllerDataSource, NSMVideoPlayerConfig;
-
-@protocol NSMVideoPlayerProtocol <NSMPlayerProtocol>
-
-- (void)restorePlayerWithConfig:(NSMVideoPlayerConfig *)config;
-- (NSMVideoPlayerConfig *)savePlayerState;
-
-@end
 
 @interface NSMVideoPlayerController : UIViewController
 
 @property (nonatomic, strong) id <NSMVideoPlayerProtocol> videoPlayer;
-
-@property (nonatomic, strong) NSURL *assetURL;
-
 
 @end
 

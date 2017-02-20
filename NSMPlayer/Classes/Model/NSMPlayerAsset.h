@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSMVideoPlayerControllerDataSource : NSObject
+@interface NSMPlayerAsset : NSObject
 
 @property (nonatomic, strong) NSURL *assetURL;
 

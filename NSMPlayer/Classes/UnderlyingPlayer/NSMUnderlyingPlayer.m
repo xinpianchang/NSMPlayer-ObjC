@@ -7,7 +7,7 @@
 //
 
 #import "NSMUnderlyingPlayer.h"
-#import "NSMVideoPlayerControllerDataSource.h"
+#import "NSMPlayerAsset.h"
 
 NSString * const NSMUnderlyingPlayerErrorDomain = @"NSMUnderlyingPlayerErrorDomain";
 
@@ -35,6 +35,22 @@ NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey = @"NSMUnderlyingPlayerEr
 
 @implementation NSMUnderlyingPlayer
 
+@synthesize duration = _duration;
+@synthesize currentStatus = _currentStatus;
+//@synthesize currentAsset = _currentAsset;
+@synthesize loopPlayback = _loopPlayback;
+@synthesize autoPlay = _autoPlay;
+@synthesize preload = _preload;
+@synthesize muted = _muted;
+@synthesize rate = _rate;
+@synthesize volume = _volume;
+@synthesize allowWWAN = _allowWWAN;
+@synthesize playHeadTime = _playHeadTime;
+@synthesize playerType = _playerType;
+
+- (id)player {
+    return nil;
+}
 //- (instancetype)initWithAssetURL:(NSURL *)assetURL {
 //    self = [super init];
 //    if (self) {
@@ -43,9 +59,9 @@ NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey = @"NSMUnderlyingPlayerEr
 //    return self;
 //}
 
-- (void)setPlayerSource:(NSMVideoPlayerControllerDataSource *)playerSource {
-    _playerURL = playerSource.assetURL;
-}
+//- (void)setPlayerSource:(NSMVideoPlayerControllerDataSource *)playerSource {
+//    _playerURL = playerSource.assetURL;
+//}
 #pragma clang diagnostic pop
 
 @end

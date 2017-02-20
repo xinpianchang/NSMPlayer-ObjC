@@ -39,9 +39,6 @@
     return NO;
 }
 
--(NSString *)getName {
-    return NSStringFromClass(self.class);
-}
 
 #pragma mark - Send Message
 
@@ -53,6 +50,10 @@
 - (void)sendMessageWithType:(NSInteger)type userInfo:(id)obj {
     NSMMessage *message = [NSMMessage messageWithType:type];
     message.userInfo = obj;
+    [self.stateMachine sendMessage:message];
+}
+
+- (void)sendMessage:(NSMMessage *)message {
     [self.stateMachine sendMessage:message];
 }
 

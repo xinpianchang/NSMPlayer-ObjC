@@ -100,39 +100,5 @@
     return self;
 }
 
-//- (instancetype)initWithType:(MessageType)type obj:(id)object {
-//    return [self initWithType:type subType:0 code:0 obj:object];
-//}
-//
-//+ (instancetype)messageWithType:(MessageType)type obj:(id)object {
-//    return  [[self alloc] initWithType:type obj:object];
-//}
-//
-//+ (instancetype)messageWithType:(MessageType)type {
-//    return [[self alloc] initWithType:type subType:0 code:0 obj:nil];
-//}
-//
-//- (instancetype)initWithType:(MessageType)type {
-//    return [self initWithType:type subType:0 code:0 obj:nil];
-//}
-//
-//+ (instancetype)messageWithType:(MessageType)type subType:(int)subType code:(int)code obj:(id)object {
-//    return [[self alloc] initWithType:type subType:subType code:code obj:object];
-//}
-//
-//- (instancetype)initWithType:(MessageType)type subType:(int)subType code:(int)code obj:(id)object {
-//    if (self == [super init]) {
-//        _type = type;
-//        _subType = subType;
-//        _code = code;
-//        _obj = object;
-//    }
-//    return self;
-//}
-
-//- (NSString *)description {
-//    return [NSString stringWithFormat:@"type:%zd subType:%d code:%d id:%@",_type,_subType,_code,_obj];
-//}
-
 @end
 

@@ -41,12 +41,14 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
     NSMVideoPlayerStatusLevelReadyToPlay = NSMVideoPlayerStatusLevelPlayed | NSMVideoPlayerStatusLevelPaused,
 };
 
-@class BFTask, NSMVideoPlayerControllerDataSource;
+@class BFTask, NSMPlayerAsset;
 
 @protocol NSMPlayerProtocol <NSObject>
 
 @property (nonatomic, readonly, strong) id player;
-@property (nonatomic, strong) NSMVideoPlayerControllerDataSource *playerSource;
+
+@property (nonatomic, readonly, strong) NSMPlayerAsset *currentAsset;
+
 @property (nonatomic, assign) long duration;
 @property (nonatomic, assign) long playHeadTime;
 
@@ -80,6 +82,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 - (void)pause;
 - (void)seekToTime:(NSTimeInterval)seconds;
 - (void)releasePlayer;
+- (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset;
 
 @end
 

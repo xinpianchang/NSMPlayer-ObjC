@@ -6,8 +6,8 @@
 //
 //
 
-#import "NSMVideoPlayerControllerDataSource.h"
+#import "NSMPlayerAsset.h"
 
-@implementation NSMVideoPlayerControllerDataSource
+@implementation NSMPlayerAsset
 
 @end

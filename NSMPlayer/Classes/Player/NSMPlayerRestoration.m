@@ -1,12 +1,12 @@
 //
-//  NSMVideoPlayerConfig.m
+//  NSMPlayerRestoration.m
 //  Pods
 //
 //  Created by chengqihan on 2017/2/16.
 //
 //
 
-#import "NSMVideoPlayerConfig.h"
+#import "NSMPlayerRestoration.h"
 #import "NSMVideoPlayerController.h"
 #import "AFNetworkReachabilityManager.h"
 
@@ -21,13 +21,13 @@ static NSString * const NSMVideoPlayerAutoPlayKey = @"NSMVideoPlayerAutoPlayKey"
 static NSString * const NSMVideoPlayerAllowMeteredNetworkKey = @"NSMVideoPlayerAllowMeteredNetworkKey";
 
 
-@interface NSMVideoPlayerConfig ()
+@interface NSMPlayerRestoration ()
 
 @property (nonatomic, strong) NSMutableDictionary *configs;
 
 @end
 
-@implementation NSMVideoPlayerConfig
+@implementation NSMPlayerRestoration
 
 + (instancetype)videoPlayerConfig {
     return [[self alloc] init];

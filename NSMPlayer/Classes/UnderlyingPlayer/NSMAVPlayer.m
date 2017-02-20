@@ -8,22 +8,25 @@
 
 #import "NSMAVPlayer.h"
 #import <Bolts/Bolts.h>
-#import "NSMVideoAssetInfo.h"
 #import "NSMAVPlayerView.h"
 #import "NSMPlayerProtocol.h"
 #import "NSMPlayerLogging.h"
+#import "NSMPlayerAsset.h"
+#import "NSMVideoAssetInfo.h"
 
 @interface NSMAVPlayer ()
 
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) id timeObserverToken;
 @property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
+@property (nonatomic, strong) NSMPlayerAsset *currentAsset;
 
 @end
 
 @implementation NSMAVPlayer
 
 @synthesize loopPlayback = _loopPlayback;
+
 #pragma mark - Properties
 
 - (AVPlayer *)avplayer {
@@ -130,7 +133,7 @@
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
     self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
         NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
-        NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
+        //NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
         [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
     }];
 }
@@ -142,8 +145,21 @@
  Preparing an Asset for Use
  If you want to prepare an asset for playback, you should load its tracks property
  */
+- (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset {
+    self.currentAsset = asset;
+}
+
+
+- (void)setLoopPlayback:(BOOL)loopPlayback {
+    _loopPlayback = loopPlayback;
+}
+
+- (BOOL)isLoopPlayback {
+    return _loopPlayback;
+}
+
 - (BFTask *)prepare {
-    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.playerURL options:nil];
+    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.currentAsset.assetURL options:nil];
     self.asset = asset;
     return [self asynchronouslyLoadURLAsset:asset];
 }
@@ -171,6 +187,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self removeCurrentItemObserver];
         [self removeTimeObserverToken];
+        [self.avplayer replaceCurrentItemWithPlayerItem:nil];
         self.avplayer = nil;
     });
 }
@@ -235,7 +252,7 @@
             CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
             CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
             CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
-            NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
+            //NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
         }
         

@@ -21,8 +21,7 @@
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _videoPlayer = [[NSMVideoPlayer alloc] init];
-        [_videoPlayer setPlayerType:NSMVideoPlayerAVPlayer];
+        _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
         [_videoPlayer setAutoPlay:YES];
     }
     return self;
@@ -31,8 +30,7 @@
 - (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _videoPlayer = [[NSMVideoPlayer alloc] init];
-        [_videoPlayer setPlayerType:NSMVideoPlayerAVPlayer];
+        _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
         [_videoPlayer setAutoPlay:YES];
     }
     return self;
@@ -51,10 +49,9 @@
 }
 
 - (void)setAssetURL:(NSURL *)assetURL {
-    NSMVideoPlayerControllerDataSource *playerSource = [[NSMVideoPlayerControllerDataSource alloc] init];
-    playerSource.assetURL = assetURL;
-    [self.videoPlayer setPlayerSource:playerSource];
-    _assetURL = assetURL;
+    NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
+    playerAsset.assetURL = assetURL;
+    [self.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 }
 
 @end

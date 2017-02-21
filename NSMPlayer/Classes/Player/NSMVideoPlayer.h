@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventReplacePlayerItem,
-    NSMVideoPlayerEventTryToPrepared,
+    NSMVideoPlayerEventStartPreparing,
     NSMVideoPlayerEventPreparingCompleted,
     NSMVideoPlayerEventPlay,
     NSMVideoPlayerEventPause,
@@ -40,7 +40,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerActionPause,
     NSMVideoPlayerActionReleasePlayer,
     NSMVideoPlayerActionSeek,
-    
 };
 
 FOUNDATION_EXPORT NSString * NSMVideoPlayerStatusDescription (NSMVideoPlayerStatus status);

@@ -30,13 +30,6 @@
 
 #pragma mark - Properties
 
-- (AVPlayer *)avplayer {
-    if (!_avplayer) {
-        _avplayer = [[AVPlayer alloc] init];
-    }
-    return _avplayer;
-}
-
 // Will attempt load and test these asset keys before playing
 + (NSArray *)assetKeysRequiredToPlay {
     return @[@"tracks", @"playable", @"hasProtectedContent"];
@@ -185,7 +178,7 @@
     [self.avplayer seekToTime:time];
 }
 
-- (NSTimeInterval)playHeadTime {
+- (NSTimeInterval)currentTime {
     return CMTimeGetSeconds(self.avplayer.currentTime);
 }
 

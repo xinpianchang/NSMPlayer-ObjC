@@ -67,10 +67,12 @@
     NSMPlayerRestoration *saveConfig = [self.playerController.videoPlayer savePlayerState];
     self.saveConfig = saveConfig;
     [self.playerController.videoPlayer releasePlayer];
+    NSLog(@"releasePlayer");
 }
 
 - (IBAction)restore:(UIButton *)sender {
     [self.playerController.videoPlayer restorePlayerWithConfig:self.saveConfig];
+    NSLog(@"restore");
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {

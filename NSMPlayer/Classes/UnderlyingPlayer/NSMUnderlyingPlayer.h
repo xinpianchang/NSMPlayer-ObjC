@@ -18,24 +18,26 @@ FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerDidPlayToEndTimeNotificatio
 
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerFailedNotification;
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification;
+//FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification;
 
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyNotification;
 
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification;
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlayheadDidChangeNotification;
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackStallingNotification;
+
+//FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlayheadDidChangeNotification;
 
 // notification userInfo key
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey;
+//FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey;
 
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerErrorKey;// NSError
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey;//NSValue [CMTimeRange]
+//FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey;//NSValue [CMTimeRange]
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey;// NSNumber BOOL
+//FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey;// NSNumber BOOL
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey;// NSNumber BOOL
+//FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey;// NSNumber BOOL
 
 
 

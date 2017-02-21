@@ -48,8 +48,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 
 @property (nonatomic, readonly, strong) NSMPlayerAsset *currentAsset;
 
-@property (nonatomic, assign) NSTimeInterval duration;
-
 @property (nonatomic, assign, getter=isPreload) BOOL preload;
 @property (nonatomic, assign, getter=isAutoPlay) BOOL autoPlay;
 @property (nonatomic, assign, getter=isLoopPlayback) BOOL loopPlayback;
@@ -83,6 +81,8 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 - (NSTimeInterval)seekTime;
 - (void)seekToTime:(NSTimeInterval)seconds;
 - (NSTimeInterval)currentTime;
+- (CGFloat)bufferPercentage;
+- (NSTimeInterval)duration;
 - (void)releasePlayer;
 - (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset;
 - (NSMPlayerAsset *)currentAsset;

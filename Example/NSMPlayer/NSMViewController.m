@@ -23,6 +23,8 @@
 @property (weak, nonatomic) IBOutlet UISlider *playHeadSlider;
 @property (weak, nonatomic) IBOutlet UIProgressView *loadProgress;
 @property (nonatomic, strong) NSMPlayerRestoration *saveConfig;
+@property (weak, nonatomic) IBOutlet UILabel *durationLabel;
+@property (weak, nonatomic) IBOutlet UILabel *currentTimeLabel;
 
 @end
 
@@ -76,7 +78,7 @@
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
-    [self.playerController.videoPlayer seekToTime:sender.value * 200];
+    [self.playerController.videoPlayer seekToTime:sender.value];
 }
 
 - (IBAction)playerTypeChange:(UISwitch *)sender {
@@ -98,11 +100,23 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.loadProgress.progress = 0.5;
+    self.playHeadSlider.continuous = NO;
+    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateView) userInfo:nil repeats:YES];
 }
 
 - (void)videoPlayerStatusDidChange {
+    [self updateView];
+}
+
+- (void)updateView {
+    NSTimeInterval douration = self.playerController.videoPlayer.duration;
+    NSInteger wholeMinutes = (int)trunc(douration / 60);
+    self.durationLabel.text = [NSString stringWithFormat:@"%ld:%02ld", wholeMinutes, (int)trunc(douration) - wholeMinutes * 60];
+    
     self.playerStateLabel.text = NSMVideoPlayerStatusDescription(self.playerController.videoPlayer.currentStatus);
+    self.playHeadSlider.maximumValue = self.playerController.videoPlayer.duration;
+    self.playHeadSlider.value = self.playerController.videoPlayer.currentTime;
+    self.loadProgress.progress = self.playerController.videoPlayer.bufferPercentage;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

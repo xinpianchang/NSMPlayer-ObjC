@@ -21,17 +21,19 @@ NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyNotification = @"NSMUnderl
 
 NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification = @"NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification";
 
-NSString *const NSMUnderlyingPlayerPlayheadDidChangeNotification = @"NSMUnderlyingPlayerPlayheadDidChangeNotification";
+NSString *const NSMUnderlyingPlayerPlaybackStallingNotification = @"NSMUnderlyingPlayerPlaybackStallingNotification";
 
-NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey = @"NSMUnderlyingPlayerPeriodicPlayTimeChangeKey";
+//NSString *const NSMUnderlyingPlayerPlayheadDidChangeNotification = @"NSMUnderlyingPlayerPlayheadDidChangeNotification";
+
+//NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey = @"NSMUnderlyingPlayerPeriodicPlayTimeChangeKey";
 
 NSString *const NSMUnderlyingPlayerErrorKey = @"NSMUnderlyingPlayerErrorKey";
 
-NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey = @"NSMUnderlyingPlayerErrorKey";
+//NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey = @"NSMUnderlyingPlayerErrorKey";
 
-NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey = @"NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey";
+//NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey = @"NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey";
 
-NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey = @"NSMUnderlyingPlayerPlaybackBufferEmptyKey";
+//NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey = @"NSMUnderlyingPlayerPlaybackBufferEmptyKey";
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wprotocol"
@@ -39,7 +41,7 @@ NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey = @"NSMUnderlyingPlaye
 
 @implementation NSMUnderlyingPlayer
 
-@dynamic duration, currentStatus, currentAsset, loopPlayback, autoPlay, preload, muted, rate, volume, allowWWAN, playerType, playerView;
+@dynamic currentStatus, currentAsset, loopPlayback, autoPlay, preload, muted, rate, volume, allowWWAN, playerType, playerView;
 
 #pragma clang diagnostic pop
 

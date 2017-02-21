@@ -16,10 +16,11 @@
 
 @interface NSMAVPlayer () {
     NSMPlayerAsset *_currentAsset;
+    CGFloat _bufferPercentage;
 }
 
 @property (nonatomic, strong) AVURLAsset *asset;
-@property (nonatomic, strong) id timeObserverToken;
+//@property (nonatomic, strong) id timeObserverToken;
 @property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
 
 @end
@@ -102,13 +103,13 @@
     AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:asset];
     // ensure that this is done before the playerItem is associated with the player
     //inspect whether if paused <rate == 0>
-    [playerItem addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionInitial context:nil];
-    [playerItem addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionInitial context:nil];
-    [playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionInitial context:nil];
+    
+    [playerItem addObserver:self forKeyPath:@"status" options:0 context:nil];
+    [playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:0 context:nil];
     
     //waitingBufferToPlay
-    [playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionInitial context:nil];
-    [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionInitial context:nil];
+    [playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:0 context:nil];
+    [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:0 context:nil];
     
     //playToEndTime
     /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
@@ -116,26 +117,31 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemFailedToPlayToEndTime:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:playerItem];
     
     
-    [self removeTimeObserverToken];
+//    [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
     
     if (self.avplayer == nil) {
         self.avplayer = [[AVPlayer alloc] init];
+        [self.avplayer addObserver:self forKeyPath:@"rate" options:0 context:nil];
     }
+    
     
     [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
     
     // Invoke callback every one second
     __weak __typeof(self) weakself = self;
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
-    self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
-        NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
-        //NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
-        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
-    }];
+//    self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
+//        NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
+//        //NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
+//        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
+//    }];
 }
 
-
+- (CGFloat)bufferPercentage {
+    NSMPlayerLogInfo(@"bufferPercentage == %@",@(_bufferPercentage));
+    return _bufferPercentage;
+}
 #pragma mark - NSMUnderlyingPlayerProtocol
 
 /**
@@ -179,7 +185,12 @@
 }
 
 - (NSTimeInterval)currentTime {
-    return CMTimeGetSeconds(self.avplayer.currentTime);
+    if (self.avplayer) {
+        NSTimeInterval currentTime = CMTimeGetSeconds(self.avplayer.currentTime);
+        NSMPlayerLogInfo(@"currentTime == %@",@(currentTime));
+        return currentTime;
+    }
+    return 0;
 }
 
 /**
@@ -189,8 +200,9 @@
 - (void)releasePlayer {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self removeCurrentItemObserver];
-        [self removeTimeObserverToken];
+//        [self removeTimeObserverToken];
         [self.avplayer replaceCurrentItemWithPlayerItem:nil];
+        [self.avplayer removeObserver:self forKeyPath:@"rate" context:nil];
         self.avplayer = nil;
     });
 }
@@ -220,7 +232,11 @@
 }
 
 - (NSTimeInterval)duration {
-    return CMTimeGetSeconds(self.avplayer.currentItem.duration);
+    if (self.avplayer) {
+        NSMPlayerLogDebug(@"duration == %@",@(CMTimeGetSeconds(self.avplayer.currentItem.duration)));
+        return CMTimeGetSeconds(self.avplayer.currentItem.duration);
+    }
+    return 0;
 }
 
 - (void)setPlayerView:(id<NSMVideoPlayerViewProtocol>)playerView {
@@ -255,16 +271,33 @@
             CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
             CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
             NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
-            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
+            _bufferPercentage = (rangeStartSeconds + rangeDurationSeconds) / self.duration;
+//            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
         }
         
     } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
         //indicates that playback has consumed all buffered media and that playback will stall or end
-        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:@{NSMUnderlyingPlayerPlaybackBufferEmptyKey: @(self.avplayer.currentItem.playbackBufferEmpty)}];
+        if (self.avplayer.currentItem.isPlaybackBufferEmpty) {
+            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
+        } else {
+            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
+        }
         
     } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
         //Indicates whether the item will likely play through without stalling
-        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:@{NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey : @(self.avplayer.currentItem.playbackLikelyToKeepUp)}];
+        if (self.avplayer.currentItem.isPlaybackLikelyToKeepUp) {
+            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:nil];
+        } else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
+            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
+        }
+    } else if ([keyPath isEqualToString:@"rate"]) {
+//        NSMPlayerLogDebug(@"rateChange");
+        if (self.avplayer.rate == 0) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackStallingNotification object:self userInfo:nil];
+        }
     }
 }
 
@@ -283,20 +316,20 @@
 }
 
 - (void)dealloc {
-    [self removeTimeObserverToken];
+//    [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)removeTimeObserverToken {
-    if (self.timeObserverToken) {
-        /*
-         * 只能保证调用下面方法的时候，只能保证这个方法 - (id)addPeriodicTimeObserverForInterval:(CMTime)interval queue:(dispatch_queue_t)queue usingBlock:(void (^)(CMTime time))block 中的block不会被再次触发，而不能保证已经触发的 block 中断执行，可以用这个做到 dispatch_sync(queue, ^{} 。
-         */
-        [self.avplayer removeTimeObserver:self.timeObserverToken];
-        self.timeObserverToken = nil;
-    }
-}
+//- (void)removeTimeObserverToken {
+//    if (self.timeObserverToken) {
+//        /*
+//         * 只能保证调用下面方法的时候，只能保证这个方法 - (id)addPeriodicTimeObserverForInterval:(CMTime)interval queue:(dispatch_queue_t)queue usingBlock:(void (^)(CMTime time))block 中的block不会被再次触发，而不能保证已经触发的 block 中断执行，可以用这个做到 dispatch_sync(queue, ^{} 。
+//         */
+//        [self.avplayer removeTimeObserver:self.timeObserverToken];
+//        self.timeObserverToken = nil;
+//    }
+//}
 
 - (void)removeCurrentItemObserver {
     if (self.avplayer.currentItem) {
@@ -305,7 +338,7 @@
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:nil];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty" context:nil];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
-        [self.avplayer.currentItem removeObserver:self forKeyPath:@"rate" context:nil];
+        //[self.avplayer.currentItem removeObserver:self forKeyPath:@"rate" context:nil];
     }
 }
 

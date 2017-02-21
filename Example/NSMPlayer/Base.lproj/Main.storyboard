@@ -66,13 +66,13 @@
                                     </label>
                                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1th-jT-y7U">
                                         <rect key="frame" x="109" y="94" width="250" height="2"/>
-                                        <color key="progressTintColor" red="1" green="0.067145067530000005" blue="0.018148933740000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="progressTintColor" red="1" green="0.067145067530000005" blue="0.018148933740000001" alpha="0.25069285168195721" colorSpace="calibratedRGB"/>
                                         <color key="trackTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     </progressView>
                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="LSo-du-3If">
                                         <rect key="frame" x="107" y="80" width="254" height="31"/>
-                                        <color key="minimumTrackTintColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
-                                        <color key="maximumTrackTintColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        <color key="minimumTrackTintColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="maximumTrackTintColor" red="0.93725490199999995" green="0.93725490199999995" blue="0.95686274510000002" alpha="0.5" colorSpace="custom" customColorSpace="sRGB"/>
                                         <color key="thumbTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <connections>
                                             <action selector="playHeaderChange:" destination="whP-gf-Uak" eventType="valueChanged" id="ZOR-Jr-l4W"/>
@@ -93,6 +93,19 @@
                                             <action selector="volumChange:" destination="whP-gf-Uak" eventType="valueChanged" id="GYL-ph-FqN"/>
                                         </connections>
                                     </slider>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ars-o5-vML">
+                                        <rect key="frame" x="317" y="58" width="42" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K4m-2b-Yuu">
+                                        <rect key="frame" x="267" y="59" width="42" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" red="0.32588868570000001" green="0.85201371469999998" blue="0.54446071299999999" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -103,6 +116,7 @@
                                     <constraint firstItem="o2i-sA-Xma" firstAttribute="leading" secondItem="qNc-GM-rsO" secondAttribute="leading" constant="18" id="Jyf-9M-J73"/>
                                     <constraint firstAttribute="bottom" secondItem="Yey-Wn-T3Y" secondAttribute="bottom" constant="31" id="Lht-j8-Kzq"/>
                                     <constraint firstItem="A1Z-yS-ibe" firstAttribute="centerY" secondItem="o2i-sA-Xma" secondAttribute="centerY" id="MEm-rY-e2Y"/>
+                                    <constraint firstAttribute="trailing" secondItem="ars-o5-vML" secondAttribute="trailing" constant="16" id="RQZ-ae-aYC"/>
                                     <constraint firstItem="qRc-rb-yzK" firstAttribute="leading" secondItem="A1Z-yS-ibe" secondAttribute="leading" id="Rd2-mN-IBg"/>
                                     <constraint firstItem="1th-jT-y7U" firstAttribute="centerY" secondItem="LSo-du-3If" secondAttribute="centerY" id="Smi-sh-zoP"/>
                                     <constraint firstItem="Yey-Wn-T3Y" firstAttribute="leading" secondItem="o2i-sA-Xma" secondAttribute="leading" id="Tg1-No-t8j"/>
@@ -115,6 +129,7 @@
                                     <constraint firstItem="08R-Xm-o9l" firstAttribute="leading" secondItem="LSo-du-3If" secondAttribute="leading" id="hxo-9N-Kh2"/>
                                     <constraint firstItem="08R-Xm-o9l" firstAttribute="leading" secondItem="qRc-rb-yzK" secondAttribute="leading" id="jqU-vQ-Ooz"/>
                                     <constraint firstItem="DzA-po-xE6" firstAttribute="leading" secondItem="o2i-sA-Xma" secondAttribute="leading" id="mUf-n9-4uM"/>
+                                    <constraint firstItem="LSo-du-3If" firstAttribute="top" secondItem="ars-o5-vML" secondAttribute="bottom" constant="1" id="oBp-rr-Ujz"/>
                                     <constraint firstItem="Hx7-Ly-TsF" firstAttribute="leading" secondItem="o2i-sA-Xma" secondAttribute="leading" id="oYZ-Fl-xcu"/>
                                     <constraint firstItem="DzA-po-xE6" firstAttribute="top" secondItem="o2i-sA-Xma" secondAttribute="bottom" constant="17" id="r9I-yg-O0p"/>
                                     <constraint firstItem="LSo-du-3If" firstAttribute="top" secondItem="qRc-rb-yzK" secondAttribute="bottom" constant="3" id="tPw-fI-h9U"/>
@@ -242,6 +257,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="currentTimeLabel" destination="K4m-2b-Yuu" id="gXL-7q-NFg"/>
+                        <outlet property="durationLabel" destination="ars-o5-vML" id="vk3-Am-0CT"/>
                         <outlet property="loadProgress" destination="1th-jT-y7U" id="ttV-f7-pf7"/>
                         <outlet property="playHeadSlider" destination="LSo-du-3If" id="nT9-ij-ks3"/>
                         <outlet property="playerStateLabel" destination="A1Z-yS-ibe" id="Opm-aq-g9Q"/>

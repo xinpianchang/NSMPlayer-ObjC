@@ -78,7 +78,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 - (BFTask *)prepare;
 - (void)play;
 - (void)pause;
-- (NSTimeInterval)seekTime;
 - (void)seekToTime:(NSTimeInterval)seconds;
 - (NSTimeInterval)currentTime;
 - (CGFloat)bufferPercentage;

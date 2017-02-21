@@ -34,6 +34,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventAllowWWANChange,
     NSMVideoPlayerEventPlayerTypeChange,
     NSMVideoPlayerEventPlayerRestore,
+    NSMVideoPlayerEventPlayerStartRestorePrepare,
     NSMVideoPlayerEventReplacePlayerView,
     
     NSMVideoPlayerActionPlay,

@@ -140,10 +140,9 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                 case NSMVideoPlayerStatusPlaying: {
                     if (self.videoPlayer.currentAsset != nil) {
                         [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
-                        NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventStartPreparing];
+                        NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerStartRestorePrepare userInfo:message.userInfo];
                         msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                         [self sendMessage:msg];
-//                        [self sendMessageWithType:NSMVideoPlayerEventPlayerRestorePrepare];
                         self.videoPlayer.tempRestoringConfig = nil;
                     }
                     break;
@@ -253,22 +252,24 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             return YES;
         }
         
-//        case NSMVideoPlayerEventPlayerRestorePrepare: {
-//            if (self.videoPlayer.playerSource == nil) {
-//                [self.videoPlayer transitionToState:self.videoPlayer.idleState];
-//            } else {
-//                if ([self.videoPlayer shouldPlayWithWWAN]) {
-//                    // 是否允许 3G/4G网络播放
-//                    [self.videoPlayer prepare];
-//                } else {
-//                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
-//                    msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
-//                    [self sendMessage:msg];
-//                    //[self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
-//                }
-//            }
-//            return YES;
-//        }
+        case NSMVideoPlayerEventPlayerStartRestorePrepare: {
+            if (self.videoPlayer.currentAsset == nil) {
+                [self.videoPlayer transitionToState:self.videoPlayer.idleState];
+            } else {
+                if ([self.videoPlayer shouldPlayWithWWAN]) {
+                    // 是否允许 3G/4G网络播放
+                    [self.videoPlayer prepare];
+                    NSMPlayerRestoration *restoration = message.userInfo;
+                    [self.videoPlayer seekToTime:restoration.seekTime];
+                } else {
+                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
+                    msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
+                    [self sendMessage:msg];
+                    //[self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
+                }
+            }
+            return YES;
+        }
         default:
             return NO;
     }
@@ -284,7 +285,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     self.videoPlayer.underlyingPlayer.rate = self.videoPlayer.rate;
     self.videoPlayer.underlyingPlayer.volume = self.videoPlayer.volume;
     self.videoPlayer.underlyingPlayer.muted = self.videoPlayer.isMuted;
-    [self.videoPlayer.underlyingPlayer seekToTime:[self.videoPlayer seekTime]];
     [self.videoPlayer.underlyingPlayer setPlayerView:[self.videoPlayer playerView]];
 }
 
@@ -485,7 +485,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 @interface NSMVideoPlayer () {
     NSMPlayerAsset *_currentAsset;
-    NSTimeInterval _seekTime;
 }
 
 @property (nonatomic, strong) NSThread *stateMachineRunLoopThread;
@@ -549,7 +548,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 - (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset {
     NSAssert(asset.assetURL, @"playerSource.assetURL is nil");
     if (![self.currentAsset.assetURL.absoluteString isEqualToString:asset.assetURL.absoluteString]) {
-        _seekTime = 0;
         _currentAsset = asset;
         NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReplacePlayerItem];
         msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
@@ -614,7 +612,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 }
 
 - (void)seekToTime:(NSTimeInterval)time {
-    _seekTime = time;
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionSeek userInfo:@(time)];
     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
     [self sendMessage:msg];
@@ -680,17 +677,10 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     }
 }
 
-- (NSTimeInterval)seekTime {
-    return _seekTime;
-}
-
 - (NSTimeInterval)duration {
     return self.underlyingPlayer.duration;
 }
 
-//- (NSTimeInterval)bufferInterval {
-//    return <#expression#>
-//}
 
 - (void)restorePlayerWithConfig:(NSMPlayerRestoration *)config {
     
@@ -704,7 +694,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         _muted = config.isMuted;
         _volume = config.volume;
         _rate = config.rate;
-        _seekTime = config.seekTime;
         
         NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerRestore userInfo:config];
         msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);

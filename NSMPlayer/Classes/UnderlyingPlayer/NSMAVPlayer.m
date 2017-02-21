@@ -233,7 +233,7 @@
 
 - (NSTimeInterval)duration {
     if (self.avplayer) {
-        NSMPlayerLogDebug(@"duration == %@",@(CMTimeGetSeconds(self.avplayer.currentItem.duration)));
+        NSMPlayerLogDebug(@"duration == %@ currentItem == %@", @(CMTimeGetSeconds(self.avplayer.currentItem.duration)), self.avplayer.currentItem);
         return CMTimeGetSeconds(self.avplayer.currentItem.duration);
     }
     return 0;

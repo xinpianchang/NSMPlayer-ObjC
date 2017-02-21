@@ -136,50 +136,44 @@
                                     <constraint firstItem="Yey-Wn-T3Y" firstAttribute="top" secondItem="Hx7-Ly-TsF" secondAttribute="bottom" constant="12" id="zSe-Bo-2wc"/>
                                 </constraints>
                             </view>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="abK-s2-TbZ">
-                                <rect key="frame" x="163" y="449" width="51" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="abK-s2-TbZ">
+                                <rect key="frame" x="163" y="452" width="51" height="31"/>
                                 <connections>
                                     <action selector="allowMobileNetworkChange:" destination="whP-gf-Uak" eventType="valueChanged" id="KF0-zg-ybt"/>
                                 </connections>
                             </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="允许移动网络播放" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iAI-Cm-Wrk">
-                                <rect key="frame" x="16" y="454" width="139" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="允许移动网络播放" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iAI-Cm-Wrk">
+                                <rect key="frame" x="16" y="457" width="139" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="xhg-ag-M8A">
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="xhg-ag-M8A">
                                 <rect key="frame" x="163" y="483" width="51" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <action selector="ciclePlayChange:" destination="whP-gf-Uak" eventType="valueChanged" id="IC2-3b-meU"/>
                                 </connections>
                             </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="是否循环播放" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8lt-wD-wxA">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="是否循环播放" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8lt-wD-wxA">
                                 <rect key="frame" x="16" y="488" width="104" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="evY-U4-zxd">
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="evY-U4-zxd">
                                 <rect key="frame" x="163" y="517" width="51" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <action selector="mutedChange:" destination="whP-gf-Uak" eventType="valueChanged" id="UI4-RI-viw"/>
                                 </connections>
                             </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="是否静音" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zSq-Ay-fXA">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="是否静音" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zSq-Ay-fXA">
                                 <rect key="frame" x="16" y="522" width="70" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WuC-nO-nRk">
-                                <rect key="frame" x="253" y="445" width="31" height="30"/>
+                                <rect key="frame" x="292" y="479" width="31" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <state key="normal" title="播放">
@@ -212,22 +206,20 @@
                                     <action selector="releasePlayer:" destination="whP-gf-Uak" eventType="touchUpInside" id="KVM-bF-VlW"/>
                                 </connections>
                             </button>
-                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zzz-KM-SKc">
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Zzz-KM-SKc">
                                 <rect key="frame" x="163" y="551" width="51" height="31"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <action selector="playerTypeChange:" destination="whP-gf-Uak" eventType="valueChanged" id="QDT-QP-aIn"/>
                                 </connections>
                             </switch>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="是否选择AVPlayer" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xRv-b5-yHf">
-                                <rect key="frame" x="17" y="556" width="138" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="是否选择AVPlayer" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xRv-b5-yHf">
+                                <rect key="frame" x="16" y="556" width="138" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N5Z-JE-gOm">
-                                <rect key="frame" x="253" y="551" width="30" height="29"/>
+                                <rect key="frame" x="293" y="519" width="30" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.95277372220000001" green="1" blue="0.1108428232" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -242,9 +234,25 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="qNc-GM-rsO" secondAttribute="trailing" id="2yy-s5-PA9"/>
+                            <constraint firstItem="xRv-b5-yHf" firstAttribute="leading" secondItem="iAI-Cm-Wrk" secondAttribute="leading" id="4s3-XV-z7h"/>
+                            <constraint firstItem="evY-U4-zxd" firstAttribute="centerY" secondItem="zSq-Ay-fXA" secondAttribute="centerY" id="841-au-XEX"/>
                             <constraint firstItem="qNc-GM-rsO" firstAttribute="top" secondItem="jch-AY-zuS" secondAttribute="bottom" constant="2" id="8Oa-tQ-5Rj"/>
+                            <constraint firstItem="abK-s2-TbZ" firstAttribute="leading" secondItem="iAI-Cm-Wrk" secondAttribute="trailing" constant="8" id="EAK-X8-WcJ"/>
+                            <constraint firstItem="iAI-Cm-Wrk" firstAttribute="leading" secondItem="TpU-gO-2f1" secondAttribute="leading" constant="16" id="IWw-t3-hHA"/>
                             <constraint firstAttribute="trailing" secondItem="jch-AY-zuS" secondAttribute="trailing" id="Ijb-sT-peN"/>
+                            <constraint firstItem="zSq-Ay-fXA" firstAttribute="top" secondItem="8lt-wD-wxA" secondAttribute="bottom" constant="13" id="ReF-Uc-Ead"/>
+                            <constraint firstItem="8lt-wD-wxA" firstAttribute="leading" secondItem="iAI-Cm-Wrk" secondAttribute="leading" id="Sz0-2x-j8P"/>
+                            <constraint firstItem="evY-U4-zxd" firstAttribute="leading" secondItem="xhg-ag-M8A" secondAttribute="leading" id="TZN-Ta-Vaj"/>
+                            <constraint firstItem="xhg-ag-M8A" firstAttribute="leading" secondItem="abK-s2-TbZ" secondAttribute="leading" id="V0C-MR-JPL"/>
+                            <constraint firstItem="Zzz-KM-SKc" firstAttribute="leading" secondItem="xhg-ag-M8A" secondAttribute="leading" id="Yyx-K0-Eo1"/>
+                            <constraint firstItem="xRv-b5-yHf" firstAttribute="top" secondItem="zSq-Ay-fXA" secondAttribute="bottom" constant="13" id="ayF-zL-kZK"/>
+                            <constraint firstItem="iAI-Cm-Wrk" firstAttribute="top" secondItem="qNc-GM-rsO" secondAttribute="bottom" constant="16" id="eQY-UH-f1E"/>
+                            <constraint firstItem="xhg-ag-M8A" firstAttribute="centerY" secondItem="8lt-wD-wxA" secondAttribute="centerY" id="fLk-HY-rBT"/>
                             <constraint firstItem="jch-AY-zuS" firstAttribute="top" secondItem="uEw-UM-LJ8" secondAttribute="bottom" id="gQy-Ji-b6H"/>
+                            <constraint firstItem="abK-s2-TbZ" firstAttribute="centerY" secondItem="iAI-Cm-Wrk" secondAttribute="centerY" id="lPz-1H-lHQ"/>
+                            <constraint firstItem="Zzz-KM-SKc" firstAttribute="centerY" secondItem="xRv-b5-yHf" secondAttribute="centerY" id="rm2-Gy-rmC"/>
+                            <constraint firstItem="zSq-Ay-fXA" firstAttribute="leading" secondItem="iAI-Cm-Wrk" secondAttribute="leading" id="sBO-Tc-Mh1"/>
+                            <constraint firstItem="8lt-wD-wxA" firstAttribute="top" secondItem="iAI-Cm-Wrk" secondAttribute="bottom" constant="10" id="xnr-U1-NfE"/>
                             <constraint firstItem="qNc-GM-rsO" firstAttribute="leading" secondItem="TpU-gO-2f1" secondAttribute="leading" id="yFf-fs-Rkb"/>
                             <constraint firstItem="jch-AY-zuS" firstAttribute="leading" secondItem="TpU-gO-2f1" secondAttribute="leading" id="zie-eX-6ea"/>
                         </constraints>

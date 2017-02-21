@@ -39,7 +39,7 @@
 
 @property (nonatomic, assign, getter=isIntentToPlay) BOOL intentToPlay;
 
-@property (nonatomic, assign) long playHeadTime;
+@property (nonatomic, assign) NSTimeInterval seekTime;
 
 @property (nonatomic, assign) CGFloat rate;
 

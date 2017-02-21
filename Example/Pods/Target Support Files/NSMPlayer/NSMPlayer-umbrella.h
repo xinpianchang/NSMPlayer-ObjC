@@ -21,7 +21,9 @@
 #import "NSMPlayerAccessoryViewProtocol.h"
 #import "NSMAVPlayerView.h"
 #import "NSMPlayerProtocol.h"
+#import "NSMUnderlyingPlayerProtocol.h"
 #import "NSMVideoPlayerProtocol.h"
+#import "NSMVideoPlayerViewProtocol.h"
 #import "NSMAVPlayer.h"
 #import "NSMUnderlyingPlayer.h"
 

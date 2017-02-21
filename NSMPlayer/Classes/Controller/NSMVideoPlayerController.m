@@ -13,6 +13,7 @@
 
 @interface NSMVideoPlayerController ()
 
+@property (nonatomic, weak) NSMAVPlayerView *playerView;
 
 @end
 
@@ -36,6 +37,7 @@
     return self;
 }
 
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor greenColor]];
@@ -45,7 +47,7 @@
     [playerView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.view);
     }];
-    [playerView setPlayer:self.videoPlayer.player];
+    [self.videoPlayer setPlayerView:playerView];
 }
 
 - (void)setAssetURL:(NSURL *)assetURL {

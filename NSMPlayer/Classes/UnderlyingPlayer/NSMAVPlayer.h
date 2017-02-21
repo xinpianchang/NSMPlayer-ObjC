@@ -14,5 +14,4 @@
 
 @property (nonatomic, strong) AVPlayer *avplayer;
 
-
 @end

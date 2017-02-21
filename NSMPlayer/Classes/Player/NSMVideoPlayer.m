@@ -140,7 +140,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                 case NSMVideoPlayerStatusPlaying: {
                     if (self.videoPlayer.currentAsset != nil) {
                         [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
-                        NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerRestorePrepare];
+                        NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventTryToPrepared];
                         msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                         [self sendMessage:msg];
 //                        [self sendMessageWithType:NSMVideoPlayerEventPlayerRestorePrepare];
@@ -197,7 +197,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-        case NSMVideoPlayerEventReadyToPlay: {
+        case NSMVideoPlayerEventPreparingCompleted: {
             if (self.videoPlayer.intentToPlay) {
                 [self.videoPlayer transitionToState:self.videoPlayer.readyToPlayState];
 //                [self sendMessageWithType:NSMVideoPlayerEventPlay];
@@ -214,7 +214,11 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             return YES;
         }
         
-        case NSMVideoPlayerEventPlayerRestorePrepare:
+        case NSMVideoPlayerEventReplacePlayerView: {
+            [self.videoPlayer.underlyingPlayer setPlayerView:self.videoPlayer.playerView];
+            return YES;
+        }
+        
         case NSMVideoPlayerEventReplacePlayerItem:
         case NSMVideoPlayerEventTryToPrepared: {
             if (self.videoPlayer.currentAsset == nil) {
@@ -285,7 +289,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     self.videoPlayer.underlyingPlayer.rate = self.videoPlayer.rate;
     self.videoPlayer.underlyingPlayer.volume = self.videoPlayer.volume;
     self.videoPlayer.underlyingPlayer.muted = self.videoPlayer.isMuted;
-    [self.videoPlayer.underlyingPlayer seekToTime:self.videoPlayer.playHeadTime];
+    [self.videoPlayer.underlyingPlayer seekToTime:self.videoPlayer.seekTime];
 }
 
 - (BOOL)processMessage:(NSMMessage *)message {
@@ -350,6 +354,11 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         
         case NSMVideoPlayerEventSetMuted: {
             [self.videoPlayer.underlyingPlayer setMuted:[message.userInfo boolValue]];
+            return YES;
+        }
+        
+        case NSMVideoPlayerEventReplacePlayerView: {
+            [self.videoPlayer.underlyingPlayer setPlayerView:self.videoPlayer.playerView];
             return YES;
         }
         
@@ -476,11 +485,13 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 @end
 
 
-@interface NSMVideoPlayer ()
+@interface NSMVideoPlayer () {
+    NSMPlayerAsset *_currentAsset;
+    NSTimeInterval _seekTime;
+}
 
 @property (nonatomic, strong) NSThread *stateMachineRunLoopThread;
 @property (nonatomic, strong) NSMutableDictionary *players;
-@property (nonatomic, strong) NSMPlayerAsset *currentAsset;
 
 - (instancetype)init NS_DESIGNATED_INITIALIZER;
 
@@ -490,7 +501,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 @synthesize duration = _duration;
 @synthesize currentStatus = _currentStatus;
-//@synthesize currentAsset = _currentAsset;
 @synthesize loopPlayback = _loopPlayback;
 @synthesize autoPlay = _autoPlay;
 @synthesize preload = _preload;
@@ -498,8 +508,8 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 @synthesize rate = _rate;
 @synthesize volume = _volume;
 @synthesize allowWWAN = _allowWWAN;
-@synthesize playHeadTime = _playHeadTime;
 @synthesize playerType = _playerType;
+@synthesize playerView = _playerView;
 
 - (instancetype)initWithPlayerType:(NSMVideoPlayerType)playerType {
     self = [super init];
@@ -540,28 +550,37 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 - (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset {
     NSAssert(asset.assetURL, @"playerSource.assetURL is nil");
     if (![self.currentAsset.assetURL.absoluteString isEqualToString:asset.assetURL.absoluteString]) {
-        self.currentAsset = asset;
+        _currentAsset = asset;
         NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReplacePlayerItem];
         msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
         [self sendMessage:msg];
     }
 }
 
-
-- (void)setPlayerView:(UIView *)playerView {
-    
+- (NSMPlayerAsset *)currentAsset {
+    return _currentAsset;
 }
 
-- (long)playHeadTime {
-    return _playHeadTime;
+- (void)setPlayerView:(id<NSMVideoPlayerViewProtocol>)playerView {
+    _playerView = playerView;
+    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReplacePlayerView];
+    msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
+    [self sendMessage:msg];
 }
 
+- (NSTimeInterval)seekTime {
+    return _seekTime;
+}
+
+- (NSTimeInterval)currentTime {
+    return [self.underlyingPlayer currentTime];
+}
 
 - (BFTask *)prepare {
     [self.underlyingPlayer replaceCurrentAssetWithAsset:self.currentAsset];
     return [[self.underlyingPlayer prepare] continueWithBlock:^id _Nullable(BFTask * _Nonnull t) {
         if (t.result) {
-            NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReadyToPlay];
+            NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPreparingCompleted];
             msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
             [self sendMessage:msg];
         } else if (t.error) {
@@ -594,15 +613,12 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 }
 
 - (void)seekToTime:(NSTimeInterval)time {
-    _playHeadTime = time;
+    _seekTime = time;
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionSeek userInfo:@(time)];
     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
     [self sendMessage:msg];
 }
 
-- (id)player {
-    return self.underlyingPlayer.player;
-}
 
 - (void)setMuted:(BOOL)on {
     if (_muted != on) {
@@ -613,10 +629,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     }
 }
 
-- (BOOL)isMuted {
-    return _muted;
-}
-
 - (void)setVolume:(CGFloat)volume {
     _volume = volume;
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventAdjustVolume userInfo:@(volume)];
@@ -624,19 +636,11 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     [self sendMessage:msg];
 }
 
-- (CGFloat)volume {
-    return self.underlyingPlayer.volume;
-}
-
 - (void)setRate:(CGFloat)rate {
     _rate = rate;
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventAdjustRate userInfo:@(rate)];
     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
     [self sendMessage:msg];
-}
-
-- (CGFloat)rate {
-    return self.underlyingPlayer.rate;
 }
 
 - (void)setAllowWWAN:(BOOL)allowWWAN {
@@ -681,7 +685,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         self.tempRestoringConfig = config;
     } else {
         // 正在恢复
-        self.currentAsset = config.playerAsset;
+        _currentAsset = config.playerAsset;
         _playerType = config.playerType;
         _autoPlay = config.isAutoPlay;
         _preload = config.isPreload;
@@ -710,14 +714,14 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         
         if (NSMVideoPlayerStatusPlayToEndTime == self.currentStatus) {
             restoration.intentToPlay = NO;
-            restoration.playHeadTime = 0;
+            restoration.seekTime = 0;
         } else if (NSMVideoPlayerStatusFailed == self.currentStatus) {
             restoration.intentToPlay = NO;
-            restoration.playHeadTime = self.playHeadTime;
+            restoration.seekTime = self.seekTime;
             restoration.playerError = self.playerError;
         } else {
             restoration.intentToPlay = self.intentToPlay;
-            restoration.playHeadTime = self.playHeadTime;
+            restoration.seekTime = self.seekTime;
         }
         
         restoration.playerAsset = self.currentAsset;
@@ -888,8 +892,8 @@ inline NSString * NSMVideoPlayerMessageDescription (NSMVideoPlayerMessageType me
         case NSMVideoPlayerEventTryToPrepared:
             return @"EventTryToPrepared";
         
-        case NSMVideoPlayerEventReadyToPlay:
-            return @"EventReadyToPlay";
+        case NSMVideoPlayerEventPreparingCompleted:
+            return @"EventPreparingCompleted";
         
         case NSMVideoPlayerEventPlay:
             return @"EventPlay";
@@ -936,8 +940,8 @@ inline NSString * NSMVideoPlayerMessageDescription (NSMVideoPlayerMessageType me
         case NSMVideoPlayerEventPlayerRestore:
             return @"EventPlayerRestore";
 
-        case NSMVideoPlayerEventPlayerRestorePrepare:
-            return @"EventPlayerRestorePrepare";
+        case NSMVideoPlayerEventReplacePlayerView:
+            return @"EventReplacePlayerView";
 
         case NSMVideoPlayerActionPlay:
             return @"ActionPlay";

@@ -14,13 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 FOUNDATION_EXPORT NSString * const NSMUnderlyingPlayerErrorDomain;
 
-// item has played to its end time
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerDidPlayToEndTimeNotification;
 
-// item has played to its end time
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerFailedNotification;
 
-// item has played to its end time
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification;
 
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyNotification;
@@ -29,21 +26,17 @@ FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotif
 
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlayheadDidChangeNotification;
 
-// notification userInfo key                                                                    type
+// notification userInfo key
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey;
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerErrorKey;//NSError
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerErrorKey;// NSError
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey;//NSValue[CMTimeRange]
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey;//NSValue [CMTimeRange]
 
-//AVF_EXPORT NSString *const AVPlayerItemDidPlayToEndTimeNotification      NS_AVAILABLE(10_7, 4_0);
-//AVF_EXPORT NSString *const AVPlayerItemFailedToPlayToEndTimeNotification NS_AVAILABLE(10_7, 4_3);   // item has failed to play to its end time
-//AVF_EXPORT NSString *const AVPlayerItemPlaybackStalledNotification       NS_AVAILABLE(10_9, 6_0);    // media did not arrive in time to continue playback
-//AVF_EXPORT NSString *const AVPlayerItemNewAccessLogEntryNotification	 NS_AVAILABLE(10_9, 6_0);	// a new access log entry has been added
-//AVF_EXPORT NSString *const AVPlayerItemNewErrorLogEntryNotification		 NS_AVAILABLE(10_9, 6_0);	// a new error log entry has been added
-//
-//// notification userInfo key                                                                    type
-//AVF_EXPORT NSString *const AVPlayerItemFailedToPlayToEndTimeErrorKey     NS_AVAILABLE(10_7, 4_3);   // NSError
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey;// NSNumber BOOL
+
+FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey;// NSNumber BOOL
+
 
 
 @interface NSMUnderlyingPlayer : NSObject <NSMUnderlyingPlayerProtocol>

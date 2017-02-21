@@ -109,7 +109,7 @@
         if ([playerController isKindOfClass:[NSMVideoPlayerController class]]) {
             NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
             playerAsset.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
-            [playerController.videoPlayer setPlayerAsset:playerAsset];
+            [playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
             self.playerController = playerController;
         }
     }
@@ -118,7 +118,7 @@
 #pragma mark - NSMVideoSourceControllerDelegate
 
 - (void)videoSourceControllerDidSelectedPlayerItem:(NSMPlayerAsset *)playerAsset {
-    [self.playerController.videoPlayer setPlayerAsset:playerAsset];
+    [self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 }
 
 @end

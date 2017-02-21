@@ -14,12 +14,13 @@
 #import "NSMPlayerAsset.h"
 #import "NSMVideoAssetInfo.h"
 
-@interface NSMAVPlayer ()
+@interface NSMAVPlayer () {
+    NSMPlayerAsset *_currentAsset;
+}
 
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) id timeObserverToken;
 @property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
-@property (nonatomic, strong) NSMPlayerAsset *currentAsset;
 
 @end
 
@@ -125,8 +126,11 @@
     [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
     
-    [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
+    if (self.avplayer == nil) {
+        self.avplayer = [[AVPlayer alloc] init];
+    }
     
+    [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
     
     // Invoke callback every one second
     __weak __typeof(self) weakself = self;
@@ -146,9 +150,12 @@
  If you want to prepare an asset for playback, you should load its tracks property
  */
 - (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset {
-    self.currentAsset = asset;
+    _currentAsset = asset;
 }
 
+- (NSMPlayerAsset *)currentAsset {
+    return _currentAsset;
+}
 
 - (void)setLoopPlayback:(BOOL)loopPlayback {
     _loopPlayback = loopPlayback;
@@ -178,6 +185,9 @@
     [self.avplayer seekToTime:time];
 }
 
+- (NSTimeInterval)playHeadTime {
+    return CMTimeGetSeconds(self.avplayer.currentTime);
+}
 
 /**
  You should register for KVO change notifications and unregister from KVO change notifications on the main thread.
@@ -216,14 +226,13 @@
     return self.avplayer.rate;
 }
 
-- (long)duration {
+- (NSTimeInterval)duration {
     return CMTimeGetSeconds(self.avplayer.currentItem.duration);
 }
 
-- (id)player {
-    return self.avplayer;
+- (void)setPlayerView:(id<NSMVideoPlayerViewProtocol>)playerView {
+    [playerView setPlayer:self.avplayer];
 }
-
 
 #pragma mark - - NSKeyValueObserving
 
@@ -252,17 +261,17 @@
             CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
             CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
             CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
-            //NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
+            NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
         }
         
     } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
         //indicates that playback has consumed all buffered media and that playback will stall or end
-        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:@(self.avplayer.currentItem.playbackBufferEmpty)];
+        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:@{NSMUnderlyingPlayerPlaybackBufferEmptyKey: @(self.avplayer.currentItem.playbackBufferEmpty)}];
         
     } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
         //Indicates whether the item will likely play through without stalling
-        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:@(self.avplayer.currentItem.playbackLikelyToKeepUp)];
+        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:@{NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey : @(self.avplayer.currentItem.playbackLikelyToKeepUp)}];
     }
 }
 
@@ -326,8 +335,5 @@
     return nil;
 }
 
-- (long)playHeadTime {
-    return CMTimeGetSeconds(self.avplayer.currentTime);
-}
 
 @end

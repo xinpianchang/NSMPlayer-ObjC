@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NSMVideoPlayerViewProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,12 +46,9 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 
 @protocol NSMPlayerProtocol <NSObject>
 
-@property (nonatomic, readonly, strong) id player;
-
 @property (nonatomic, readonly, strong) NSMPlayerAsset *currentAsset;
 
-@property (nonatomic, assign) long duration;
-@property (nonatomic, assign) long playHeadTime;
+@property (nonatomic, assign) NSTimeInterval duration;
 
 @property (nonatomic, assign, getter=isPreload) BOOL preload;
 @property (nonatomic, assign, getter=isAutoPlay) BOOL autoPlay;
@@ -76,13 +74,18 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 
 @property (nonatomic, assign, getter=isAllowWWAN) BOOL allowWWAN;
 
+@property (nonatomic, weak) id<NSMVideoPlayerViewProtocol> playerView;
+
 
 - (BFTask *)prepare;
 - (void)play;
 - (void)pause;
+- (NSTimeInterval)seekTime;
 - (void)seekToTime:(NSTimeInterval)seconds;
+- (NSTimeInterval)currentTime;
 - (void)releasePlayer;
 - (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset;
+- (NSMPlayerAsset *)currentAsset;
 
 @end
 

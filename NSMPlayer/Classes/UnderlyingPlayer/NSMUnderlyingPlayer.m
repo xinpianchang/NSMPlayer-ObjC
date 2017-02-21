@@ -29,39 +29,18 @@ NSString *const NSMUnderlyingPlayerErrorKey = @"NSMUnderlyingPlayerErrorKey";
 
 NSString *const NSMUnderlyingPlayerLoadedTimeRangesKey = @"NSMUnderlyingPlayerErrorKey";
 
+NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey = @"NSMUnderlyingPlayerPlaybackLikelyToKeepUpKey";
+
+NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey = @"NSMUnderlyingPlayerPlaybackBufferEmptyKey";
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wprotocol"
 
+
 @implementation NSMUnderlyingPlayer
 
-@synthesize duration = _duration;
-@synthesize currentStatus = _currentStatus;
-//@synthesize currentAsset = _currentAsset;
-@synthesize loopPlayback = _loopPlayback;
-@synthesize autoPlay = _autoPlay;
-@synthesize preload = _preload;
-@synthesize muted = _muted;
-@synthesize rate = _rate;
-@synthesize volume = _volume;
-@synthesize allowWWAN = _allowWWAN;
-@synthesize playHeadTime = _playHeadTime;
-@synthesize playerType = _playerType;
+@dynamic duration, currentStatus, currentAsset, loopPlayback, autoPlay, preload, muted, rate, volume, allowWWAN, playerType, playerView;
 
-- (id)player {
-    return nil;
-}
-//- (instancetype)initWithAssetURL:(NSURL *)assetURL {
-//    self = [super init];
-//    if (self) {
-//        _playerURL = assetURL;
-//    }
-//    return self;
-//}
-
-//- (void)setPlayerSource:(NSMVideoPlayerControllerDataSource *)playerSource {
-//    _playerURL = playerSource.assetURL;
-//}
 #pragma clang diagnostic pop
 
 @end

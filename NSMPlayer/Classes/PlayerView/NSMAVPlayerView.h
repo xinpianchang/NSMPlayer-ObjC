@@ -7,13 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <AVFoundation/AVFoundation.h>
-
-@protocol NSMVideoPlayerViewProtocol <NSObject>
-
-- (void)setPlayer:(id)player;
-
-@end
+#import "NSMVideoPlayerViewProtocol.h"
 
 @interface NSMAVPlayerView : UIView <NSMVideoPlayerViewProtocol>
 

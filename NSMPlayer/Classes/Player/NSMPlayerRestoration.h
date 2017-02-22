@@ -41,7 +41,7 @@
 
 @property (nonatomic, assign) NSTimeInterval seekTime;
 
-@property (nonatomic, assign) CGFloat rate;
+//@property (nonatomic, assign) CGFloat rate;
 
 @property (nonatomic, assign) CGFloat volume;
 

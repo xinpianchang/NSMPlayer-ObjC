@@ -12,6 +12,7 @@
 #import "NSMUnderlyingPlayer.h"
 #import "NSMVideoPlayerController.h"
 #import "NSMPlayerRestoration.h"
+#import "NSMUnderlyingPlayerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,7 +23,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventPlay,
     NSMVideoPlayerEventPause,
     NSMVideoPlayerEventAdjustVolume,
-    NSMVideoPlayerEventAdjustRate,
+    //NSMVideoPlayerEventAdjustRate,
     NSMVideoPlayerEventSetMuted,
     NSMVideoPlayerEventCompleted,
     NSMVideoPlayerEventLoopPlayback,

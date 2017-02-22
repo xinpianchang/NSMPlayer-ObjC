@@ -35,14 +35,14 @@ NSString *const NSMUnderlyingPlayerErrorKey = @"NSMUnderlyingPlayerErrorKey";
 
 //NSString *const NSMUnderlyingPlayerPlaybackBufferEmptyKey = @"NSMUnderlyingPlayerPlaybackBufferEmptyKey";
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wprotocol"
-
-
-@implementation NSMUnderlyingPlayer
-
-@dynamic currentStatus, currentAsset, loopPlayback, autoPlay, preload, muted, rate, volume, allowWWAN, playerType, playerView;
-
-#pragma clang diagnostic pop
-
-@end
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Wprotocol"
+//
+//
+//@implementation NSMUnderlyingPlayer
+//
+//@dynamic currentStatus, currentAsset, loopPlayback, autoPlay, preload, muted, volume, allowWWAN, playerType, playerView;
+//
+//#pragma clang diagnostic pop
+//
+//@end

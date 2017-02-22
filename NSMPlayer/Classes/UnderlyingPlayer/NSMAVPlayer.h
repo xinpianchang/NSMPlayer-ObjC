@@ -8,9 +8,10 @@
 /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
 
 
-#import "NSMUnderlyingPlayer.h"
+#import <AVFoundation/AVFoundation.h>
+#import "NSMUnderlyingPlayerProtocol.h"
 
-@interface NSMAVPlayer : NSMUnderlyingPlayer
+@interface NSMAVPlayer : NSObject <NSMUnderlyingPlayerProtocol>
 
 @property (nonatomic, strong) AVPlayer *avplayer;
 

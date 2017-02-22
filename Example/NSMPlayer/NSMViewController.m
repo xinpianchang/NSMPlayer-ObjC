@@ -101,22 +101,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.playHeadSlider.continuous = NO;
-    [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateView) userInfo:nil repeats:YES];
+    [self.playHeadSlider addTarget:self action:@selector(beginSrubbing) forControlEvents:UIControlEventTouchDragInside];
 }
 
+- (void)beginSrubbing {
+    [self.playerController.videoPlayer suspendPlayingback];
+}
 - (void)videoPlayerStatusDidChange {
     [self updateView];
 }
 
 - (void)updateView {
-    NSTimeInterval douration = self.playerController.videoPlayer.duration;
-    NSInteger wholeMinutes = (int)trunc(douration / 60);
-    self.durationLabel.text = [NSString stringWithFormat:@"%ld:%02ld", wholeMinutes, (int)trunc(douration) - wholeMinutes * 60];
-    
     self.playerStateLabel.text = NSMVideoPlayerStatusDescription(self.playerController.videoPlayer.currentStatus);
-    self.playHeadSlider.maximumValue = self.playerController.videoPlayer.duration;
-    self.playHeadSlider.value = self.playerController.videoPlayer.currentTime;
-    self.loadProgress.progress = self.playerController.videoPlayer.bufferPercentage;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -127,10 +123,40 @@
             playerAsset.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
             [playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
             self.playerController = playerController;
+            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:@"totalUnitCount" options:0 context:nil];
+//            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:@"totalUnitCount" options:0 context:nil];
+            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:@"completedUnitCount" options:0 context:nil];
+            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:@"completedUnitCount" options:0 context:nil];
         }
     }
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    
+    //playbackProgress
+    if (object == self.playerController.videoPlayer.playbackProgress) {
+        NSProgress *playbackProgress = (NSProgress *)object;
+        if ([keyPath isEqualToString:@"totalUnitCount"]) {
+            NSTimeInterval douration = playbackProgress.totalUnitCount;
+            NSInteger wholeMinutes = (int)trunc(douration / 60);
+            self.durationLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", wholeMinutes, (int)trunc(douration) - wholeMinutes * 60];
+            self.playHeadSlider.maximumValue = playbackProgress.totalUnitCount;
+            
+        } else if ([keyPath isEqualToString:@"completedUnitCount"]) {
+            NSTimeInterval currentTime = playbackProgress.completedUnitCount;
+            NSInteger currentMinutes = (int)trunc(currentTime / 60);
+            self.currentTimeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", currentMinutes, (int)trunc(currentTime) - currentMinutes * 60];
+            self.playHeadSlider.value = playbackProgress.completedUnitCount;
+        }
+        
+    } else {
+        
+        if ([keyPath isEqualToString:@"completedUnitCount"]) {
+            NSProgress *bufferProgress = (NSProgress *)object;
+            self.loadProgress.progress = bufferProgress.fractionCompleted;
+        }
+    }
+}
 #pragma mark - NSMVideoSourceControllerDelegate
 
 - (void)videoSourceControllerDidSelectedPlayerItem:(NSMPlayerAsset *)playerAsset {

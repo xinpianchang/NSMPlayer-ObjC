@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "NSMUnderlyingPlayerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -41,9 +40,9 @@ FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerErrorKey;// NSError
 
 
 
-@interface NSMUnderlyingPlayer : NSObject <NSMUnderlyingPlayerProtocol>
-
-
-@end
+//@interface NSMUnderlyingPlayer : NSObject <NSMUnderlyingPlayerProtocol>
+//
+//
+//@end
 
 NS_ASSUME_NONNULL_END

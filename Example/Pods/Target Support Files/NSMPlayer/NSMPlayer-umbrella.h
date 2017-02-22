@@ -13,7 +13,6 @@
 #import "NSMVideoPlayerController.h"
 #import "NSMPlayerLogging.h"
 #import "NSMPlayerAsset.h"
-#import "NSMVideoAssetInfo.h"
 #import "NSMPlayerRestoration.h"
 #import "NSMVideoPlayer.h"
 #import "NSMPlayerAccessoryView.h"

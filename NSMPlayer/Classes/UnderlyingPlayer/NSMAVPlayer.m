@@ -12,24 +12,35 @@
 #import "NSMPlayerProtocol.h"
 #import "NSMPlayerLogging.h"
 #import "NSMPlayerAsset.h"
-#import "NSMVideoAssetInfo.h"
+//#import "NSMVideoAssetInfo.h"
+#import "NSMUnderlyingPlayer.h"
 
 @interface NSMAVPlayer () {
-    NSMPlayerAsset *_currentAsset;
+    //    NSMPlayerAsset *_currentAsset;
     CGFloat _bufferPercentage;
 }
 
 @property (nonatomic, strong) AVURLAsset *asset;
-//@property (nonatomic, strong) id timeObserverToken;
+@property (nonatomic, strong) id timeObserverToken;
 @property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
+@property (nonatomic, strong) NSMPlayerAsset *currentAsset;
+@property (nonatomic, strong) NSProgress *playbackProgress;
+@property (nonatomic, strong) NSProgress *bufferProgress;
 
 @end
 
 @implementation NSMAVPlayer
 
-@synthesize loopPlayback = _loopPlayback;
-
 #pragma mark - Properties
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _playbackProgress = [NSProgress progressWithTotalUnitCount:0];
+        _bufferProgress = [NSProgress progressWithTotalUnitCount:0];
+    }
+    return self;
+}
 
 // Will attempt load and test these asset keys before playing
 + (NSArray *)assetKeysRequiredToPlay {
@@ -117,7 +128,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemFailedToPlayToEndTime:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:playerItem];
     
     
-//    [self removeTimeObserverToken];
+    [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
     
     if (self.avplayer == nil) {
@@ -129,17 +140,11 @@
     [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
     
     // Invoke callback every one second
-    __weak __typeof(self) weakself = self;
-    dispatch_queue_t mainQueue = dispatch_get_main_queue();
-//    self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
-//        NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
-//        //NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
-//        [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
-//    }];
+    [self addTimeObserverToken];
 }
 
 - (CGFloat)bufferPercentage {
-    NSMPlayerLogInfo(@"bufferPercentage == %@",@(_bufferPercentage));
+//    NSMPlayerLogInfo(@"bufferPercentage == %@",@(_bufferPercentage));
     return _bufferPercentage;
 }
 #pragma mark - NSMUnderlyingPlayerProtocol
@@ -149,20 +154,9 @@
  If you want to prepare an asset for playback, you should load its tracks property
  */
 - (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset {
-    _currentAsset = asset;
+    self.currentAsset = asset;
 }
 
-- (NSMPlayerAsset *)currentAsset {
-    return _currentAsset;
-}
-
-- (void)setLoopPlayback:(BOOL)loopPlayback {
-    _loopPlayback = loopPlayback;
-}
-
-- (BOOL)isLoopPlayback {
-    return _loopPlayback;
-}
 
 - (BFTask *)prepare {
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.currentAsset.assetURL options:nil];
@@ -179,19 +173,27 @@
     [self.avplayer pause];
 }
 
-- (void)seekToTime:(NSTimeInterval)seconds {
-    CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
-    [self.avplayer seekToTime:time];
+- (void)suspendPlayingback {
+    self.avplayer.rate = 0.0;
+    [self removeTimeObserverToken];
 }
 
-- (NSTimeInterval)currentTime {
-    if (self.avplayer) {
-        NSTimeInterval currentTime = CMTimeGetSeconds(self.avplayer.currentTime);
-        NSMPlayerLogInfo(@"currentTime == %@",@(currentTime));
-        return currentTime;
-    }
-    return 0;
+- (void)seekToTime:(NSTimeInterval)seconds {
+    CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
+    [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
+        self.avplayer.rate = 1.0;
+        [self addTimeObserverToken];
+    }];
 }
+
+//- (NSTimeInterval)currentTime {
+//    if (self.avplayer) {
+//        NSTimeInterval currentTime = CMTimeGetSeconds(self.avplayer.currentTime);
+////        NSMPlayerLogInfo(@"currentTime == %@",@(currentTime));
+//        return currentTime;
+//    }
+//    return 0;
+//}
 
 /**
  You should register for KVO change notifications and unregister from KVO change notifications on the main thread.
@@ -200,7 +202,7 @@
 - (void)releasePlayer {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self removeCurrentItemObserver];
-//        [self removeTimeObserverToken];
+        [self removeTimeObserverToken];
         [self.avplayer replaceCurrentItemWithPlayerItem:nil];
         [self.avplayer removeObserver:self forKeyPath:@"rate" context:nil];
         self.avplayer = nil;
@@ -231,13 +233,13 @@
     return self.avplayer.rate;
 }
 
-- (NSTimeInterval)duration {
-    if (self.avplayer) {
-        NSMPlayerLogDebug(@"duration == %@ currentItem == %@", @(CMTimeGetSeconds(self.avplayer.currentItem.duration)), self.avplayer.currentItem);
-        return CMTimeGetSeconds(self.avplayer.currentItem.duration);
-    }
-    return 0;
-}
+//- (NSTimeInterval)duration {
+//    if (AVPlayerItemStatusReadyToPlay == self.avplayer.status) {
+//        NSMPlayerLogDebug(@"duration == %@ currentItem == %@", @(CMTimeGetSeconds(self.avplayer.currentItem.duration)), self.avplayer.currentItem);
+//        return CMTimeGetSeconds(self.avplayer.currentItem.duration);
+//    }
+//    return 0;
+//}
 
 - (void)setPlayerView:(id<NSMVideoPlayerViewProtocol>)playerView {
     [playerView setPlayer:self.avplayer];
@@ -250,17 +252,19 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"status"]) {
         //POST
-        NSMPlayerLogDebug(@"currentItem status %@",@(self.avplayer.currentItem.status));
+//        NSMPlayerLogDebug(@"currentItem status %@",@(self.avplayer.currentItem.status));
         if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
             //Prepared finish
             if (self.prepareSouce && !self.prepareSouce.task.isCompleted) {
-                NSMVideoAssetInfo *assetInfo = [[NSMVideoAssetInfo alloc] init];
-                assetInfo.duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
-                [self.prepareSouce setResult:assetInfo];
+//                NSMVideoAssetInfo *assetInfo = [[NSMVideoAssetInfo alloc] init];
+               NSTimeInterval duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
+//                assetInfo.duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
+                self.bufferProgress.totalUnitCount = self.playbackProgress.totalUnitCount = duration;
+                [self.prepareSouce setResult:@YES];
             }
         } else if (AVPlayerItemStatusFailed == self.avplayer.currentItem.status) {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
-            NSMPlayerLogDebug(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
+            NSMPlayerLogError(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : self.avplayer.error}];
         }
     } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
@@ -270,31 +274,32 @@
             CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
             CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
             CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
-            NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
-            _bufferPercentage = (rangeStartSeconds + rangeDurationSeconds) / self.duration;
-//            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
+//            NSMPlayerLogDebug(@"rangeStartSeconds:%f rangeDurationSeconds:%f",rangeStartSeconds,rangeDurationSeconds);
+//            _bufferPercentage = (rangeStartSeconds + rangeDurationSeconds) / self.duration;
+            self.bufferProgress.completedUnitCount = rangeStartSeconds + rangeDurationSeconds;
+            //            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerLoadedTimeRangesDidChangeNotification object:self userInfo:@{NSMUnderlyingPlayerLoadedTimeRangesKey : loadedTimeRanges.firstObject}];
         }
         
     } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
         //indicates that playback has consumed all buffered media and that playback will stall or end
         if (self.avplayer.currentItem.isPlaybackBufferEmpty) {
-            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
-            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
+//            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
+            //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
         } else {
-            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
+//            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
         }
         
     } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
         //Indicates whether the item will likely play through without stalling
         if (self.avplayer.currentItem.isPlaybackLikelyToKeepUp) {
-            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
+//            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:nil];
         } else {
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
-            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
+//            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
         }
     } else if ([keyPath isEqualToString:@"rate"]) {
-//        NSMPlayerLogDebug(@"rateChange");
+        //        NSMPlayerLogDebug(@"rateChange");
         if (self.avplayer.rate == 0) {
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackStallingNotification object:self userInfo:nil];
         }
@@ -305,31 +310,39 @@
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerDidPlayToEndTimeNotification object:self userInfo:nil];
-    if (self.loopPlayback) {
-        [self.avplayer seekToTime:kCMTimeZero];
-    }
 }
 
 - (void)playerItemFailedToPlayToEndTime:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
-    NSMPlayerLogDebug(@"%@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
+    //NSMPlayerLogDebug(@"%@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
 }
 
 - (void)dealloc {
-//    [self removeTimeObserverToken];
+    [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-//- (void)removeTimeObserverToken {
-//    if (self.timeObserverToken) {
-//        /*
-//         * 只能保证调用下面方法的时候，只能保证这个方法 - (id)addPeriodicTimeObserverForInterval:(CMTime)interval queue:(dispatch_queue_t)queue usingBlock:(void (^)(CMTime time))block 中的block不会被再次触发，而不能保证已经触发的 block 中断执行，可以用这个做到 dispatch_sync(queue, ^{} 。
-//         */
-//        [self.avplayer removeTimeObserver:self.timeObserverToken];
-//        self.timeObserverToken = nil;
-//    }
-//}
+- (void)removeTimeObserverToken {
+    if (self.timeObserverToken) {
+        /*
+         * 只能保证调用下面方法的时候，只能保证这个方法 - (id)addPeriodicTimeObserverForInterval:(CMTime)interval queue:(dispatch_queue_t)queue usingBlock:(void (^)(CMTime time))block 中的block不会被再次触发，而不能保证已经触发的 block 中断执行，可以用这个做到 dispatch_sync(queue, ^{} 。
+         */
+        [self.avplayer removeTimeObserver:self.timeObserverToken];
+        self.timeObserverToken = nil;
+    }
+}
+
+- (void)addTimeObserverToken {
+    __weak __typeof(self) weakself = self;
+    dispatch_queue_t mainQueue = dispatch_get_main_queue();
+    self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
+        NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
+        NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
+        //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
+        self.playbackProgress.completedUnitCount = currenTimeInterval;
+    }];
+}
 
 - (void)removeCurrentItemObserver {
     if (self.avplayer.currentItem) {

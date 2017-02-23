@@ -327,7 +327,13 @@ NSString * const NSMVideoPlayerRestorationKey = @"NSMVideoPlayerRestorationKey";
         }
         
         case NSMVideoPlayerActionSeek: {
-            [self.videoPlayer.underlyingPlayer seekToTime:[message.userInfo doubleValue]];
+//            [self.videoPlayer.underlyingPlayer seekToTime:[message.userInfo doubleValue]];
+            BFTaskCompletionSource *tcs = message.userInfo[@"tcs"];
+            // 循环播放
+            [[self.videoPlayer.underlyingPlayer seekToTime:[message.userInfo[@"time"] doubleValue]] continueWithBlock:^id _Nullable(BFTask * _Nonnull t) {
+                [tcs setResult:nil];
+                return nil;
+            }];
             return YES;
         }
         
@@ -496,7 +502,12 @@ NSString * const NSMVideoPlayerRestorationKey = @"NSMVideoPlayerRestorationKey";
         }
         
         case NSMVideoPlayerActionSeek: {
-            [self.videoPlayer.underlyingPlayer seekToTime:[message.userInfo doubleValue]];
+            BFTaskCompletionSource *tcs = message.userInfo[@"tcs"];
+            // 循环播放
+            [[self.videoPlayer.underlyingPlayer seekToTime:[message.userInfo[@"time"] doubleValue]] continueWithBlock:^id _Nullable(BFTask * _Nonnull t) {
+                [tcs setResult:nil];
+                return nil;
+            }];
             [self.videoPlayer transitionToState:self.videoPlayer.playingState];
             return YES;
         }
@@ -623,6 +634,7 @@ NSString * const NSMVideoPlayerRestorationKey = @"NSMVideoPlayerRestorationKey";
             [self sendMessage:msg];
         } else if (t.error) {
             NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure];
+            msg.userInfo  = t.error;
             msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
             [self sendMessage:msg];
         }
@@ -650,10 +662,13 @@ NSString * const NSMVideoPlayerRestorationKey = @"NSMVideoPlayerRestorationKey";
     [self sendMessage:msg];
 }
 
-- (void)seekToTime:(NSTimeInterval)time {
-    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionSeek userInfo:@(time)];
+- (BFTask *)seekToTime:(NSTimeInterval)time {
+    BFTaskCompletionSource *tcs = [BFTaskCompletionSource taskCompletionSource];
+    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerActionSeek];
+    msg.userInfo = @{@"time": @(time), @"tcs": tcs};
     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
     [self sendMessage:msg];
+    return tcs.task;
 }
 
 

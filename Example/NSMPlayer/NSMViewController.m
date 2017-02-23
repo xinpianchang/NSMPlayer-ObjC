@@ -13,6 +13,7 @@
 #import "NSMPlayerAsset.h"
 #import "NSMVideoPlayer.h"
 #import "NSMPlayerLogging.h"
+#import <Bolts/Bolts.h>
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 
@@ -89,10 +90,10 @@
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
-    if (NSMVideoPlayerStatusPlaying == [self.playerController.videoPlayer currentStatus]) {
+    [[self.playerController.videoPlayer seekToTime:sender.value] continueWithExecutor:[BFExecutor mainThreadExecutor] withBlock:^id _Nullable(BFTask * _Nonnull t) {
         [self.playerController.videoPlayer setRate:1.0];
-    }
-    [self.playerController.videoPlayer seekToTime:sender.value];
+        return nil;
+    }];
 }
 
 - (IBAction)playerTypeChange:(UISwitch *)sender {

@@ -184,9 +184,15 @@
 //    [self removeTimeObserverToken];
 //}
 
-- (void)seekToTime:(NSTimeInterval)seconds {
+- (BFTask *)seekToTime:(NSTimeInterval)seconds {
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
-    [self.avplayer seekToTime:time];
+    BFTaskCompletionSource *tcs = [BFTaskCompletionSource taskCompletionSource];
+    [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
+        if (finished) {
+            [tcs setResult:nil];
+        }
+    }];
+    return tcs.task;
 }
 
 //- (NSTimeInterval)currentTime {

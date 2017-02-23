@@ -12,7 +12,7 @@
 
 @protocol NSMVideoPlayerProtocol <NSMPlayerProtocol>
 
-- (void)restorePlayerWithConfig:(NSMPlayerRestoration *)config;
+- (void)restorePlayerWithRestoration:(NSMPlayerRestoration *)restoration;
 - (NSMPlayerRestoration *)savePlayerState;
 //- (void)setPlayerView:(UIView *)playerView;
 

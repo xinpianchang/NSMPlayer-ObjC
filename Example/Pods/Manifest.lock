@@ -1,5 +1,4 @@
 PODS:
-  - AFNetworking/Reachability (3.1.0)
   - Bolts (1.8.4):
     - Bolts/AppLinks (= 1.8.4)
     - Bolts/Tasks (= 1.8.4)
@@ -26,12 +25,13 @@ PODS:
     - FBSnapshotTestCase/Core
   - Masonry (1.0.2)
   - NSMPlayer (0.1.0):
-    - AFNetworking/Reachability
     - Bolts
     - Masonry
     - NSMStateMachine
+    - Reachability
   - NSMStateMachine (0.1.7):
     - CocoaLumberjack
+  - Reachability (3.2)
   - Specta (1.0.6)
 
 DEPENDENCIES:
@@ -46,15 +46,15 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
   CocoaLumberjack: c823149bccc5519a9447aeb433be7b1212a7d6a5
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
   Expecta+Snapshots: aee0487f8bbb9df7e0b7735380565ac06207e959
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
-  NSMPlayer: 65b8946f938cba90db08ef1a9593d0c62e9d13b6
+  NSMPlayer: 6f8c78bb80362e4cb5eac84fe98edaed3ed95c76
   NSMStateMachine: e953e8b8f43f74efc20d11c43a57b7fe188277d5
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465
 
 PODFILE CHECKSUM: b5bfce22bcb986e9abec5fb7ee3a6c91536bd0db

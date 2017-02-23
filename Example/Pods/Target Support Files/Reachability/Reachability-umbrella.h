@@ -10,8 +10,8 @@
 #endif
 #endif
 
-#import "AFNetworkReachabilityManager.h"
+#import "Reachability.h"
 
-FOUNDATION_EXPORT double AFNetworkingVersionNumber;
-FOUNDATION_EXPORT const unsigned char AFNetworkingVersionString[];
+FOUNDATION_EXPORT double ReachabilityVersionNumber;
+FOUNDATION_EXPORT const unsigned char ReachabilityVersionString[];
 

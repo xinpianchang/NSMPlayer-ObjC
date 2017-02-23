@@ -18,5 +18,5 @@ Pod::Spec.new do |s|
 
   s.dependency 'Masonry'
 
-  s.dependency 'AFNetworking/Reachability'
+  s.dependency 'Reachability'
 end

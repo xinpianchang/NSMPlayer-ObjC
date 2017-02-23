@@ -8,7 +8,7 @@
 
 #import "NSMPlayerRestoration.h"
 #import "NSMVideoPlayerController.h"
-#import "AFNetworkReachabilityManager.h"
+
 
 static NSString * const NSMVideoPlayerPlayLoopKey = @"NSMVideoPlayerPlayLoopKey";
 

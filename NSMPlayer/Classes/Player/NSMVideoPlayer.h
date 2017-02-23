@@ -55,6 +55,7 @@ FOUNDATION_EXPORT NSString * const NSMVideoPlayerOldStatusKey;
 FOUNDATION_EXPORT NSString * const NSMVideoPlayerNewStatusKey;
 
 
+
 @class NSMStateMachine, NSMVideoPlayer;
 
 @interface NSMPlayerState : NSMState
@@ -130,10 +131,9 @@ FOUNDATION_EXPORT NSString * const NSMVideoPlayerNewStatusKey;
 @property (nonatomic, strong) NSMPlayerState *pausedState;
 @property (nonatomic, strong) NSMPlayerState *pausingState;
 @property (nonatomic, strong) NSMPlayerState *completedState;
-@property (nonatomic, strong) NSError *playerError;
 @property (nullable, nonatomic, strong) NSMPlayerRestoration *tempRestoringConfig;
 
-
+@property (nullable, nonatomic, strong) NSError *playerError;
 
 /**
  在 preparing 的时候接受到 Play/Pause 等 Event 时，需要记录用户<测试人员的>的 是否最终想要播放的一种意图。

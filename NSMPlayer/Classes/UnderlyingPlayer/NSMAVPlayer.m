@@ -12,13 +12,9 @@
 #import "NSMPlayerProtocol.h"
 #import "NSMPlayerLogging.h"
 #import "NSMPlayerAsset.h"
-//#import "NSMVideoAssetInfo.h"
 #import "NSMUnderlyingPlayer.h"
 
-@interface NSMAVPlayer () {
-    //    NSMPlayerAsset *_currentAsset;
-    CGFloat _bufferPercentage;
-}
+@interface NSMAVPlayer ()
 
 @property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) id timeObserverToken;
@@ -31,15 +27,23 @@
 
 @implementation NSMAVPlayer
 
+@dynamic playerView, playerType ,playerError, currentStatus, autoPlay, loopPlayback, preload, allowWWAN;
+
 #pragma mark - Properties
 
 - (instancetype)init {
     self = [super init];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         _playbackProgress = [NSProgress progressWithTotalUnitCount:0];
         _bufferProgress = [NSProgress progressWithTotalUnitCount:0];
     }
     return self;
+}
+
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification {
+    [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackStallingNotification object:self userInfo:nil];
 }
 
 // Will attempt load and test these asset keys before playing
@@ -133,7 +137,6 @@
     
     if (self.avplayer == nil) {
         self.avplayer = [[AVPlayer alloc] init];
-        [self.avplayer addObserver:self forKeyPath:@"rate" options:0 context:nil];
     }
     
     
@@ -143,10 +146,10 @@
     [self addTimeObserverToken];
 }
 
-- (CGFloat)bufferPercentage {
-//    NSMPlayerLogInfo(@"bufferPercentage == %@",@(_bufferPercentage));
-    return _bufferPercentage;
-}
+//- (CGFloat)bufferPercentage {
+////    NSMPlayerLogInfo(@"bufferPercentage == %@",@(_bufferPercentage));
+//    return _bufferPercentage;
+//}
 #pragma mark - NSMUnderlyingPlayerProtocol
 
 /**
@@ -173,17 +176,17 @@
     [self.avplayer pause];
 }
 
-- (void)suspendPlayingback {
-    self.avplayer.rate = 0.0;
-    [self removeTimeObserverToken];
+- (void)setRate:(CGFloat)rate {
+    self.avplayer.rate = rate;
 }
+//- (void)suspendPlayingback {
+//    [self setRate:0.0];
+//    [self removeTimeObserverToken];
+//}
 
 - (void)seekToTime:(NSTimeInterval)seconds {
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
-    [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
-        self.avplayer.rate = 1.0;
-        [self addTimeObserverToken];
-    }];
+    [self.avplayer seekToTime:time];
 }
 
 //- (NSTimeInterval)currentTime {
@@ -204,7 +207,6 @@
         [self removeCurrentItemObserver];
         [self removeTimeObserverToken];
         [self.avplayer replaceCurrentItemWithPlayerItem:nil];
-        [self.avplayer removeObserver:self forKeyPath:@"rate" context:nil];
         self.avplayer = nil;
     });
 }
@@ -225,9 +227,6 @@
     return self.avplayer.isMuted;
 }
 
-- (void)setRate:(CGFloat)rate {
-    self.avplayer.rate = rate;
-}
 
 - (CGFloat)rate {
     return self.avplayer.rate;
@@ -284,7 +283,7 @@
         //indicates that playback has consumed all buffered media and that playback will stall or end
         if (self.avplayer.currentItem.isPlaybackBufferEmpty) {
 //            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
-            //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
         } else {
 //            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
         }
@@ -297,11 +296,6 @@
         } else {
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
 //            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
-        }
-    } else if ([keyPath isEqualToString:@"rate"]) {
-        //        NSMPlayerLogDebug(@"rateChange");
-        if (self.avplayer.rate == 0) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackStallingNotification object:self userInfo:nil];
         }
     }
 }
@@ -340,7 +334,7 @@
         NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
         NSMPlayerLogDebug(@"currenTimeInterval : %.2f",currenTimeInterval);
         //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlayheadDidChangeNotification object:weakself userInfo:@{NSMUnderlyingPlayerPeriodicPlayTimeChangeKey : @(currenTimeInterval)}];
-        self.playbackProgress.completedUnitCount = currenTimeInterval;
+        weakself.playbackProgress.completedUnitCount = currenTimeInterval;
     }];
 }
 
@@ -351,7 +345,6 @@
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:nil];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty" context:nil];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:nil];
-        //[self.avplayer.currentItem removeObserver:self forKeyPath:@"rate" context:nil];
     }
 }
 

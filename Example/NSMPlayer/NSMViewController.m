@@ -41,7 +41,18 @@
 }
 
 - (IBAction)allowMobileNetworkChange:(UISwitch *)sender {
-    [self.playerController.videoPlayer setAllowWWAN:sender.isOn];
+    if (sender.isOn) {
+        if (NSMVideoPlayerStatusFailed == [self.playerController.videoPlayer currentStatus]) {
+            NSError *playerError = [self.playerController.videoPlayer playerError];
+            if (playerError != nil) {
+                NSMPlayerRestoration *restoration = playerError.userInfo[NSMVideoPlayerRestorationKey];
+                restoration.allowWWAN = sender.isOn;
+                [self.playerController.videoPlayer restorePlayerWithRestoration:restoration];
+            }
+        }
+    } else {
+        [self.playerController.videoPlayer setAllowWWAN:sender.isOn];
+    }
 }
 
 - (IBAction)ciclePlayChange:(UISwitch *)sender {
@@ -73,11 +84,14 @@
 }
 
 - (IBAction)restore:(UIButton *)sender {
-    [self.playerController.videoPlayer restorePlayerWithConfig:self.saveConfig];
+    [self.playerController.videoPlayer restorePlayerWithRestoration:self.saveConfig];
     NSLog(@"restore");
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
+    if (NSMVideoPlayerStatusPlaying == [self.playerController.videoPlayer currentStatus]) {
+        [self.playerController.videoPlayer setRate:1.0];
+    }
     [self.playerController.videoPlayer seekToTime:sender.value];
 }
 
@@ -105,7 +119,7 @@
 }
 
 - (void)beginSrubbing {
-    [self.playerController.videoPlayer suspendPlayingback];
+    [self.playerController.videoPlayer setRate:0.0];
 }
 - (void)videoPlayerStatusDidChange {
     [self updateView];
@@ -124,7 +138,7 @@
             [playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
             self.playerController = playerController;
             [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:@"totalUnitCount" options:0 context:nil];
-//            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:@"totalUnitCount" options:0 context:nil];
+            //            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:@"totalUnitCount" options:0 context:nil];
             [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:@"completedUnitCount" options:0 context:nil];
             [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:@"completedUnitCount" options:0 context:nil];
         }

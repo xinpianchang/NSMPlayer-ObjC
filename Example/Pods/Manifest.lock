@@ -5,6 +5,15 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
+  - Bugly (2.4.6)
+  - CocoaLumberjack (3.0.0):
+    - CocoaLumberjack/Default (= 3.0.0)
+    - CocoaLumberjack/Extensions (= 3.0.0)
+  - CocoaLumberjack/Core (3.0.0)
+  - CocoaLumberjack/Default (3.0.0):
+    - CocoaLumberjack/Core
+  - CocoaLumberjack/Extensions (3.0.0):
+    - CocoaLumberjack/Default
   - Expecta (1.0.5)
   - Expecta+Snapshots (3.0.1):
     - Expecta (~> 1.0)
@@ -15,11 +24,19 @@ PODS:
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
+  - Masonry (1.0.2)
   - NSMPlayer (0.1.0):
     - Bolts
-  - Specta (1.0.5)
+    - Masonry
+    - NSMStateMachine
+    - Reachability
+  - NSMStateMachine (0.1.7):
+    - CocoaLumberjack
+  - Reachability (3.2)
+  - Specta (1.0.6)
 
 DEPENDENCIES:
+  - Bugly
   - Expecta
   - Expecta+Snapshots
   - FBSnapshotTestCase
@@ -32,12 +49,17 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
+  Bugly: 7756e72c59387b0d490f46e83ab458ae94ee7fba
+  CocoaLumberjack: c823149bccc5519a9447aeb433be7b1212a7d6a5
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
   Expecta+Snapshots: aee0487f8bbb9df7e0b7735380565ac06207e959
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  NSMPlayer: 3f442101194c2c67f57a9e119a918d987dc7ec09
-  Specta: ac94d110b865115fe60ff2c6d7281053c6f8e8a2
+  Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
+  NSMPlayer: 6f8c78bb80362e4cb5eac84fe98edaed3ed95c76
+  NSMStateMachine: e953e8b8f43f74efc20d11c43a57b7fe188277d5
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465
 
-PODFILE CHECKSUM: 33e163be36171cbac199fff3b0f85e6fe27e5a90
+PODFILE CHECKSUM: b20e7dcc914c89b6c49f4e968f23ce1bfd039056
 
 COCOAPODS: 1.2.0

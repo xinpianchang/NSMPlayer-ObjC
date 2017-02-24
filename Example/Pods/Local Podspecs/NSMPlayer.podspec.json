@@ -21,6 +21,15 @@
   "dependencies": {
     "Bolts": [
 
+    ],
+    "NSMStateMachine": [
+
+    ],
+    "Masonry": [
+
+    ],
+    "Reachability": [
+
     ]
   }
 }

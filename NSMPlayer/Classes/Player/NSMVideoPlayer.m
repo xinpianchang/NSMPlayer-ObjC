@@ -478,10 +478,10 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-        case NSMVideoPlayerEventWaitingBufferToPlay: {
-            [self.videoPlayer transitionToState:self.videoPlayer.waitBufferingToPlayState];
-            return YES;
-        }
+//        case NSMVideoPlayerEventWaitingBufferToPlay: {
+//            [self.videoPlayer transitionToState:self.videoPlayer.waitBufferingToPlayState];
+//            return YES;
+//        }
         
         default:
             return NO;
@@ -498,10 +498,10 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-        case NSMVideoPlayerEventEnoughBufferToPlay: {
-            [self.videoPlayer transitionToState:self.videoPlayer.playingState];
-            return YES;
-        }
+//        case NSMVideoPlayerEventEnoughBufferToPlay: {
+//            [self.videoPlayer transitionToState:self.videoPlayer.playingState];
+//            return YES;
+//        }
         
         default:
             return NO;
@@ -1073,6 +1073,9 @@ inline NSString * NSMVideoPlayerMessageDescription (NSMVideoPlayerMessageType me
         case NSMVideoPlayerEventEnoughBufferToPlay:
             return @"EventEnoughBufferToPlay";
         
+        case NSMVideoPlayerEventUpdateBuffering:
+            return @"EventUpdateBuffering";
+            
         case NSMVideoPlayerEventReleasePlayer:
             return @"EventReleasePlayer";
         
@@ -1105,6 +1108,7 @@ inline NSString * NSMVideoPlayerMessageDescription (NSMVideoPlayerMessageType me
 
         case NSMVideoPlayerActionSeek:
             return @"ActionSeek";
+            
     }
 }
 

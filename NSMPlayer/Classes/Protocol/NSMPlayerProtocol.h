@@ -11,8 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-FOUNDATION_EXPORT NSString * const NSMVideoPlayerRestorationKey; //NSMPlayerRestoration
-
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerType) {
     NSMVideoPlayerAVPlayer = 1,
     NSMVideoPlayerIJKPlayer,
@@ -44,7 +42,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
     NSMVideoPlayerStatusLevelReadyToPlay = NSMVideoPlayerStatusLevelPlayed | NSMVideoPlayerStatusLevelPaused,
 };
 
-@class BFTask, NSMPlayerAsset;
+@class BFTask, NSMPlayerAsset, NSMPlayerError;
 
 @protocol NSMPlayerProtocol <NSObject>
 
@@ -57,7 +55,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 /* indicates whether or not audio output of the player is muted. Only affects audio muting for the player instance and not for the device. */
 @property (nonatomic, assign, getter=isMuted) BOOL muted;
 
-@property (nonatomic, readonly, strong) NSError *playerError;
+@property (nonatomic, readonly, strong) NSMPlayerError *playerError;;
 
 /* Indicates the current audio volume of the player; 0.0 means "silence all audio", 1.0 means "play at the full volume of the current item".
  
@@ -83,7 +81,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 - (BFTask *)prepare;
 - (void)play;
 - (void)pause;
-- (void)suspendPlayingback;
 - (BFTask *)seekToTime:(NSTimeInterval)seconds;
 - (void)releasePlayer;
 - (void)replaceCurrentAssetWithAsset:(NSMPlayerAsset *)asset;

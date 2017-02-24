@@ -313,8 +313,8 @@
 }
 
 - (void)playerItemFailedToPlayToEndTime:(NSNotification *)notification {
+    NSLog(@"playerItemFailedToPlayToEndTime == %@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
-    //NSMPlayerLogDebug(@"%@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
 }
 
 - (void)dealloc {

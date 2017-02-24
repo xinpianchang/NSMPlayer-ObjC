@@ -257,6 +257,7 @@
 				TargetAttributes = {
 					6003F589195388D20070C39A = {
 						DevelopmentTeam = 7GL725C6FL;
+						ProvisioningStyle = Automatic;
 					};
 					6003F5AD195388D20070C39A = {
 						LastSwiftMigration = 0820;
@@ -544,6 +545,7 @@
 			baseConfigurationReference = 353D816CCCB5BFA7A26FF5E6 /* Pods-NSMPlayer_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 7GL725C6FL;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NSMPlayer/NSMPlayer-Prefix.pch";
@@ -560,6 +562,7 @@
 			baseConfigurationReference = 9FF6A8AA9AA90156EF86244F /* Pods-NSMPlayer_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = 7GL725C6FL;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NSMPlayer/NSMPlayer-Prefix.pch";

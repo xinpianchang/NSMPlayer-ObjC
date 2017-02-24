@@ -14,6 +14,7 @@
 #import "NSMVideoPlayer.h"
 #import "NSMPlayerLogging.h"
 #import <Bolts/Bolts.h>
+#import <NSMPlayer/NSMPlayerError.h>
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 
@@ -42,14 +43,12 @@
 }
 
 - (IBAction)allowMobileNetworkChange:(UISwitch *)sender {
-    if (sender.isOn) {
-        if (NSMVideoPlayerStatusFailed == [self.playerController.videoPlayer currentStatus]) {
-            NSError *playerError = [self.playerController.videoPlayer playerError];
-            if (playerError != nil) {
-                NSMPlayerRestoration *restoration = playerError.userInfo[NSMVideoPlayerRestorationKey];
-                restoration.allowWWAN = sender.isOn;
-                [self.playerController.videoPlayer restorePlayerWithRestoration:restoration];
-            }
+    if (NSMVideoPlayerStatusFailed == [self.playerController.videoPlayer currentStatus]) {
+        NSMPlayerError *playerError = [self.playerController.videoPlayer playerError];
+        if (playerError != nil) {
+            NSMPlayerRestoration *restoration = playerError.restoration;
+            restoration.allowWWAN = sender.isOn;
+            [self.playerController.videoPlayer restorePlayerWithRestoration:restoration];
         }
     } else {
         [self.playerController.videoPlayer setAllowWWAN:sender.isOn];
@@ -63,7 +62,6 @@
 - (IBAction)mutedChange:(UISwitch *)sender {
     [self.playerController.videoPlayer setMuted:sender.isOn];
 }
-
 
 - (IBAction)volumChange:(UISlider *)sender {
     [self.playerController.videoPlayer setVolume:sender.value];
@@ -100,6 +98,7 @@
     if (sender.isOn) {
         self.playerController.videoPlayer.playerType = NSMVideoPlayerAVPlayer;
     } else {
+        self.playerController.videoPlayer.playerType = NSMVideoPlayerIJKPlayer;
         NSLog(@"IJKPlayer还没有添加");
     }
 }

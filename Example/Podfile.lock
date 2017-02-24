@@ -5,6 +5,7 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
+  - Bugly (2.4.6)
   - CocoaLumberjack (3.0.0):
     - CocoaLumberjack/Default (= 3.0.0)
     - CocoaLumberjack/Extensions (= 3.0.0)
@@ -35,6 +36,7 @@ PODS:
   - Specta (1.0.6)
 
 DEPENDENCIES:
+  - Bugly
   - Expecta
   - Expecta+Snapshots
   - FBSnapshotTestCase
@@ -47,6 +49,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
+  Bugly: 7756e72c59387b0d490f46e83ab458ae94ee7fba
   CocoaLumberjack: c823149bccc5519a9447aeb433be7b1212a7d6a5
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
   Expecta+Snapshots: aee0487f8bbb9df7e0b7735380565ac06207e959
@@ -57,6 +60,6 @@ SPEC CHECKSUMS:
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465
 
-PODFILE CHECKSUM: b5bfce22bcb986e9abec5fb7ee3a6c91536bd0db
+PODFILE CHECKSUM: b20e7dcc914c89b6c49f4e968f23ce1bfd039056
 
 COCOAPODS: 1.2.0

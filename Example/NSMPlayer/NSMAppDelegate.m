@@ -9,13 +9,14 @@
 #import "NSMAppDelegate.h"
 #import "NSMPlayerLogging.h"
 #import <CocoaLumberjack/CocoaLumberjack.h>
+#import <Bugly/Bugly.h>
 
 @implementation NSMAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    
+    [Bugly startWithAppId:@"30acc17426"];
     NSMPlayerLogDebug(@"didFinishLaunchingWithOptions");
     
     return YES;

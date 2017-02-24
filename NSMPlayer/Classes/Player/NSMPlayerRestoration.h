@@ -11,7 +11,7 @@
 
 @protocol NSMVideoPlayerProtocol;
 
-@class NSMPlayerAsset;
+@class NSMPlayerAsset, NSMPlayerError;
 
 @interface NSMPlayerRestoration : NSObject
 
@@ -31,11 +31,10 @@
 
 @property (nonatomic, assign) NSMVideoPlayerType playerType;
 
-@property (nonatomic, strong) NSError *playerError;
+@property (nonatomic, strong) NSMPlayerError *playerError;
 
 @property (nonatomic, assign) NSMVideoPlayerStatus restoredStatus;
 
-@property (nonatomic, assign, getter=isRestoring) BOOL restoring;
 
 @property (nonatomic, assign, getter=isIntentToPlay) BOOL intentToPlay;
 

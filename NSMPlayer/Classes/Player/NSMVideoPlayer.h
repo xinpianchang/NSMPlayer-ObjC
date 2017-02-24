@@ -14,6 +14,7 @@
 #import "NSMPlayerRestoration.h"
 #import "NSMUnderlyingPlayerProtocol.h"
 
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
@@ -29,6 +30,7 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerMessageType) {
     NSMVideoPlayerEventLoopPlayback,
     NSMVideoPlayerEventWaitingBufferToPlay,
     NSMVideoPlayerEventEnoughBufferToPlay,
+    NSMVideoPlayerEventUpdateBuffering,
     NSMVideoPlayerEventReleasePlayer,
     NSMVideoPlayerEventSeek,
     NSMVideoPlayerEventFailure,
@@ -115,6 +117,7 @@ FOUNDATION_EXPORT NSString * const NSMVideoPlayerNewStatusKey;
 
 @end
 
+@class NSMPlayerError;
 @interface NSMVideoPlayer : NSMStateMachine <NSMVideoPlayerProtocol>
 
 @property (nonatomic, strong) id<NSMUnderlyingPlayerProtocol> underlyingPlayer;
@@ -131,15 +134,17 @@ FOUNDATION_EXPORT NSString * const NSMVideoPlayerNewStatusKey;
 @property (nonatomic, strong) NSMPlayerState *pausedState;
 @property (nonatomic, strong) NSMPlayerState *pausingState;
 @property (nonatomic, strong) NSMPlayerState *completedState;
+
 @property (nullable, nonatomic, strong) NSMPlayerRestoration *tempRestoringConfig;
 
-@property (nullable, nonatomic, strong) NSError *playerError;
+@property (nullable, nonatomic, strong) NSMPlayerError *playerError;
 
 /**
  在 preparing 的时候接受到 Play/Pause 等 Event 时，需要记录用户<测试人员的>的 是否最终想要播放的一种意图。
  */
 @property (nonatomic, assign) BOOL intentToPlay;
 
+@property (nonatomic, assign, getter = isBuffering) BOOL buffering;
 
 /**
  判断播放器是否处在某个状态层级中

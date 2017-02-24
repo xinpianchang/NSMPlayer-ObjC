@@ -33,9 +33,9 @@ cd ${WORKSPACE}/Example
 
 rm -rf ${WORKSPACE}/Example/Pods
 
-pod repo update vmovier-scm-nsm-specs
-pod repo update taobao-baichuansdk-alibcspecs
-pod repo update vmovier-scm-im3-magicboxspecs
+#pod repo update vmovier-scm-nsm-specs
+#pod repo update taobao-baichuansdk-alibcspecs
+#pod repo update vmovier-scm-im3-magicboxspecs
 pod install
 
 set -e

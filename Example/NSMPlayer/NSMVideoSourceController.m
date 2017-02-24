@@ -7,11 +7,13 @@
 //
 
 #import "NSMVideoSourceController.h"
+
 @import NSMPlayer;
 
 @interface NSMVideoSourceController ()
 
 @property (nonatomic, strong) NSMutableArray *urls;
+
 @end
 
 @implementation NSMVideoSourceController

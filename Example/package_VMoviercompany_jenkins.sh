@@ -9,7 +9,7 @@
 #CONFIGRATION="Debug"
 
 #<一>-------定义一些常量
-WORK_SPACE="MagicBox.xcworkspace"
+WORK_SPACE="NSMPlayer.xcworkspace"
 
 
 #SCHEME名字
@@ -29,9 +29,9 @@ IPA_NAME="${SCHEME}_release.ipa"
 BUILD_DIR="${SCHEME}_Build"
 echo "----------------------------------------${WORKSPACE}"
 echo "PATH:"$PATH
-cd ${WORKSPACE}
+cd ${WORKSPACE}/Example
 
-rm -rf ${WORKSPACE}/Pods
+rm -rf ${WORKSPACE}/Example/Pods
 
 pod repo update vmovier-scm-nsm-specs
 pod repo update taobao-baichuansdk-alibcspecs
@@ -60,32 +60,18 @@ VersionString="${mainVersion}.${BUILD_NUMBER}"
 echo ${VersionString} > ${WORKSPACE}/version.txt
 
 
-if [ $SCHEME = "MagicBox" ]
-then
-
-echo "----------------------------------------${SCHEME}"
 
 #证书信息
 DEVELOP_IDENTITY="iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)"
 DEVELOPMENT_TEAM='7GL725C6FL'
 #描述文件
-PROFILE="2b7b166d-85bf-46c5-98bf-b9a908b589ef"
-PROFILENAME='com_molihe_AdHoc'
+PROFILE="69bc3f2c-7f66-48fa-9f34-731c1e8335bb"
+PROFILENAME='XC iOS Ad Hoc:*'
 #Info.plist的文件路径
-INFOPLIST_FILE="${WORKSPACE}/MagicBox/MagicBox/Info.plist"
+INFOPLIST_FILE="${WORKSPACE}/Example/NSMPlayer/NSMPlayer-Info.plist"
 
-else
-echo "----------------------------------------${SCHEME}"
-DEVELOPMENT_TEAM='QK99YTSTSE'
-#证书信息
-DEVELOP_IDENTITY="iPhone Distribution: Honorary Academy Technology Co. Ltd."
-#描述文件
-PROFILE="cc62f315-006a-41c9-839b-235b0f0c9f06"
-PROFILENAME='com_molihe_test_AdHoc'
-#Info.plist的文件路径
-INFOPLIST_FILE="${WORKSPACE}/MagicBox/MagicBox/TestInfo.plist"
 
-fi
+
 
 set -e
 

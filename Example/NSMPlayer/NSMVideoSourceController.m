@@ -7,7 +7,7 @@
 //
 
 #import "NSMVideoSourceController.h"
-#import "NSMPlayerAsset.h"
+@import NSMPlayer;
 
 @interface NSMVideoSourceController ()
 

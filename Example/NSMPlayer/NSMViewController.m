@@ -6,15 +6,10 @@
 //  Copyright (c) 2017 migrant. All rights reserved.
 //
 
+@import NSMPlayer;
 #import "NSMViewController.h"
-#import <NSMPlayer/NSMVideoPlayerController.h>
-#import <Masonry/Masonry.h>
 #import "NSMVideoSourceController.h"
-#import "NSMPlayerAsset.h"
-#import "NSMVideoPlayer.h"
-#import "NSMPlayerLogging.h"
 #import <Bolts/Bolts.h>
-#import <NSMPlayer/NSMPlayerError.h>
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 

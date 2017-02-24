@@ -7,9 +7,9 @@
 //
 
 #import "NSMAppDelegate.h"
-#import <CocoaLumberjack/CocoaLumberjack.h>
 #import <Bugly/Bugly.h>
 @import NSMPlayer;
+@import CocoaLumberjack;
 
 @implementation NSMAppDelegate
 

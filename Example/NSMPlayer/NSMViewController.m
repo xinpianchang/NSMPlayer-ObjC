@@ -5,11 +5,11 @@
 //  Created by migrant on 02/10/2017.
 //  Copyright (c) 2017 migrant. All rights reserved.
 //
-
+@import Bolts;
 @import NSMPlayer;
 #import "NSMViewController.h"
 #import "NSMVideoSourceController.h"
-#import <Bolts/Bolts.h>
+//#import <Bolts/Bolts.h>
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 

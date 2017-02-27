@@ -71,8 +71,6 @@ PROFILENAME='XC iOS Ad Hoc: *'
 INFOPLIST_FILE="${WORKSPACE}/Example/NSMPlayer/NSMPlayer-Info.plist"
 
 
-
-
 set -e
 
 # /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VersionString" $INFOPLIST_FILE
@@ -87,10 +85,16 @@ set -e
 #xcodebuild -workspace $WORK_SPACE -scheme $SCHEME -configuration ${CONFIGRATION} CONFIGURATION_BUILD_DIR=$customBuildPath ONLY_ACTIVE_ARCH=NO PRODUCT_BUNDLE_IDENTIFIER=$BUNDLEID  PROVISIONING_PROFILE="$PROFILE" CODE_SIGN_IDENTITY="$DEVELOP_IDENTITY"
 #执行ARCHIVE:
 
-xcodebuild -scheme $SCHEME -archivePath $BUILD_DIR/${SCHEME}.xcarchive  archive PROVISIONING_PROFILE_SPECIFIER="$PROFILENAME" DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" CODE_SIGN_IDENTITY="$DEVELOP_IDENTITY" ONLY_ACTIVE_ARCH=NO
+#xcodebuild -scheme $SCHEME -archivePath $BUILD_DIR/${SCHEME}.xcarchive  archive PROVISIONING_PROFILE_SPECIFIER="$PROFILENAME" DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" CODE_SIGN_IDENTITY="$DEVELOP_IDENTITY" ONLY_ACTIVE_ARCH=NO
+
+
+xcodebuild -workspace $WORK_SPACE -scheme $SCHEME -archivePath $BUILD_DIR/${SCHEME}.xcarchive archive ONLY_ACTIVE_ARCH=NO
+
 set -e
+
 #导出IPA:
 xcodebuild -exportArchive -exportFormat IPA -archivePath $BUILD_DIR/${SCHEME}.xcarchive -exportPath $BUILD_DIR/${IPA_NAME} -exportProvisioningProfile "${PROFILENAME}"
+
 set -e
 #<四>-------打包
 #mkdir -p ${IPA_DESTINATION_DIERECTORY}

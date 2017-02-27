@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1FAD1C9836607CBC7580C41C /* Pods_NSMPlayer_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C75A92C32043E9D5CD17191D /* Pods_NSMPlayer_Tests.framework */; };
+		46099D86635D7B91A36C4C23 /* Pods_NSMPlayer_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 129A7898763E4D5902C45769 /* Pods_NSMPlayer_Example.framework */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -22,9 +24,7 @@
 		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
-		A6A551EEB1B361355BA312BE /* Pods_NSMPlayer_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B245789E2930947D3E7B296B /* Pods_NSMPlayer_Example.framework */; };
 		AF5E3FAE1E5405E9009325F4 /* NSMVideoSourceController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF5E3FAD1E5405E9009325F4 /* NSMVideoSourceController.m */; };
-		CFDEB84F2620D1D466B88A59 /* Pods_NSMPlayer_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6C3EDB5A9C3FE37324F7A0 /* Pods_NSMPlayer_Tests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,8 +37,22 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		AF04162B1E603F0400D410FD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		0E4953B8EAD17AB38424E488 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		129A7898763E4D5902C45769 /* Pods_NSMPlayer_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NSMPlayer_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		353D816CCCB5BFA7A26FF5E6 /* Pods-NSMPlayer_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NSMPlayer_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NSMPlayer_Example/Pods-NSMPlayer_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		491D54AA9868915A06CA63D7 /* Pods-NSMPlayer_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NSMPlayer_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NSMPlayer_Tests/Pods-NSMPlayer_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		53F3A884146913A6189BDD20 /* Pods-NSMPlayer_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NSMPlayer_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NSMPlayer_Tests/Pods-NSMPlayer_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -67,9 +81,8 @@
 		9FF6A8AA9AA90156EF86244F /* Pods-NSMPlayer_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NSMPlayer_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-NSMPlayer_Example/Pods-NSMPlayer_Example.release.xcconfig"; sourceTree = "<group>"; };
 		AF5E3FAC1E5405E9009325F4 /* NSMVideoSourceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMVideoSourceController.h; sourceTree = "<group>"; };
 		AF5E3FAD1E5405E9009325F4 /* NSMVideoSourceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMVideoSourceController.m; sourceTree = "<group>"; };
-		B245789E2930947D3E7B296B /* Pods_NSMPlayer_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NSMPlayer_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BA2DF6B2999B44B4742F99 /* NSMPlayer.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = NSMPlayer.podspec; path = ../NSMPlayer.podspec; sourceTree = "<group>"; };
-		DB6C3EDB5A9C3FE37324F7A0 /* Pods_NSMPlayer_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NSMPlayer_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C75A92C32043E9D5CD17191D /* Pods_NSMPlayer_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NSMPlayer_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,7 +93,7 @@
 				6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */,
 				6003F592195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F58E195388D20070C39A /* Foundation.framework in Frameworks */,
-				A6A551EEB1B361355BA312BE /* Pods_NSMPlayer_Example.framework in Frameworks */,
+				46099D86635D7B91A36C4C23 /* Pods_NSMPlayer_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,7 +104,7 @@
 				6003F5B0195388D20070C39A /* XCTest.framework in Frameworks */,
 				6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */,
-				CFDEB84F2620D1D466B88A59 /* Pods_NSMPlayer_Tests.framework in Frameworks */,
+				1FAD1C9836607CBC7580C41C /* Pods_NSMPlayer_Tests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,8 +139,8 @@
 				6003F58F195388D20070C39A /* CoreGraphics.framework */,
 				6003F591195388D20070C39A /* UIKit.framework */,
 				6003F5AF195388D20070C39A /* XCTest.framework */,
-				B245789E2930947D3E7B296B /* Pods_NSMPlayer_Example.framework */,
-				DB6C3EDB5A9C3FE37324F7A0 /* Pods_NSMPlayer_Tests.framework */,
+				129A7898763E4D5902C45769 /* Pods_NSMPlayer_Example.framework */,
+				C75A92C32043E9D5CD17191D /* Pods_NSMPlayer_Tests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -214,6 +227,7 @@
 				6003F588195388D20070C39A /* Resources */,
 				263B7B7105C17B873A54A9E7 /* [CP] Embed Pods Frameworks */,
 				09E604D6F8EDBF821321FA54 /* [CP] Copy Pods Resources */,
+				AF04162B1E603F0400D410FD /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -256,6 +270,7 @@
 				ORGANIZATIONNAME = migrant;
 				TargetAttributes = {
 					6003F589195388D20070C39A = {
+						DevelopmentTeam = 7GL725C6FL;
 						ProvisioningStyle = Manual;
 					};
 					6003F5AD195388D20070C39A = {
@@ -544,17 +559,29 @@
 			baseConfigurationReference = 353D816CCCB5BFA7A26FF5E6 /* Pods-NSMPlayer_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = 7GL725C6FL;
+				ENABLE_BITCODE = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/Bolts\"",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/CocoaLumberjack\"",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/Masonry\"",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/NSMPlayer\"",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/NSMStateMachine\"",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/Reachability\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NSMPlayer/NSMPlayer-Prefix.pch";
 				INFOPLIST_FILE = "NSMPlayer/NSMPlayer-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "69bc3f2c-7f66-48fa-9f34-731c1e8335bb";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE = "9438a14f-1d9a-47b4-bacc-beaddabbb6f9";
+				PROVISIONING_PROFILE_SPECIFIER = NSMPlayerProfile;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -564,17 +591,20 @@
 			baseConfigurationReference = 9FF6A8AA9AA90156EF86244F /* Pods-NSMPlayer_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
-				DEVELOPMENT_TEAM = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				DEVELOPMENT_TEAM = 7GL725C6FL;
+				ENABLE_BITCODE = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NSMPlayer/NSMPlayer-Prefix.pch";
 				INFOPLIST_FILE = "NSMPlayer/NSMPlayer-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "69bc3f2c-7f66-48fa-9f34-731c1e8335bb";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE = "9438a14f-1d9a-47b4-bacc-beaddabbb6f9";
+				PROVISIONING_PROFILE_SPECIFIER = NSMPlayerProfile;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

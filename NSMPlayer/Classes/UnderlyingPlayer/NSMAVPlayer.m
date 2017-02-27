@@ -5,9 +5,11 @@
 //  Created by chengqihan on 2017/2/9.
 //  Copyright © 2017年 chengqihan. All rights reserved.
 //
+@import MediaPlayer;
+@import Bolts;
 
 #import "NSMAVPlayer.h"
-#import <Bolts/Bolts.h>
+//#import <Bolts/Bolts.h>
 #import "NSMAVPlayerView.h"
 #import "NSMPlayerProtocol.h"
 #import "NSMPlayerLogging.h"
@@ -22,6 +24,7 @@
 @property (nonatomic, strong) NSMPlayerAsset *currentAsset;
 @property (nonatomic, strong) NSProgress *playbackProgress;
 @property (nonatomic, strong) NSProgress *bufferProgress;
+//@property (nonatomic, strong) UISlider *volumSliderView;
 
 @end
 
@@ -34,6 +37,12 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+//        MPVolumeView *volumeView = [[MPVolumeView alloc] init];
+//        [volumeView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+//            if([obj isKindOfClass:[UISlider class]]){
+//                _volumSliderView = obj;
+//            }
+//        }];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         _playbackProgress = [NSProgress progressWithTotalUnitCount:0];
         _bufferProgress = [NSProgress progressWithTotalUnitCount:0];
@@ -218,10 +227,12 @@
 }
 
 - (void)setVolume:(CGFloat)volume {
+//    self.volumSliderView.value = volume;
     self.avplayer.volume = volume;
 }
 
 - (CGFloat)volume {
+//    return self.volumSliderView.value;
     return self.avplayer.volume;
 }
 
@@ -289,7 +300,7 @@
         //indicates that playback has consumed all buffered media and that playback will stall or end
         if (self.avplayer.currentItem.isPlaybackBufferEmpty) {
 //            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
-            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
+            //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
         } else {
 //            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
         }
@@ -297,13 +308,13 @@
     } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
         //Indicates whether the item will likely play through without stalling
         if (self.avplayer.currentItem.isPlaybackLikelyToKeepUp) {
-//            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
+            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:nil];
         } else {
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
-//            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
+            NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
         }
-    }
+    } 
 }
 
 #pragma mark - NSNotification

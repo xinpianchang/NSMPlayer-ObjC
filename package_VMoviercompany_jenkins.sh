@@ -62,11 +62,11 @@ echo ${VersionString} > ${WORKSPACE}/version.txt
 
 
 #证书信息
-DEVELOP_IDENTITY="iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)"
-DEVELOPMENT_TEAM='7GL725C6FL'
+#DEVELOP_IDENTITY="iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)"
+#DEVELOPMENT_TEAM='7GL725C6FL'
 #描述文件
-PROFILE="69bc3f2c-7f66-48fa-9f34-731c1e8335bb"
-PROFILENAME='XC iOS Ad Hoc: *'
+#PROFILE="69bc3f2c-7f66-48fa-9f34-731c1e8335bb"
+#PROFILENAME='XC iOS Ad Hoc: *'
 #Info.plist的文件路径
 INFOPLIST_FILE="${WORKSPACE}/Example/NSMPlayer/NSMPlayer-Info.plist"
 
@@ -93,7 +93,7 @@ xcodebuild -workspace $WORK_SPACE -scheme $SCHEME -archivePath $BUILD_DIR/${SCHE
 set -e
 
 #导出IPA:
-xcodebuild -exportArchive -exportFormat IPA -archivePath $BUILD_DIR/${SCHEME}.xcarchive -exportPath $BUILD_DIR/${IPA_NAME} -exportProvisioningProfile "${PROFILENAME}"
+xcodebuild -exportArchive -exportFormat IPA -archivePath $BUILD_DIR/${SCHEME}.xcarchive -exportPath $BUILD_DIR/${IPA_NAME} #-exportProvisioningProfile "${PROFILENAME}"
 
 set -e
 #<四>-------打包

@@ -449,14 +449,14 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             return YES;
         }
             
-        case NSMVideoPlayerEventUpdateBuffering: {
-            if (self.videoPlayer.isBuffering) {
-                [self.videoPlayer transitionToState:self.videoPlayer.waitBufferingToPlayState];
-            } else {
-                [self.videoPlayer transitionToState:self.videoPlayer.playingState];
-            }
-            return YES;
-        }
+//        case NSMVideoPlayerEventUpdateBuffering: {
+//            if (self.videoPlayer.isBuffering) {
+//                [self.videoPlayer transitionToState:self.videoPlayer.waitBufferingToPlayState];
+//            } else {
+//                [self.videoPlayer transitionToState:self.videoPlayer.playingState];
+//            }
+//            return YES;
+//        }
             
         case NSMVideoPlayerActionPlay:
         case NSMVideoPlayerEventPlay:
@@ -478,10 +478,12 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-//        case NSMVideoPlayerEventWaitingBufferToPlay: {
-//            [self.videoPlayer transitionToState:self.videoPlayer.waitBufferingToPlayState];
-//            return YES;
-//        }
+        case NSMVideoPlayerEventUpdateBuffering: {
+            if (self.videoPlayer.isBuffering) {
+                [self.videoPlayer transitionToState:self.videoPlayer.waitBufferingToPlayState];
+            }
+            return YES;
+        }
         
         default:
             return NO;
@@ -498,10 +500,12 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-//        case NSMVideoPlayerEventEnoughBufferToPlay: {
-//            [self.videoPlayer transitionToState:self.videoPlayer.playingState];
-//            return YES;
-//        }
+        case NSMVideoPlayerEventUpdateBuffering: {
+            if (!self.videoPlayer.isBuffering) {
+                [self.videoPlayer transitionToState:self.videoPlayer.playingState];
+            }
+            return YES;
+        }
         
         default:
             return NO;
@@ -622,7 +626,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
         [_reach startNotifier];
         
-        _volume = 1;
+        //_volume = 1;
         _currentStatus =  NSMVideoPlayerStatusUnknown;
         self.players = [NSMutableDictionary dictionary];
         self.stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];

@@ -7,9 +7,11 @@
 //
 @import Bolts;
 @import NSMPlayer;
+@import MediaPlayer;
+
 #import "NSMViewController.h"
 #import "NSMVideoSourceController.h"
-//#import <Bolts/Bolts.h>
+
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 
@@ -83,6 +85,7 @@
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
+    return;
     [[self.playerController.videoPlayer seekToTime:sender.value] continueWithExecutor:[BFExecutor mainThreadExecutor] withBlock:^id _Nullable(BFTask * _Nonnull t) {
         [self.playerController.videoPlayer setRate:1.0];
         return nil;
@@ -109,13 +112,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self.playerController.videoPlayer setVolume:self.volumSlider.value];
     self.playHeadSlider.continuous = NO;
-    [self.playHeadSlider addTarget:self action:@selector(beginSrubbing) forControlEvents:UIControlEventTouchDragInside];
+    [self.playHeadSlider addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchCancel];
 }
 
-- (void)beginSrubbing {
+
+    
+- (void)beginSrubbing:(UISlider *)sender {
     [self.playerController.videoPlayer setRate:0.0];
 }
+
 - (void)videoPlayerStatusDidChange {
     [self updateView];
 }
@@ -159,7 +167,6 @@
         }
         
     } else {
-        
         if ([keyPath isEqualToString:@"completedUnitCount"]) {
             NSProgress *bufferProgress = (NSProgress *)object;
             self.loadProgress.progress = bufferProgress.fractionCompleted;
@@ -172,4 +179,5 @@
     [self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 }
 
+    
 @end

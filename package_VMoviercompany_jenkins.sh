@@ -66,7 +66,7 @@ echo ${VersionString} > ${WORKSPACE}/version.txt
 #DEVELOPMENT_TEAM='7GL725C6FL'
 #描述文件
 #PROFILE="69bc3f2c-7f66-48fa-9f34-731c1e8335bb"
-#PROFILENAME='XC iOS Ad Hoc: *'
+PROFILENAME='NSMPlayerProfile'
 #Info.plist的文件路径
 INFOPLIST_FILE="${WORKSPACE}/Example/NSMPlayer/NSMPlayer-Info.plist"
 

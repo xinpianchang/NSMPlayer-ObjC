@@ -198,6 +198,16 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     self.videoPlayer.playerError = nil;
 }
 
+- (BOOL)processMessage:(NSMMessage *)message {
+    switch (message.messageType) {
+        case NSMVideoPlayerEventFailure:
+            return YES;
+            
+        default:
+            return NO;
+    }
+}
+
 @end
 
 @implementation NSMPlayerPreparingState

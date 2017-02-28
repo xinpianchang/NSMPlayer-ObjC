@@ -7,14 +7,15 @@
 //
 @import MediaPlayer;
 @import Bolts;
+@import Reachability;
 
 #import "NSMAVPlayer.h"
-//#import <Bolts/Bolts.h>
 #import "NSMAVPlayerView.h"
 #import "NSMPlayerProtocol.h"
 #import "NSMPlayerLogging.h"
 #import "NSMPlayerAsset.h"
 #import "NSMUnderlyingPlayer.h"
+
 
 @interface NSMAVPlayer ()
 
@@ -139,7 +140,8 @@
     /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemFailedToPlayToEndTime:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:playerItem];
-    
+    //The notification’s object is the AVPlayerItem instance whose playback was unable to continue because the necessary streaming media wasn’t delivered in a timely fashion over a network.
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemPlaybackStalled:) name:AVPlayerItemPlaybackStalledNotification object:playerItem];
     
     [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
@@ -297,7 +299,7 @@
         }
         
     } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
-        //indicates that playback has consumed all buffered media and that playback will stall or end
+        //indicates that playback has consumed all buffered media and that playback will stall or ends
         if (self.avplayer.currentItem.isPlaybackBufferEmpty) {
 //            NSMPlayerLogDebug(@"playbackBufferEmpty:%@",@(self.avplayer.currentItem.playbackBufferEmpty));
             //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
@@ -311,8 +313,14 @@
             NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:nil];
         } else {
-            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
             NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
+            // checkout network state
+            if(![[Reachability reachabilityForInternetConnection] isReachable]) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : [NSError errorWithDomain:NSURLErrorDomain code:-1005 userInfo:@{NSLocalizedFailureReasonErrorKey : @"connect failed"}]}];
+                [self.avplayer pause];
+            } else {
+                [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
+            }
         }
     } 
 }
@@ -327,6 +335,10 @@
     NSLog(@"playerItemFailedToPlayToEndTime == %@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
 }
+
+//- (void)playerItemPlaybackStalled:(NSNotification *)notification {
+    //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
+//}
 
 - (void)dealloc {
     [self removeTimeObserverToken];

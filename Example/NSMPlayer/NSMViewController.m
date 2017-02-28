@@ -24,10 +24,22 @@
 @property (nonatomic, strong) NSMPlayerRestoration *saveConfig;
 @property (weak, nonatomic) IBOutlet UILabel *durationLabel;
 @property (weak, nonatomic) IBOutlet UILabel *currentTimeLabel;
+@property (nonatomic, strong) UISlider *volumSliderView;
+@property (nonatomic, assign) BOOL allowWWAN;
 
 @end
 
 @implementation NSMViewController
+
+- (IBAction)retry:(UIButton *)sender {
+    if (NSMVideoPlayerStatusFailed == [self.playerController.videoPlayer currentStatus]) {
+        NSMPlayerError *playerError = [self.playerController.videoPlayer playerError];
+        if (playerError != nil) {
+            NSMPlayerRestoration *restoration = playerError.restoration;
+            [self.playerController.videoPlayer restorePlayerWithRestoration:restoration];
+        }
+    }
+}
 
 - (IBAction)chooseSource:(UIBarButtonItem *)sender {
     NSMVideoSourceController *meauVC = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"source"];
@@ -40,6 +52,7 @@
 }
 
 - (IBAction)allowMobileNetworkChange:(UISwitch *)sender {
+    self.allowWWAN = sender.isOn;
     if (NSMVideoPlayerStatusFailed == [self.playerController.videoPlayer currentStatus]) {
         NSMPlayerError *playerError = [self.playerController.videoPlayer playerError];
         if (playerError != nil) {
@@ -61,7 +74,8 @@
 }
 
 - (IBAction)volumChange:(UISlider *)sender {
-    [self.playerController.videoPlayer setVolume:sender.value];
+//    [self.playerController.videoPlayer setVolume:sender.value];
+    self.volumSliderView.value = sender.value;
 }
 - (IBAction)play:(UIButton *)sender {
     [self.playerController.videoPlayer play];
@@ -80,12 +94,12 @@
 }
 
 - (IBAction)restore:(UIButton *)sender {
+    self.saveConfig.allowWWAN = self.allowWWAN;
     [self.playerController.videoPlayer restorePlayerWithRestoration:self.saveConfig];
     NSLog(@"restore");
 }
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
-    return;
     [[self.playerController.videoPlayer seekToTime:sender.value] continueWithExecutor:[BFExecutor mainThreadExecutor] withBlock:^id _Nullable(BFTask * _Nonnull t) {
         [self.playerController.videoPlayer setRate:1.0];
         return nil;
@@ -113,12 +127,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self setupVolumeView];
     [self.playerController.videoPlayer setVolume:self.volumSlider.value];
     self.playHeadSlider.continuous = NO;
     [self.playHeadSlider addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchCancel];
 }
 
-
+- (void)setupVolumeView {
+    MPVolumeView *volumeView = [[MPVolumeView alloc] init];
+    [volumeView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if([obj isKindOfClass:[UISlider class]]){
+            _volumSliderView = obj;
+        }
+    }];
+}
     
 - (void)beginSrubbing:(UISlider *)sender {
     [self.playerController.videoPlayer setRate:0.0];
@@ -168,8 +190,10 @@
         
     } else {
         if ([keyPath isEqualToString:@"completedUnitCount"]) {
-            NSProgress *bufferProgress = (NSProgress *)object;
-            self.loadProgress.progress = bufferProgress.fractionCompleted;
+            if(self.playerController.videoPlayer.currentStatus & NSMVideoPlayerStatusLevelReadyToPlay){
+                NSProgress *bufferProgress = (NSProgress *)object;
+                self.loadProgress.progress = bufferProgress.fractionCompleted;
+            }
         }
     }
 }

@@ -204,6 +204,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
         case NSMVideoPlayerEventFailure:
+            self.videoPlayer.tempRestoringConfig = nil;
             return YES;
             
         default:
@@ -271,10 +272,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             
             return YES;
         }
-        case NSMVideoPlayerEventFailure: {
             
-            return YES;
-        }
         case NSMVideoPlayerEventReplacePlayerItem:
         case NSMVideoPlayerEventStartPreparing: {
             if (self.videoPlayer.currentAsset == nil) {

@@ -45,12 +45,15 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 - (BOOL)processMessage:(NSMMessage *)message {
     
     switch (message.messageType) {
-        case NSMVideoPlayerEventPlayerTypeChange: {
+        case NSMVideoPlayerEventPlayerTypeChangeStart: {
             [self.videoPlayer setupUnderlyingPlayerWithPlayerType:(NSMVideoPlayerType)[message.userInfo intValue]];
             return YES;
         }
         
         case NSMVideoPlayerEventFailure: {
+            // restore -> preparing ->preparing receive EventFailure
+            self.videoPlayer.tempRestoringConfig = nil;
+            
             NSError *error = message.userInfo;
             NSMPlayerRestoration *restoration = [self.videoPlayer savePlayerState];
             NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
@@ -268,7 +271,10 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             
             return YES;
         }
-        
+        case NSMVideoPlayerEventFailure: {
+            
+            return YES;
+        }
         case NSMVideoPlayerEventReplacePlayerItem:
         case NSMVideoPlayerEventStartPreparing: {
             if (self.videoPlayer.currentAsset == nil) {
@@ -365,7 +371,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             return YES;
         }
         
-        case NSMVideoPlayerEventPlayerTypeChange:
+        case NSMVideoPlayerEventPlayerTypeChangeFinish:
         case NSMVideoPlayerEventReplacePlayerItem: {
             [self.videoPlayer transitionToState:self.videoPlayer.preparingState];
             NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventStartPreparing];
@@ -636,7 +642,8 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
         [_reach startNotifier];
         
-        //_volume = 1;
+        _volume = 1.0;
+        
         _currentStatus =  NSMVideoPlayerStatusUnknown;
         self.players = [NSMutableDictionary dictionary];
         self.stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];
@@ -923,7 +930,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 - (void)setPlayerType:(NSMVideoPlayerType)playerType {
     if (_playerType != playerType) {
         _playerType = playerType;
-        NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerTypeChange userInfo:@(playerType)];
+        NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerTypeChangeStart userInfo:@(playerType)];
         msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
         [self sendMessage:msg];
     }
@@ -931,15 +938,24 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (void)setupUnderlyingPlayerWithPlayerType:(NSMVideoPlayerType)playerType {
     id<NSMUnderlyingPlayerProtocol>  player = self.players[@(playerType)];
-    if (!player) {
+    if (player == nil) {
         if (NSMVideoPlayerAVPlayer == playerType) {
             player = [[NSMAVPlayer alloc] init];
+            self.players[@(playerType)] = player;
         } else if (NSMVideoPlayerIJKPlayer == playerType) {
-            
+//            player = [[NSMIJKPlayer alloc] init];
+//            self.players[@(playerType)] = player;
         }
     }
-    self.players[@(playerType)] = player;
-    self.underlyingPlayer = player;
+    
+    if (player != nil) {
+        if (self.underlyingPlayer != player) {
+            self.underlyingPlayer = player;
+            NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerTypeChangeFinish userInfo:@(playerType)];
+            msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
+            [self sendMessage:msg];
+        }
+    }
 }
 
 
@@ -1102,9 +1118,12 @@ inline NSString * NSMVideoPlayerMessageDescription (NSMVideoPlayerMessageType me
         case NSMVideoPlayerEventAllowWWANChange:
             return @"EventAllowWWANChange";
         
-        case NSMVideoPlayerEventPlayerTypeChange:
+        case NSMVideoPlayerEventPlayerTypeChangeStart:
             return @"EventPlayerTypeChange";
-        
+            
+        case NSMVideoPlayerEventPlayerTypeChangeFinish:
+            return @"EventPlayerTypeChangeFinish";
+            
         case NSMVideoPlayerEventPlayerRestore:
             return @"EventPlayerRestore";
 

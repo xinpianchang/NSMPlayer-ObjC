@@ -140,8 +140,11 @@
     /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemFailedToPlayToEndTime:) name:AVPlayerItemFailedToPlayToEndTimeNotification object:playerItem];
+    //Posted when some media did not arrive in time to continue playback.
+    //The notification’s object is the AVPlayerItem instance whose playback was unable to continue because the necessary streaming media wasn’t delivered in a timely fashion over a network. Playback of streaming media continues once a sufficient amount of data is delivered. File-based playback does not continue.< i doubt that，File-based palyback also continue>
+
     //The notification’s object is the AVPlayerItem instance whose playback was unable to continue because the necessary streaming media wasn’t delivered in a timely fashion over a network.
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemPlaybackStalled:) name:AVPlayerItemPlaybackStalledNotification object:playerItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemPlaybackStalled:) name:AVPlayerItemPlaybackStalledNotification object:playerItem];
     
     [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
@@ -332,13 +335,13 @@
 }
 
 - (void)playerItemFailedToPlayToEndTime:(NSNotification *)notification {
-    NSLog(@"playerItemFailedToPlayToEndTime == %@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
+    NSMPlayerLogInfo(@"playerItemFailedToPlayToEndTime == %@",notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]);
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
 }
 
-//- (void)playerItemPlaybackStalled:(NSNotification *)notification {
-    //[[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : notification.userInfo[AVPlayerItemFailedToPlayToEndTimeErrorKey]}];
-//}
+- (void)playerItemPlaybackStalled:(NSNotification *)notification {
+    NSMPlayerLogInfo(@"playerItemPlaybackStalled");
+}
 
 - (void)dealloc {
     [self removeTimeObserverToken];

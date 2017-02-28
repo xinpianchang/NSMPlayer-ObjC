@@ -87,8 +87,10 @@
 
 
 - (IBAction)releasePlayer:(UIButton *)sender {
-    NSMPlayerRestoration *saveConfig = [self.playerController.videoPlayer savePlayerState];
-    self.saveConfig = saveConfig;
+    if (self.playerController.videoPlayer.currentStatus != NSMVideoPlayerStatusIdle) {
+        NSMPlayerRestoration *saveConfig = [self.playerController.videoPlayer savePlayerState];
+        self.saveConfig = saveConfig;
+    }
     [self.playerController.videoPlayer releasePlayer];
     NSLog(@"releasePlayer");
 }
@@ -110,8 +112,8 @@
     if (sender.isOn) {
         self.playerController.videoPlayer.playerType = NSMVideoPlayerAVPlayer;
     } else {
-        self.playerController.videoPlayer.playerType = NSMVideoPlayerIJKPlayer;
         NSLog(@"IJKPlayer还没有添加");
+        self.playerController.videoPlayer.playerType = NSMVideoPlayerIJKPlayer;
     }
 }
 
@@ -126,9 +128,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.title = [NSString stringWithFormat:@"Build:#%@",[[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"]];
     
     [self setupVolumeView];
-    [self.playerController.videoPlayer setVolume:self.volumSlider.value];
     self.playHeadSlider.continuous = NO;
     [self.playHeadSlider addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchCancel];
 }

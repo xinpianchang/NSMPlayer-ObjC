@@ -93,7 +93,7 @@ xcodebuild -workspace $WORK_SPACE -scheme $SCHEME -archivePath $BUILD_DIR/${SCHE
 set -e
 
 #导出IPA:
-xcodebuild -exportArchive -exportFormat IPA -archivePath $BUILD_DIR/${SCHEME}.xcarchive -exportPath $BUILD_DIR/${IPA_NAME} #-exportProvisioningProfile "${PROFILENAME}"
+xcodebuild -exportArchive -exportFormat IPA -archivePath $BUILD_DIR/${SCHEME}.xcarchive -exportPath $BUILD_DIR/${IPA_NAME} -exportProvisioningProfile "${PROFILENAME}"
 
 set -e
 #<四>-------打包

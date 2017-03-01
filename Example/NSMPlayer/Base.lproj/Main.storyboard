@@ -249,11 +249,18 @@
                                     <action selector="retry:" destination="whP-gf-Uak" eventType="touchUpInside" id="hTT-vv-aaY"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bff-wB-Qbo">
+                                <rect key="frame" x="187.5" y="169.5" width="0.0" height="0.0"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="qNc-GM-rsO" secondAttribute="trailing" id="2yy-s5-PA9"/>
                             <constraint firstItem="xRv-b5-yHf" firstAttribute="leading" secondItem="iAI-Cm-Wrk" secondAttribute="leading" id="4s3-XV-z7h"/>
+                            <constraint firstItem="Bff-wB-Qbo" firstAttribute="centerX" secondItem="TpU-gO-2f1" secondAttribute="centerX" id="593-65-lJE"/>
                             <constraint firstItem="N5Z-JE-gOm" firstAttribute="height" secondItem="4es-Ik-A2o" secondAttribute="height" id="6m4-U7-Cfu"/>
                             <constraint firstItem="evY-U4-zxd" firstAttribute="centerY" secondItem="zSq-Ay-fXA" secondAttribute="centerY" id="841-au-XEX"/>
                             <constraint firstItem="qNc-GM-rsO" firstAttribute="top" secondItem="jch-AY-zuS" secondAttribute="bottom" constant="2" id="8Oa-tQ-5Rj"/>
@@ -269,6 +276,7 @@
                             <constraint firstItem="4es-Ik-A2o" firstAttribute="centerY" secondItem="evY-U4-zxd" secondAttribute="centerY" id="UDe-cz-36C"/>
                             <constraint firstItem="Miu-6b-cU1" firstAttribute="trailing" secondItem="N5Z-JE-gOm" secondAttribute="trailing" id="UOK-Bv-w6l"/>
                             <constraint firstItem="xhg-ag-M8A" firstAttribute="leading" secondItem="abK-s2-TbZ" secondAttribute="leading" id="V0C-MR-JPL"/>
+                            <constraint firstItem="Bff-wB-Qbo" firstAttribute="centerY" secondItem="TpU-gO-2f1" secondAttribute="centerY" constant="-164" id="VOf-8D-ryU"/>
                             <constraint firstItem="N5Z-JE-gOm" firstAttribute="width" secondItem="4es-Ik-A2o" secondAttribute="width" id="YmX-aE-tWb"/>
                             <constraint firstItem="Zzz-KM-SKc" firstAttribute="leading" secondItem="xhg-ag-M8A" secondAttribute="leading" id="Yyx-K0-Eo1"/>
                             <constraint firstAttribute="trailingMargin" secondItem="WuC-nO-nRk" secondAttribute="trailing" id="a3L-Ce-2kp"/>
@@ -302,6 +310,7 @@
                     <connections>
                         <outlet property="currentTimeLabel" destination="K4m-2b-Yuu" id="gXL-7q-NFg"/>
                         <outlet property="durationLabel" destination="ars-o5-vML" id="vk3-Am-0CT"/>
+                        <outlet property="failReasonLabel" destination="Bff-wB-Qbo" id="G1r-e0-qi7"/>
                         <outlet property="loadProgress" destination="1th-jT-y7U" id="ttV-f7-pf7"/>
                         <outlet property="playHeadSlider" destination="LSo-du-3If" id="nT9-ij-ks3"/>
                         <outlet property="playerStateLabel" destination="A1Z-yS-ibe" id="Opm-aq-g9Q"/>

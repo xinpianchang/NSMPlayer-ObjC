@@ -15,6 +15,7 @@
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 
+@property (weak, nonatomic) IBOutlet UILabel *failReasonLabel;
 @property (nonatomic, strong) NSMVideoPlayerController *playerController;
 @property (weak, nonatomic) IBOutlet UILabel *playerStateLabel;
 @property (weak, nonatomic) IBOutlet UILabel *playerTypeLabel;
@@ -135,6 +136,7 @@
     [self.playHeadSlider addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchCancel];
 }
 
+
 - (void)setupVolumeView {
     MPVolumeView *volumeView = [[MPVolumeView alloc] init];
     [volumeView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -153,6 +155,12 @@
 }
 
 - (void)updateView {
+    if (self.playerController.videoPlayer.currentStatus == NSMVideoPlayerStatusFailed) {
+        self.failReasonLabel.text = [self.playerController.videoPlayer.playerError.error localizedDescription];
+    } else {
+        self.failReasonLabel.text = @"";
+    }
+    
     self.playerStateLabel.text = NSMVideoPlayerStatusDescription(self.playerController.videoPlayer.currentStatus);
 }
 

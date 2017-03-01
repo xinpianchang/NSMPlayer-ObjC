@@ -121,7 +121,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 //                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
             } else {
 //                [self.videoPlayer transitionToState:self.videoPlayer.errorState];
-                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"播放器还没有设定播放URL"}]];
+                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"播放器还没有设定播放URL"}]];
                 msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                 [self sendMessage:msg];
                 //[self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"播放器还没有设定播放URL"}]];
@@ -203,9 +203,9 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (BOOL)processMessage:(NSMMessage *)message {
     switch (message.messageType) {
-        case NSMVideoPlayerEventFailure:
-            self.videoPlayer.tempRestoringConfig = nil;
+        case NSMVideoPlayerEventFailure: {
             return YES;
+        }
             
         default:
             return NO;
@@ -282,7 +282,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                     // 是否允许 3G/4G网络播放
                     [self.videoPlayer prepare];
                 } else {
-                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
+                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
                     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                     [self sendMessage:msg];
                 }
@@ -304,7 +304,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             } else {
                 //if avplayer has initialized, release
                 [self.videoPlayer.underlyingPlayer releasePlayer];
-                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
+                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
                 msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                 [self sendMessage:msg];
             }
@@ -321,7 +321,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                     NSMPlayerRestoration *restoration = message.userInfo;
                     [self.videoPlayer seekToTime:restoration.seekTime];
                 } else {
-                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
+                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
                     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                     [self sendMessage:msg];
                     //[self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
@@ -394,7 +394,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                 // 继续播放
             } else {
                 [self.videoPlayer.underlyingPlayer releasePlayer];
-                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
+                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
                 msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                 [self sendMessage:msg];
             }
@@ -840,6 +840,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         _allowWWAN = restoration.isAllowWWAN;
         _muted = restoration.isMuted;
         _volume = restoration.volume;
+        _playerError = restoration.playerError;
 //        _rate = config.rate;
         
         NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerRestore userInfo:restoration];

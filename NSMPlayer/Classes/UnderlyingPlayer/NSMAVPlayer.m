@@ -19,13 +19,11 @@
 
 @interface NSMAVPlayer ()
 
-@property (nonatomic, strong) AVURLAsset *asset;
 @property (nonatomic, strong) id timeObserverToken;
-@property (nonatomic, strong) BFTaskCompletionSource *prepareSouce;
+@property (nonatomic, strong) BFTaskCompletionSource *prepareSource;
 @property (nonatomic, strong) NSMPlayerAsset *currentAsset;
 @property (nonatomic, strong) NSProgress *playbackProgress;
 @property (nonatomic, strong) NSProgress *bufferProgress;
-//@property (nonatomic, strong) UISlider *volumSliderView;
 
 @end
 
@@ -66,7 +64,6 @@
 
 - (BFTask *)asynchronouslyLoadURLAsset:(AVURLAsset *)newAsset {
     BFTaskCompletionSource *source = [BFTaskCompletionSource taskCompletionSource];
-    self.prepareSouce = source;
     /*
      Using AVAsset now runs the risk of blocking the current thread
      (the main UI thread) whilst I/O happens to populate the
@@ -83,14 +80,14 @@
          */
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if (newAsset != self.asset) {
-                /*
-                 self.asset has already changed! No point continuing because
-                 another newAsset will come along in a moment.
-                 */
-                [source setError:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"asset has already changed"}]];
-                return;
-            }
+//            if (newAsset != self.asset) {
+//                /*
+//                 self.asset has already changed! No point continuing because
+//                 another newAsset will come along in a moment.
+//                 */
+//                [source setError:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"asset has already changed"}]];
+//                return;
+//            }
             
             /*
              Test whether the values of each of the keys we need have been
@@ -107,7 +104,7 @@
             
             // We can't play this asset.
             if (!newAsset.playable || newAsset.hasProtectedContent) {
-                [source setError:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"Can't use this AVAsset because it isn't playable or has protected content"}]];
+                [source setError:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"Can't use this AVAsset because it isn't playable or has protected content"}]];
                 return;
             }
             
@@ -115,14 +112,14 @@
              We can play this asset. Create a new AVPlayerItem and make it
              our player's current item.
              */
-            [self setupAVPlayerWithAsset:newAsset];
+            [self setupAVPlayerWithAsset:newAsset prepareSource:source];
             
         });
     }];
     return source.task;
 }
 
-- (void)setupAVPlayerWithAsset:(AVAsset *)asset {
+- (void)setupAVPlayerWithAsset:(AVAsset *)asset prepareSource:(BFTaskCompletionSource *)source {
     NSAssert([NSThread currentThread] == [NSThread mainThread], @"You should register for KVO change notifications and unregister from KVO change notifications on the main thread. ");
     
     AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:asset];
@@ -148,6 +145,8 @@
     
     [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
+    
+    self.prepareSource = source;
     
     if (self.avplayer == nil) {
         self.avplayer = [[AVPlayer alloc] init];
@@ -177,7 +176,6 @@
 
 - (BFTask *)prepare {
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.currentAsset.assetURL options:nil];
-    self.asset = asset;
     return [self asynchronouslyLoadURLAsset:asset];
 }
 
@@ -276,17 +274,20 @@
 //        NSMPlayerLogDebug(@"currentItem status %@",@(self.avplayer.currentItem.status));
         if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
             //Prepared finish
-            if (self.prepareSouce && !self.prepareSouce.task.isCompleted) {
+//            if (self.prepareSource && !self.prepareSource.task.isCompleted) {
 //                NSMVideoAssetInfo *assetInfo = [[NSMVideoAssetInfo alloc] init];
                NSTimeInterval duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
 //                assetInfo.duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
                 self.bufferProgress.totalUnitCount = self.playbackProgress.totalUnitCount = duration;
-                [self.prepareSouce setResult:@YES];
-            }
+                [self.prepareSource setResult:@YES];
+//            }
         } else if (AVPlayerItemStatusFailed == self.avplayer.currentItem.status) {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
             NSMPlayerLogError(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
-            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : self.avplayer.error}];
+//            [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : self.avplayer.error}];
+//            if (self.prepareSource && !self.prepareSource.task.isCompleted) {
+                [self.prepareSource setError:self.avplayer.error];
+//            }
         }
     } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
         //The array contains NSValue objects containing a CMTimeRange value indicating the times ranges for which the player item has media data readily available. The time ranges returned may be discontinuous.
@@ -319,7 +320,7 @@
             NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
             // checkout network state
             if(![[Reachability reachabilityForInternetConnection] isReachable]) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : [NSError errorWithDomain:NSURLErrorDomain code:-1005 userInfo:@{NSLocalizedFailureReasonErrorKey : @"connect failed"}]}];
+                [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : [NSError errorWithDomain:NSURLErrorDomain code:-1005 userInfo:@{NSLocalizedDescriptionKey : @"connect failed"}]}];
                 [self.avplayer pause];
             } else {
                 [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];
@@ -384,20 +385,20 @@
     [playerRenderView setPlayer:self];
 }
 
-- (UIImage *)thumnailImageWithTime:(CMTime)requestTime {
-    AVAsset *myAsset = self.asset;
-    if ([[myAsset tracksWithMediaType:AVMediaTypeVideo] count] > 0) {
-        AVAssetImageGenerator *imageGenerator =
-        [AVAssetImageGenerator assetImageGeneratorWithAsset:myAsset];
-        NSError *error;
-        CMTime actualTime;
-        CGImageRef halfWayImage = [imageGenerator copyCGImageAtTime:requestTime actualTime:&actualTime error:&error];
-        if (halfWayImage != NULL) {
-            return [UIImage imageWithCGImage:halfWayImage];
-        }
-    }
-    return nil;
-}
+//- (UIImage *)thumnailImageWithTime:(CMTime)requestTime {
+//    AVAsset *myAsset = self.asset;
+//    if ([[myAsset tracksWithMediaType:AVMediaTypeVideo] count] > 0) {
+//        AVAssetImageGenerator *imageGenerator =
+//        [AVAssetImageGenerator assetImageGeneratorWithAsset:myAsset];
+//        NSError *error;
+//        CMTime actualTime;
+//        CGImageRef halfWayImage = [imageGenerator copyCGImageAtTime:requestTime actualTime:&actualTime error:&error];
+//        if (halfWayImage != NULL) {
+//            return [UIImage imageWithCGImage:halfWayImage];
+//        }
+//    }
+//    return nil;
+//}
 
 
 @end

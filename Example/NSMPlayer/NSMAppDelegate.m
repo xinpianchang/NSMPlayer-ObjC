@@ -16,7 +16,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-//    [Bugly startWithAppId:@"30acc17426"];
+    [Bugly startWithAppId:@"30acc17426"];
     NSMPlayerLogDebug(@"didFinishLaunchingWithOptions");
     
     return YES;

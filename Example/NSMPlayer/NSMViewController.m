@@ -104,7 +104,9 @@
 
 - (IBAction)playHeaderChange:(UISlider *)sender {
     [[self.playerController.videoPlayer seekToTime:sender.value] continueWithExecutor:[BFExecutor mainThreadExecutor] withBlock:^id _Nullable(BFTask * _Nonnull t) {
-        [self.playerController.videoPlayer setRate:1.0];
+        if ([self.playerController.videoPlayer currentStatus] != NSMVideoPlayerStatusPaused) {
+            [self.playerController.videoPlayer setRate:1.0];
+        }
         return nil;
     }];
 }

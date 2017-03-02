@@ -131,10 +131,11 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:asset];
     // ensure that this is done before the playerItem is associated with the player
-    
-    [playerItem addObserver:self forKeyPath:@"status" options:0 context:NSMAVPlayerKVOContext];
-    [playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:0 context:NSMAVPlayerKVOContext];
-    [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:0 context:NSMAVPlayerKVOContext];
+    // Passing strings as key paths is strictly worse than using properties directly, as any typo or misspelling won’t be caught by the compiler, and will cause things to not work
+    // Since @selector looks through all available selectors in the target, this won’t prevent all mistakes, but it will catch most of them—including breaking changes made by Xcode automatic refactoring
+    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(status)) options:0 context:NSMAVPlayerKVOContext];
+    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) options:0 context:NSMAVPlayerKVOContext];
+    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isPlaybackLikelyToKeepUp)) options:0 context:NSMAVPlayerKVOContext];
     
     //playToEndTime
     /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
@@ -257,7 +258,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         return;
     }
     
-    if ([keyPath isEqualToString:@"status"]) {
+    if ([keyPath isEqualToString:NSStringFromSelector(@selector(status))]) {
         //        NSMPlayerLogDebug(@"currentItem status %@",@(self.avplayer.currentItem.status));
         if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
             NSTimeInterval duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
@@ -270,7 +271,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
             [self.prepareSource setError:self.avplayer.error];
             self.prepareSource = nil;
         }
-    } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
+    } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(loadedTimeRanges))]) {
         //The array contains NSValue objects containing a CMTimeRange value indicating the times ranges for which the player item has media data readily available. The time ranges returned may be discontinuous.
         NSArray *loadedTimeRanges = self.avplayer.currentItem.loadedTimeRanges;
         if (loadedTimeRanges) {
@@ -280,7 +281,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
             self.bufferProgress.completedUnitCount = rangeStartSeconds + rangeDurationSeconds;
         }
         
-    }  else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
+    }  else if ([keyPath isEqualToString:NSStringFromSelector(@selector(isPlaybackLikelyToKeepUp))]) {
         //Indicates whether the item will likely play through without stalling
         if (self.avplayer.currentItem.isPlaybackLikelyToKeepUp) {
             NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));

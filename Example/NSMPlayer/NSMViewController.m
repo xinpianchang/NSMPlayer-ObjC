@@ -174,10 +174,9 @@
             playerAsset.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
             [playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
             self.playerController = playerController;
-            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:@"totalUnitCount" options:0 context:nil];
-            //            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:@"totalUnitCount" options:0 context:nil];
-            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:@"completedUnitCount" options:0 context:nil];
-            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:@"completedUnitCount" options:0 context:nil];
+            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(totalUnitCount)) options:0 context:nil];
+            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
+            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
         }
     }
 }
@@ -187,23 +186,23 @@
     //playbackProgress
     if (object == self.playerController.videoPlayer.playbackProgress) {
         NSProgress *playbackProgress = (NSProgress *)object;
-        if ([keyPath isEqualToString:@"totalUnitCount"]) {
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(totalUnitCount))]) {
             NSTimeInterval douration = playbackProgress.totalUnitCount;
             NSInteger wholeMinutes = (int)trunc(douration / 60);
-            self.durationLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", wholeMinutes, (int)trunc(douration) - wholeMinutes * 60];
+            self.durationLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)wholeMinutes, (long)((int)trunc(douration) - wholeMinutes * 60)];
             self.playHeadSlider.maximumValue = playbackProgress.totalUnitCount;
             
-        } else if ([keyPath isEqualToString:@"completedUnitCount"]) {
+        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(completedUnitCount))]) {
             if(self.playerController.videoPlayer.currentStatus & NSMVideoPlayerStatusLevelReadyToPlay) {
                 NSTimeInterval currentTime = playbackProgress.completedUnitCount;
                 NSInteger currentMinutes = (int)trunc(currentTime / 60);
-                self.currentTimeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", currentMinutes, (int)trunc(currentTime) - currentMinutes * 60];
+                self.currentTimeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)currentMinutes, (long)((int)trunc(currentTime) - currentMinutes * 60)];
                 self.playHeadSlider.value = playbackProgress.completedUnitCount;
             }
         }
         
     } else {
-        if ([keyPath isEqualToString:@"completedUnitCount"]) {
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(completedUnitCount))]) {
             if(self.playerController.videoPlayer.currentStatus & NSMVideoPlayerStatusLevelReadyToPlay){
                 NSProgress *bufferProgress = (NSProgress *)object;
                 self.loadProgress.progress = bufferProgress.fractionCompleted;

@@ -131,12 +131,32 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActiveNotification) name:UIApplicationDidBecomeActiveNotification object:nil];
     self.title = [NSString stringWithFormat:@"Build:#%@",[[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"]];
     self.volumSlider.value = [AVAudioSession sharedInstance].outputVolume;
     [self setupVolumeView];
     self.playHeadSlider.continuous = NO;
     [self.playHeadSlider addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchCancel];
-    [[AVAudioSession sharedInstance] addObserver:self forKeyPath:NSStringFromSelector(@selector(outputVolume)) options:0 context:nil];
+    
+    
+    [[AVAudioSession sharedInstance] addObserver:self forKeyPath:NSStringFromSelector(@selector(outputVolume)) options:NSKeyValueObservingOptionNew context:nil];
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(volumeChanged:) name:@"AVSystemController_SystemVolumeDidChangeNotification" object:nil];
+
+}
+
+- (void)applicationDidBecomeActiveNotification {
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    self.volumSlider.value = [AVAudioSession sharedInstance].outputVolume;
+}
+
+- (void)volumeChanged:(NSNotification *)notification
+{
+    float volume =
+    [[[notification userInfo]
+      objectForKey:@"AVSystemController_AudioVolumeNotificationParameter"]
+     floatValue];
+    self.volumSlider.value = volume;
+    // Do stuff with volume
 }
 
 

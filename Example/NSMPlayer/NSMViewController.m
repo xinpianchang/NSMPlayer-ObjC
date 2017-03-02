@@ -194,10 +194,12 @@
             self.playHeadSlider.maximumValue = playbackProgress.totalUnitCount;
             
         } else if ([keyPath isEqualToString:@"completedUnitCount"]) {
-            NSTimeInterval currentTime = playbackProgress.completedUnitCount;
-            NSInteger currentMinutes = (int)trunc(currentTime / 60);
-            self.currentTimeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", currentMinutes, (int)trunc(currentTime) - currentMinutes * 60];
-            self.playHeadSlider.value = playbackProgress.completedUnitCount;
+            if(self.playerController.videoPlayer.currentStatus & NSMVideoPlayerStatusLevelReadyToPlay) {
+                NSTimeInterval currentTime = playbackProgress.completedUnitCount;
+                NSInteger currentMinutes = (int)trunc(currentTime / 60);
+                self.currentTimeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", currentMinutes, (int)trunc(currentTime) - currentMinutes * 60];
+                self.playHeadSlider.value = playbackProgress.completedUnitCount;
+            }
         }
         
     } else {

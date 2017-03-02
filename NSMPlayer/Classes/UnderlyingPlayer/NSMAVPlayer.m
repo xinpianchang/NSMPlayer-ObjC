@@ -131,12 +131,9 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     AVPlayerItem *playerItem = [AVPlayerItem playerItemWithAsset:asset];
     // ensure that this is done before the playerItem is associated with the player
-    //inspect whether if paused <rate == 0>
     
     [playerItem addObserver:self forKeyPath:@"status" options:0 context:NSMAVPlayerKVOContext];
     [playerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:0 context:NSMAVPlayerKVOContext];
-    
-    //waitingBufferToPlay
     [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:0 context:NSMAVPlayerKVOContext];
     
     //playToEndTime
@@ -190,6 +187,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 
 
 - (BFTask *)seekToTime:(NSTimeInterval)seconds {
+    
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
     BFTaskCompletionSource *tcs = [BFTaskCompletionSource taskCompletionSource];
     [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
@@ -197,6 +195,10 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
             [tcs setResult:nil];
         }
     }];
+    //workaround
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.playbackProgress.completedUnitCount = seconds;
+    });
     return tcs.task;
 }
 
@@ -207,6 +209,8 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
  */
 - (void)releasePlayer {
     dispatch_async(dispatch_get_main_queue(), ^{
+        self.playbackProgress.completedUnitCount = self.playbackProgress.totalUnitCount = 0;
+        self.bufferProgress.completedUnitCount = self.bufferProgress.totalUnitCount = 0;
         [self removeCurrentItemObserver];
         [self removeTimeObserverToken];
         [self.avplayer replaceCurrentItemWithPlayerItem:nil];
@@ -258,15 +262,13 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
             NSTimeInterval duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
             self.bufferProgress.totalUnitCount = self.playbackProgress.totalUnitCount = duration;
-            if (self.prepareSource && !self.prepareSource.task.isCompleted) {
-                [self.prepareSource setResult:@YES];
-            }
+            [self.prepareSource setResult:@YES];
+            self.prepareSource = nil;
         } else if (AVPlayerItemStatusFailed == self.avplayer.currentItem.status) {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
             NSMPlayerLogError(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
-            if (self.prepareSource && !self.prepareSource.task.isCompleted) {
-                [self.prepareSource setError:self.avplayer.error];
-            }
+            [self.prepareSource setError:self.avplayer.error];
+            self.prepareSource = nil;
         }
     } else if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
         //The array contains NSValue objects containing a CMTimeRange value indicating the times ranges for which the player item has media data readily available. The time ranges returned may be discontinuous.
@@ -287,7 +289,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
             NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
             // checkout network state
             if(![[Reachability reachabilityForInternetConnection] isReachable]) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : [NSError errorWithDomain:NSURLErrorDomain code:-1005 userInfo:@{NSLocalizedDescriptionKey : @"connect failed"}]}];
+                [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : [NSError errorWithDomain:NSURLErrorDomain code:-1005 userInfo:@{NSLocalizedDescriptionKey : @"connection failed"}]}];
                 [self.avplayer pause];
             } else {
                 [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:self userInfo:nil];

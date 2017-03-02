@@ -51,6 +51,10 @@ NSInteger const NSMMessageTypeActionInit = -2;
     [self.smHandler quitNow];
 }
 
+- (void)onQuitting {
+    
+}
+
 - (BOOL)isQuit:(NSMMessage *)msg {
     
     if (self.smHandler) {

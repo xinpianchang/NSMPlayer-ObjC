@@ -12,6 +12,7 @@
 #import "NSMAVPlayer.h"
 #import "Reachability.h"
 #import "NSMPlayerError.h"
+#import "NSMPlayerLogging.h"
 
 NSString * const NSMVideoPlayerStatusDidChange = @"NSMVideoPlayerStatusDidChange";
 
@@ -51,15 +52,12 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         }
         
         case NSMVideoPlayerEventFailure: {
-            // restore -> preparing ->preparing receive EventFailure
-            self.videoPlayer.tempRestoringConfig = nil;
-            
-            NSError *error = message.userInfo;
-            NSMPlayerRestoration *restoration = [self.videoPlayer savePlayerState];
-            NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
-            playerError.restoration = restoration;
-            playerError.error = error;
-            self.videoPlayer.playerError = playerError;
+//            NSMPlayerError *playerError  = message.userInfo;
+//            if (playerError.restoration == nil) {
+//                playerError.restoration = [self.videoPlayer savePlayerState];
+//            }
+//            // restore -> preparing ->preparing receive EventFailure
+//            self.videoPlayer.tempRestoringConfig = nil;
             [self.videoPlayer transitionToState:self.videoPlayer.errorState];
             return YES;
         }
@@ -74,7 +72,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventReleasePlayer];
             msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
             [self sendMessage:msg];
-//            [self sendMessageWithType:NSMVideoPlayerEventReleasePlayer];
             return YES;
         }
         
@@ -118,13 +115,17 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                 NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventStartPreparing];
                 msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                 [self sendMessage:msg];
-//                [self sendMessageWithType:NSMVideoPlayerEventTryToPrepared];
             } else {
 //                [self.videoPlayer transitionToState:self.videoPlayer.errorState];
-                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"播放器还没有设定播放URL"}]];
+                NSError *error = [NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"播放器还没有设定播放URL"}];
+                NSMPlayerRestoration *restoration = [self.videoPlayer savePlayerState];
+                NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
+                playerError.restoration = restoration;
+                playerError.error = error;
+                
+                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
                 msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                 [self sendMessage:msg];
-                //[self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"播放器还没有设定播放URL"}]];
             }
             return YES;
         }
@@ -134,12 +135,13 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             switch (restoration.restoredStatus) {
                 case NSMVideoPlayerStatusIdle: {
                     [self.videoPlayer transitionToState:self.videoPlayer.idleState];
-                    //
                     self.videoPlayer.tempRestoringConfig = nil;
                     break;
                 }
                 
                 case NSMVideoPlayerStatusFailed: {
+//                    self.videoPlayer.playerError = restoration.playerError;
+                    message.userInfo = restoration.playerError;
                     [self.videoPlayer transitionToState:self.videoPlayer.errorState];
                     self.videoPlayer.tempRestoringConfig = nil;
                     break;
@@ -153,13 +155,12 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                         NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerStartRestorePrepare userInfo:message.userInfo];
                         msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                         [self sendMessage:msg];
-//                        self.videoPlayer.tempRestoringConfig = nil;
                     }
                     break;
                 }
                     
                 default:
-                    NSLog(@"NSMVideoPlayerEventPlayerRestore");
+                    self.videoPlayer.tempRestoringConfig = nil;
                     break;
             }
             return YES;
@@ -193,6 +194,13 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (void)enter {
     [super enter];
+    NSMMessage * message = self.videoPlayer.smHandler.currentMessage;
+    NSMPlayerError *playerError  = message.userInfo;
+    if (playerError.restoration == nil) {
+        playerError.restoration = [self.videoPlayer savePlayerState];
+    }
+    self.videoPlayer.playerError = playerError;
+    self.videoPlayer.tempRestoringConfig = nil;
     self.videoPlayer.currentStatus = NSMVideoPlayerStatusFailed;
 }
 
@@ -226,6 +234,8 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         case NSMVideoPlayerEventPreparingCompleted: {
             [self.videoPlayer transitionToState:self.videoPlayer.readyToPlayState];
             NSMPlayerRestoration *restoration = self.videoPlayer.tempRestoringConfig;
+            self.videoPlayer.tempRestoringConfig = nil;
+            
             if (restoration != nil) {
                 
                 switch (restoration.restoredStatus) {
@@ -254,7 +264,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                         break;
                         
                 }
-                self.videoPlayer.tempRestoringConfig = nil;
                 
             } else {
                 if (self.videoPlayer.intentToPlay) {
@@ -282,7 +291,13 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                     // 是否允许 3G/4G网络播放
                     [self.videoPlayer prepare];
                 } else {
-                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
+                    NSError *error = [NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}];
+                    NSMPlayerRestoration *restoration = [self.videoPlayer savePlayerState];
+                    NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
+                    playerError.restoration = restoration;
+                    playerError.error = error;
+                    
+                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
                     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                     [self sendMessage:msg];
                 }
@@ -303,8 +318,15 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                 
             } else {
                 //if avplayer has initialized, release
+                NSError *error = [NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}];
+                NSMPlayerRestoration *restoration = [self.videoPlayer savePlayerState];
+                NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
+                playerError.restoration = restoration;
+                playerError.error = error;
+                
                 [self.videoPlayer.underlyingPlayer releasePlayer];
-                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
+                
+                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
                 msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                 [self sendMessage:msg];
             }
@@ -321,10 +343,15 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                     NSMPlayerRestoration *restoration = message.userInfo;
                     [self.videoPlayer seekToTime:restoration.seekTime];
                 } else {
-                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
+                    NSError *error = [NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}];
+                    NSMPlayerRestoration *restoration = [self.videoPlayer savePlayerState];
+                    NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
+                    playerError.restoration = restoration;
+                    playerError.error = error;
+                    
+                    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
                     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                     [self sendMessage:msg];
-                    //[self sendMessageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedFailureReasonErrorKey : @"不允许使用3G/4G播放"}]];
                 }
             }
             return YES;
@@ -393,8 +420,14 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
                 // 是否允许 3G/4G网络播放
                 // 继续播放
             } else {
+                NSError *error = [NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}];
+                NSMPlayerRestoration *restoration = [self.videoPlayer savePlayerState];
+                NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
+                playerError.restoration = restoration;
+                playerError.error = error;
+                
                 [self.videoPlayer.underlyingPlayer releasePlayer];
-                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:[NSError errorWithDomain:NSMUnderlyingPlayerErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : @"不允许使用3G/4G播放"}]];
+                NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
                 msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
                 [self sendMessage:msg];
             }
@@ -725,8 +758,9 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
             [self sendMessage:msg];
         } else if (t.error) {
-            NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure];
-            msg.userInfo  = t.error;
+            NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
+            playerError.error = t.error;
+            NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
             msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
             [self sendMessage:msg];
         }
@@ -830,6 +864,9 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 
 - (void)restorePlayerWithRestoration:(NSMPlayerRestoration *)restoration {
+    if (restoration == nil) {
+        return;
+    }
     
     if (self.tempRestoringConfig == nil) {
         _currentAsset = restoration.playerAsset;
@@ -840,7 +877,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         _allowWWAN = restoration.isAllowWWAN;
         _muted = restoration.isMuted;
         _volume = restoration.volume;
-        _playerError = restoration.playerError;
+//        _playerError = restoration.playerError;
 //        _rate = config.rate;
         
         NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlayerRestore userInfo:restoration];
@@ -876,7 +913,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         }
         
         restoration.playerAsset = self.currentAsset;
-        restoration.playerError = self.playerError;
         restoration.playerType = self.playerType;
         restoration.autoPlay = self.isAutoPlay;
         restoration.preload = self.isPreload;
@@ -884,6 +920,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         restoration.allowWWAN = self.isAllowWWAN;
         restoration.volume = self.volume;
 //        restoration.rate = self.rate;
+        NSMPlayerLogError(@"restoration.seekTime:%@",@(restoration.seekTime));
         return restoration;
     }
 }
@@ -975,7 +1012,9 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 }
 
 - (void)underlyingPlayerFailed:(NSNotification *)notification {
-    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:notification.userInfo[NSMUnderlyingPlayerErrorKey]];
+    NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
+    playerError.error = notification.userInfo[NSMUnderlyingPlayerErrorKey];
+    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
     [self sendMessage:msg];
 }

@@ -135,7 +135,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     // Since @selector looks through all available selectors in the target, this won’t prevent all mistakes, but it will catch most of them—including breaking changes made by Xcode automatic refactoring
     [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(status)) options:0 context:NSMAVPlayerKVOContext];
     [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) options:0 context:NSMAVPlayerKVOContext];
-    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isPlaybackLikelyToKeepUp)) options:0 context:NSMAVPlayerKVOContext];
+    [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:0 context:NSMAVPlayerKVOContext];
     
     //playToEndTime
     /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
@@ -191,7 +191,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
     BFTaskCompletionSource *tcs = [BFTaskCompletionSource taskCompletionSource];
-    [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
+    [self.avplayer seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
         if (finished) {
             [tcs setResult:nil];
         }
@@ -281,7 +281,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
             self.bufferProgress.completedUnitCount = rangeStartSeconds + rangeDurationSeconds;
         }
         
-    }  else if ([keyPath isEqualToString:NSStringFromSelector(@selector(isPlaybackLikelyToKeepUp))]) {
+    }  else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
         //Indicates whether the item will likely play through without stalling
         if (self.avplayer.currentItem.isPlaybackLikelyToKeepUp) {
             NSMPlayerLogDebug(@"playbackLikelyToKeepUp:%@",@(self.avplayer.currentItem.playbackLikelyToKeepUp));
@@ -345,8 +345,8 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 - (void)removeCurrentItemObserver {
     if (self.avplayer.currentItem) {
         NSAssert([NSThread currentThread] == [NSThread mainThread], @"You should register for KVO change notifications and unregister from KVO change notifications on the main thread. ");
-        [self.avplayer.currentItem removeObserver:self forKeyPath:@"status" context:NSMAVPlayerKVOContext];
-        [self.avplayer.currentItem removeObserver:self forKeyPath:@"loadedTimeRanges" context:NSMAVPlayerKVOContext];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(status)) context:NSMAVPlayerKVOContext];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) context:NSMAVPlayerKVOContext];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:NSMAVPlayerKVOContext];
     }
 }

@@ -132,10 +132,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.title = [NSString stringWithFormat:@"Build:#%@",[[NSBundle mainBundle] infoDictionary][@"CFBundleVersion"]];
-    
+    self.volumSlider.value = [AVAudioSession sharedInstance].outputVolume;
     [self setupVolumeView];
     self.playHeadSlider.continuous = NO;
     [self.playHeadSlider addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown | UIControlEventTouchCancel];
+    [[AVAudioSession sharedInstance] addObserver:self forKeyPath:NSStringFromSelector(@selector(outputVolume)) options:0 context:nil];
 }
 
 
@@ -208,6 +209,11 @@
                 self.loadProgress.progress = bufferProgress.fractionCompleted;
             }
         }
+    }
+    
+    if ([keyPath isEqualToString:NSStringFromSelector(@selector(outputVolume))]) {
+        self.volumSlider.value = [AVAudioSession sharedInstance].outputVolume;
+        NSLog(@"outputVolume %@",@([AVAudioSession sharedInstance].outputVolume));
     }
 }
 #pragma mark - NSMVideoSourceControllerDelegate

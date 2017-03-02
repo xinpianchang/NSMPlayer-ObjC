@@ -44,7 +44,8 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         //                _volumSliderView = obj;
         //            }
         //        }];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackStalling:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackStalling:) name:UIApplicationWillResignActiveNotification object:nil];
         _playbackProgress = [NSProgress progressWithTotalUnitCount:0];
         _bufferProgress = [NSProgress progressWithTotalUnitCount:0];
     }
@@ -52,7 +53,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 }
 
 
-- (void)applicationDidEnterBackground:(NSNotification *)notification {
+- (void)underlyingPlayerPlaybackStalling:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackStallingNotification object:self userInfo:nil];
 }
 

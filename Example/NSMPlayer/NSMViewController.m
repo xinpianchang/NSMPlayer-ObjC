@@ -149,15 +149,15 @@
     self.volumSlider.value = [AVAudioSession sharedInstance].outputVolume;
 }
 
-- (void)volumeChanged:(NSNotification *)notification
-{
-    float volume =
-    [[[notification userInfo]
-      objectForKey:@"AVSystemController_AudioVolumeNotificationParameter"]
-     floatValue];
-    self.volumSlider.value = volume;
-    // Do stuff with volume
-}
+//- (void)volumeChanged:(NSNotification *)notification
+//{
+//    float volume =
+//    [[[notification userInfo]
+//      objectForKey:@"AVSystemController_AudioVolumeNotificationParameter"]
+//     floatValue];
+//    self.volumSlider.value = volume;
+//    // Do stuff with volume
+//}
 
 
 - (void)setupVolumeView {
@@ -236,11 +236,11 @@
         NSLog(@"outputVolume %@",@([AVAudioSession sharedInstance].outputVolume));
     }
 }
+
 #pragma mark - NSMVideoSourceControllerDelegate
 
 - (void)videoSourceControllerDidSelectedPlayerItem:(NSMPlayerAsset *)playerAsset {
     [self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 }
 
-    
 @end

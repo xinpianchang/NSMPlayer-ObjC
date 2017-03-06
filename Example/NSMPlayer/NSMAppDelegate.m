@@ -8,8 +8,8 @@
 
 #import "NSMAppDelegate.h"
 #import <Bugly/Bugly.h>
-@import NSMPlayer;
 @import CocoaLumberjack;
+@import NSMPlayer;
 
 @implementation NSMAppDelegate
 

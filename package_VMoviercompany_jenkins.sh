@@ -62,15 +62,13 @@ echo ${VersionString} > ${WORKSPACE}/version.txt
 
 
 #证书信息
-DEVELOP_IDENTITY="iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)"
-DEVELOPMENT_TEAM='7GL725C6FL'
+#DEVELOP_IDENTITY="iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)"
+#DEVELOPMENT_TEAM='7GL725C6FL'
 #描述文件
-PROFILE="69bc3f2c-7f66-48fa-9f34-731c1e8335bb"
-PROFILENAME='XC iOS Ad Hoc: *'
+#PROFILE="69bc3f2c-7f66-48fa-9f34-731c1e8335bb"
+PROFILENAME='NSMPlayerProfile'
 #Info.plist的文件路径
 INFOPLIST_FILE="${WORKSPACE}/Example/NSMPlayer/NSMPlayer-Info.plist"
-
-
 
 
 set -e
@@ -87,10 +85,16 @@ set -e
 #xcodebuild -workspace $WORK_SPACE -scheme $SCHEME -configuration ${CONFIGRATION} CONFIGURATION_BUILD_DIR=$customBuildPath ONLY_ACTIVE_ARCH=NO PRODUCT_BUNDLE_IDENTIFIER=$BUNDLEID  PROVISIONING_PROFILE="$PROFILE" CODE_SIGN_IDENTITY="$DEVELOP_IDENTITY"
 #执行ARCHIVE:
 
-xcodebuild -workspace $WORK_SPACE -scheme $SCHEME -archivePath $BUILD_DIR/${SCHEME}.xcarchive  archive PROVISIONING_PROFILE_SPECIFIER="$PROFILENAME" DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" CODE_SIGN_IDENTITY="$DEVELOP_IDENTITY" ONLY_ACTIVE_ARCH=NO
+#xcodebuild -scheme $SCHEME -archivePath $BUILD_DIR/${SCHEME}.xcarchive  archive PROVISIONING_PROFILE_SPECIFIER="$PROFILENAME" DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" CODE_SIGN_IDENTITY="$DEVELOP_IDENTITY" ONLY_ACTIVE_ARCH=NO
+
+
+xcodebuild -workspace $WORK_SPACE -scheme $SCHEME -archivePath $BUILD_DIR/${SCHEME}.xcarchive archive ONLY_ACTIVE_ARCH=NO
+
 set -e
+
 #导出IPA:
 xcodebuild -exportArchive -exportFormat IPA -archivePath $BUILD_DIR/${SCHEME}.xcarchive -exportPath $BUILD_DIR/${IPA_NAME} -exportProvisioningProfile "${PROFILENAME}"
+
 set -e
 #<四>-------打包
 #mkdir -p ${IPA_DESTINATION_DIERECTORY}

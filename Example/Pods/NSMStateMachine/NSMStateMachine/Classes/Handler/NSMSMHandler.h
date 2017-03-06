@@ -26,6 +26,7 @@
 @property (nonatomic, strong) NSMutableArray *deferredMessages;
 @property (nonatomic, strong) NSMState *initialState;
 @property (nonatomic, readonly, strong) NSMutableDictionary *mapStateInfo;
+@property (nonatomic, readonly, strong) NSMMessage *currentMessage;
 @property (nonatomic, weak) NSMStateMachine* handlerDelegate;
 
 - (void)completeConstruction;

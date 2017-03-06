@@ -57,6 +57,8 @@ FOUNDATION_EXPORT NSInteger const NSMMessageTypeActionQuit;
  */
 - (void)quitNow;
 
+- (void)onQuitting;
+
 /**
  *  根据msg判断是否是退出message
  *

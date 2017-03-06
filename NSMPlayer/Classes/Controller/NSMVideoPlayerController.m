@@ -5,7 +5,7 @@
 //  Created by chengqihan on 2017/2/13.
 //
 //
-
+@import MediaPlayer;
 #import "NSMVideoPlayerController.h"
 #import "NSMAVPlayerView.h"
 #import "NSMVideoPlayer.h"

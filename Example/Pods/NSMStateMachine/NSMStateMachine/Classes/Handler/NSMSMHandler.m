@@ -117,6 +117,17 @@
     
 }
 
+- (NSMMessage *)currentMessage {
+    __block NSMMessage *msg = nil;
+    [self.operations enumerateObjectsUsingBlock:^(__kindof NSMMessageOperation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if(obj.isExecuting) {
+            msg = obj.message;
+            *stop = YES;
+        }
+    }];
+    return msg;
+}
+
 #pragma mark - CPMessageOperationDelegate 消息队列的消息出口
 - (void)sendMessageOperationDidStart:(NSMMessageOperation *)operation message:(NSMMessage *)message {
     NSMState *msgProcessedState = nil;
@@ -167,8 +178,19 @@
                 break;
             }
         }
+        self.destState = nil;
     }
-    self.destState = nil;
+    
+    if (tempDestState != nil) {
+        if (tempDestState == self.handlerDelegate.quittingState) {
+            [self.handlerDelegate onQuitting];
+            [self cleanupAfterQuitting];
+        }
+    }
+}
+
+- (void)cleanupAfterQuitting {
+    
 }
 
 /**

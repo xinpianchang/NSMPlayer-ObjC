@@ -5,7 +5,7 @@ PODS:
   - Bolts/AppLinks (1.8.4):
     - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
-  - Bugly (2.4.6)
+  - Bugly (2.4.7)
   - CocoaLumberjack (3.1.0):
     - CocoaLumberjack/Default (= 3.1.0)
     - CocoaLumberjack/Extensions (= 3.1.0)
@@ -23,12 +23,12 @@ PODS:
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
   - Masonry (1.0.2)
-  - NSMPlayer (0.1.0):
+  - NSMPlayer (0.1.1):
     - Bolts
     - Masonry
     - NSMStateMachine
     - Reachability
-  - NSMStateMachine (0.1.8):
+  - NSMStateMachine (0.1.9):
     - CocoaLumberjack
   - Reachability (3.2)
   - Specta (1.0.6)
@@ -47,14 +47,14 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bolts: 8a7995239dbe724f9cba2248b766d48b7ebdd322
-  Bugly: 7756e72c59387b0d490f46e83ab458ae94ee7fba
+  Bugly: 2c256069145f550171907c5cb1c0f84ad291f6c1
   CocoaLumberjack: 8311463ddf9ee86a06ef92a071dd656c89244500
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
   Expecta+Snapshots: dcff217eef506dabd6dfdc7864ea2da321fafbb8
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
-  NSMPlayer: 6f8c78bb80362e4cb5eac84fe98edaed3ed95c76
-  NSMStateMachine: 390faf371656aea447b5248efacecea8a77b48e4
+  NSMPlayer: b92619f4bfdc681492af03c4a68e59f0913a36a2
+  NSMStateMachine: 4d753631d299cf7977ff254a43a387dd897b854d
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465
 

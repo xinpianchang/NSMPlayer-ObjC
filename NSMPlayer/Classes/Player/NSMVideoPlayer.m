@@ -742,6 +742,10 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     [self.underlyingPlayer setRate:rate];
 }
 
+- (CGSize)videoSize {
+    return [self.underlyingPlayer videoSize];
+}
+
 //- (NSTimeInterval)currentTime {
 //    return [self.underlyingPlayer currentTime];
 //}

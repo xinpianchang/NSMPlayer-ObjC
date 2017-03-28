@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSMVideoPlayerController : UIViewController
+@interface NSMVideoPlayerController : NSObject
 
 @property (nonatomic, strong) id <NSMVideoPlayerProtocol> videoPlayer;
 

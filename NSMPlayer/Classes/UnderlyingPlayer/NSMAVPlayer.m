@@ -238,6 +238,12 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     return self.avplayer.isMuted;
 }
 
+- (CGSize)videoSize {
+    AVAssetTrack *track = [[self.avplayer.currentItem.asset tracksWithMediaType:AVMediaTypeVideo] lastObject];
+    CGSize size = [track naturalSize];
+    NSMPlayerLogInfo(@"videoSize %@",NSStringFromCGSize(size));
+    return size;
+}
 
 - (CGFloat)rate {
     return self.avplayer.rate;

@@ -11,10 +11,11 @@
 
 #import "NSMViewController.h"
 #import "NSMVideoSourceController.h"
-
+#import "NSMVideoPlayerViewController.h"
 
 @interface NSMViewController () <NSMVideoSourceControllerDelegate>
 
+@property (nonatomic, strong) NSMVideoPlayerViewController *playerViewController;
 @property (weak, nonatomic) IBOutlet UILabel *failReasonLabel;
 @property (nonatomic, strong) NSMVideoPlayerController *playerController;
 @property (weak, nonatomic) IBOutlet UILabel *playerStateLabel;
@@ -27,10 +28,27 @@
 @property (weak, nonatomic) IBOutlet UILabel *currentTimeLabel;
 @property (nonatomic, strong) UISlider *volumSliderView;
 @property (nonatomic, assign) BOOL allowWWAN;
+@property (weak, nonatomic) IBOutlet UIButton *immerseButton;
 
 @end
 
 @implementation NSMViewController
+
+- (NSMVideoPlayerController *)playerController {
+    if (!_playerController) {
+        _playerController = [[NSMVideoPlayerController alloc] init];
+    }
+    return _playerController;
+}
+
+- (IBAction)immerse:(UIButton *)sender {
+    CGSize videoSize = [self.playerController.videoPlayer videoSize];
+    if (videoSize.width / videoSize.height > (9 / 16.0)) {
+        NSLog(@"横屏播放");
+    } else {
+        NSLog(@"竖屏播放");
+    }
+}
 
 - (IBAction)retry:(UIButton *)sender {
     if (NSMVideoPlayerStatusFailed == [self.playerController.videoPlayer currentStatus]) {
@@ -75,7 +93,7 @@
 }
 
 - (IBAction)volumChange:(UISlider *)sender {
-//    [self.playerController.videoPlayer setVolume:sender.value];
+    [self.playerController.videoPlayer setVolume:sender.value];
     self.volumSliderView.value = sender.value;
 }
 - (IBAction)play:(UIButton *)sender {
@@ -83,6 +101,7 @@
 }
 
 - (IBAction)pause:(UIButton *)sender {
+    
     [self.playerController.videoPlayer pause];
 }
 
@@ -109,6 +128,9 @@
         }
         return nil;
     }];
+}
+- (IBAction)separate:(UISwitch *)sender {
+    ((NSMAVPlayerView *)self.playerController.videoPlayer.playerView).hidden = sender.isOn;
 }
 
 - (IBAction)playerTypeChange:(UISwitch *)sender {
@@ -185,19 +207,26 @@
     }
     
     self.playerStateLabel.text = NSMVideoPlayerStatusDescription(self.playerController.videoPlayer.currentStatus);
+    if (self.playerController.videoPlayer.currentStatus & NSMVideoPlayerStatusLevelReadyToPlay) {
+        self.immerseButton.hidden = NO;
+        self.playerController.videoPlayer.playerView = self.playerViewController.playerRenderingView;
+        
+    } else {
+        self.immerseButton.hidden = YES;
+    }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"videoPlayer"]) {
-        NSMVideoPlayerController *playerController = segue.destinationViewController;
-        if ([playerController isKindOfClass:[NSMVideoPlayerController class]]) {
+        NSMVideoPlayerViewController *playerViewController = segue.destinationViewController;
+        if ([playerViewController isKindOfClass:[NSMVideoPlayerViewController class]]) {
+            self.playerViewController = playerViewController;
             NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
             playerAsset.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
-            [playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
-            self.playerController = playerController;
-            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(totalUnitCount)) options:0 context:nil];
-            [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
-            [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
+            [self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
+            [self.playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(totalUnitCount)) options:0 context:nil];
+            [self.playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
+            [self.playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
         }
     }
 }
@@ -242,5 +271,6 @@
 - (void)videoSourceControllerDidSelectedPlayerItem:(NSMPlayerAsset *)playerAsset {
     [self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 }
+
 
 @end

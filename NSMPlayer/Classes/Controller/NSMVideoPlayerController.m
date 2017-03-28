@@ -5,55 +5,19 @@
 //  Created by chengqihan on 2017/2/13.
 //
 //
-@import MediaPlayer;
 #import "NSMVideoPlayerController.h"
-#import "NSMAVPlayerView.h"
 #import "NSMVideoPlayer.h"
-#import <Masonry/Masonry.h>
-
-@interface NSMVideoPlayerController ()
-
-@property (nonatomic, weak) NSMAVPlayerView *playerView;
-
-@end
+@import MediaPlayer;
 
 @implementation NSMVideoPlayerController
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
+- (instancetype)init {
+    self = [super init];
     if (self) {
         _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
         [_videoPlayer setAutoPlay:YES];
     }
     return self;
-}
-
-- (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
-        [_videoPlayer setAutoPlay:YES];
-    }
-    return self;
-}
-
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self.view setBackgroundColor:[UIColor greenColor]];
-    
-    NSMAVPlayerView *playerView = [[NSMAVPlayerView alloc] init];
-    [self.view addSubview:playerView];
-    [playerView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self.view);
-    }];
-    [self.videoPlayer setPlayerView:playerView];
-}
-
-- (void)setAssetURL:(NSURL *)assetURL {
-    NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
-    playerAsset.assetURL = assetURL;
-    [self.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 }
 
 @end

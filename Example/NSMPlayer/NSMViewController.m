@@ -222,7 +222,7 @@
         if ([playerViewController isKindOfClass:[NSMVideoPlayerViewController class]]) {
             self.playerViewController = playerViewController;
             NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
-            playerAsset.assetURL = [NSURL URLWithString:@"http://qiniu.vmagic.vmoviercdn.com/57aad69c25a41_lower.mp4"];
+            playerAsset.assetURL = [NSURL URLWithString:@"http://video.xinpianchang.com/58744ca3bf757.mp4"];
             [self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
             [self.playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(totalUnitCount)) options:0 context:nil];
             [self.playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
@@ -256,6 +256,7 @@
             if(self.playerController.videoPlayer.currentStatus & NSMVideoPlayerStatusLevelReadyToPlay){
                 NSProgress *bufferProgress = (NSProgress *)object;
                 self.loadProgress.progress = bufferProgress.fractionCompleted;
+                NSLog(@"bufferProgress.fractionCompleted:%f",bufferProgress.fractionCompleted);
             }
         }
     }

@@ -282,10 +282,15 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         //The array contains NSValue objects containing a CMTimeRange value indicating the times ranges for which the player item has media data readily available. The time ranges returned may be discontinuous.
         NSArray *loadedTimeRanges = self.avplayer.currentItem.loadedTimeRanges;
         if (loadedTimeRanges) {
-            CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];
-            CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
-            CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
-            self.bufferProgress.completedUnitCount = rangeStartSeconds + rangeDurationSeconds;
+            for (NSValue *rangeValue in loadedTimeRanges) {
+                CMTimeRange timeRange = [rangeValue CMTimeRangeValue];
+                if (CMTimeRangeContainsTime(timeRange, CMTimeMakeWithSeconds(self.playbackProgress.completedUnitCount, NSEC_PER_SEC))) {
+                    CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
+                    CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
+                    self.bufferProgress.completedUnitCount = rangeStartSeconds + rangeDurationSeconds;
+                    break;
+                }
+            }
         }
         
     }  else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {

@@ -66,7 +66,6 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 
 @property (nonatomic, assign) CGFloat rate;
 
-
 @property (nonatomic, assign) NSMVideoPlayerStatus currentStatus;
 
 @property (nonatomic, assign) NSMVideoPlayerType playerType;
@@ -77,6 +76,8 @@ typedef NS_ENUM(NSUInteger, NSMVideoPlayerStatusLevel) {
 
 @property (nonatomic, strong, readonly) NSProgress *playbackProgress;
 @property (nonatomic, strong, readonly) NSProgress *bufferProgress;
+
+@property (nonatomic, assign, readonly) CGSize videoSize;
 
 - (BFTask *)prepare;
 - (void)play;

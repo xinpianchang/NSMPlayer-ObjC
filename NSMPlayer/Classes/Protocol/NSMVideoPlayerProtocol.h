@@ -14,6 +14,5 @@
 
 - (void)restorePlayerWithRestoration:(NSMPlayerRestoration *)restoration;
 - (NSMPlayerRestoration *)savePlayerState;
-//- (void)setPlayerView:(UIView *)playerView;
 
 @end

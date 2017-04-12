@@ -140,9 +140,9 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     // ensure that this is done before the playerItem is associated with the player
     // Passing strings as key paths is strictly worse than using properties directly, as any typo or misspelling won’t be caught by the compiler, and will cause things to not work
     // Since @selector looks through all available selectors in the target, this won’t prevent all mistakes, but it will catch most of them—including breaking changes made by Xcode automatic refactoring
-    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(status)) options:0 context:NSMAVPlayerKVOContext];
-    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) options:0 context:NSMAVPlayerKVOContext];
-    [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:0 context:NSMAVPlayerKVOContext];
+    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(status)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionInitial context:NSMAVPlayerKVOContext];
+    [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionInitial context:NSMAVPlayerKVOContext];
+    [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionInitial context:NSMAVPlayerKVOContext];
     
     //playToEndTime
     /* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
@@ -217,12 +217,12 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
  */
 - (void)releasePlayer {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.playbackProgress.completedUnitCount = self.playbackProgress.totalUnitCount = 0;
-        self.bufferProgress.completedUnitCount = self.bufferProgress.totalUnitCount = 0;
         [self removeCurrentItemObserver];
         [self removeTimeObserverToken];
         [self.avplayer replaceCurrentItemWithPlayerItem:nil];
         self.avplayer = nil;
+        self.playbackProgress.completedUnitCount = self.playbackProgress.totalUnitCount = 0;
+        self.bufferProgress.completedUnitCount = self.bufferProgress.totalUnitCount = 0;
     });
 }
 
@@ -273,12 +273,13 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     if ([keyPath isEqualToString:NSStringFromSelector(@selector(status))]) {
         //        NSMPlayerLogDebug(@"currentItem status %@",@(self.avplayer.currentItem.status));
-        if (self.avplayer.currentItem.status == AVPlayerItemStatusReadyToPlay){
+        AVPlayerItemStatus status = [change[NSKeyValueChangeNewKey] intValue];
+        if (status == AVPlayerItemStatusReadyToPlay) {
             NSTimeInterval duration = CMTimeGetSeconds(self.avplayer.currentItem.duration);
             self.bufferProgress.totalUnitCount = self.playbackProgress.totalUnitCount = duration;
             [self.prepareSource setResult:@YES];
             self.prepareSource = nil;
-        } else if (AVPlayerItemStatusFailed == self.avplayer.currentItem.status) {
+        } else if (status == self.avplayer.currentItem.status) {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
             NSMPlayerLogError(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
             [self.prepareSource setError:self.avplayer.error];
@@ -293,7 +294,10 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
                 if (CMTimeRangeContainsTime(timeRange, CMTimeMakeWithSeconds(self.playbackProgress.completedUnitCount, NSEC_PER_SEC))) {
                     CGFloat rangeStartSeconds = CMTimeGetSeconds(timeRange.start);
                     CGFloat rangeDurationSeconds = CMTimeGetSeconds(timeRange.duration);
-                    self.bufferProgress.completedUnitCount = rangeStartSeconds + rangeDurationSeconds;
+                    // keyPath loadedTimeRanges may change before keyPath status
+                    if (self.bufferProgress.totalUnitCount > 0) {
+                        self.bufferProgress.completedUnitCount = rangeStartSeconds + rangeDurationSeconds;
+                    }
                     break;
                 }
             }

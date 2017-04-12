@@ -279,7 +279,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
             self.bufferProgress.totalUnitCount = self.playbackProgress.totalUnitCount = duration;
             [self.prepareSource setResult:@YES];
             self.prepareSource = nil;
-        } else if (status == self.avplayer.currentItem.status) {
+        } else if (status == AVPlayerItemStatusFailed) {
             //If the receiver's status is AVPlayerStatusFailed, this describes the error that caused the failure
             NSMPlayerLogError(@"AVPlayerStatusFailed error:%@",self.avplayer.error);
             [self.prepareSource setError:self.avplayer.error];

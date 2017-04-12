@@ -23,6 +23,8 @@ NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification = @"NSMUnd
 
 NSString *const NSMUnderlyingPlayerPlaybackStallingNotification = @"NSMUnderlyingPlayerPlaybackStallingNotification";
 
+NSString *const NSMUnderlyingPlayerPlaybackResignStallingNotification = @"NSMUnderlyingPlayerPlaybackResignStallingNotification";
+
 //NSString *const NSMUnderlyingPlayerPlayheadDidChangeNotification = @"NSMUnderlyingPlayerPlayheadDidChangeNotification";
 
 //NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey = @"NSMUnderlyingPlayerPeriodicPlayTimeChangeKey";

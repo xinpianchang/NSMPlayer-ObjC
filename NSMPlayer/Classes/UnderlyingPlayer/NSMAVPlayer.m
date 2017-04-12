@@ -45,7 +45,9 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         //            }
         //        }];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackStalling:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackResignStalling:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackStalling:) name:UIApplicationWillResignActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackResignStalling:) name:UIApplicationDidBecomeActiveNotification object:nil];
         _playbackProgress = [NSProgress progressWithTotalUnitCount:0];
         _bufferProgress = [NSProgress progressWithTotalUnitCount:0];
     }
@@ -55,6 +57,10 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 
 - (void)underlyingPlayerPlaybackStalling:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackStallingNotification object:self userInfo:nil];
+}
+
+- (void)underlyingPlayerPlaybackResignStalling:(NSNotification *)notification {
+    [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackResignStallingNotification object:self userInfo:nil];
 }
 
 // Will attempt load and test these asset keys before playing
@@ -192,7 +198,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
     BFTaskCompletionSource *tcs = [BFTaskCompletionSource taskCompletionSource];
-    [self.avplayer seekToTime:time toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
+    [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
         if (finished) {
             [tcs setResult:nil];
         }

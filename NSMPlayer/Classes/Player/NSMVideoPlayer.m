@@ -634,6 +634,9 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             return YES;
         }
             
+        case NSMVideoPlayerEventPlay:
+            return YES;
+            
         default:
             return NO;
     }

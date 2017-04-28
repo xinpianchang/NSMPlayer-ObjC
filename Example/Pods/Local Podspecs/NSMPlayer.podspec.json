@@ -1,6 +1,6 @@
 {
   "name": "NSMPlayer",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "summary": "NSMPlayer is a library of playing video.",
   "homepage": "https://git.vmovier.cc/projects/NSM/repos/nsmplayer",
   "license": {
@@ -12,7 +12,7 @@
   },
   "source": {
     "git": "https://git.vmovier.cc/scm/nsm/nsmplayer.git",
-    "tag": "0.1.1"
+    "tag": "0.2.0"
   },
   "platforms": {
     "ios": "8.0"

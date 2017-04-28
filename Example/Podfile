@@ -5,7 +5,6 @@ use_frameworks!
 
 target 'NSMPlayer_Example' do
   pod 'NSMPlayer', :path => '../'
-  pod 'Bugly'
   target 'NSMPlayer_Tests' do
     inherit! :search_paths
 

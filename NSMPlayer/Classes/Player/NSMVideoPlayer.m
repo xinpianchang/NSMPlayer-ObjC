@@ -634,6 +634,9 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
             return YES;
         }
             
+        case NSMVideoPlayerEventPlay:
+            return YES;
+            
         default:
             return NO;
     }
@@ -898,7 +901,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         return self.tempRestoringConfig;
     } else {
         NSMPlayerRestoration *restoration = [[NSMPlayerRestoration alloc] init];
-        if ([self isOnCurrentLevelWithLevel:NSMVideoPlayerStatusLevelReadyToPlay] || self.currentStatus == NSMVideoPlayerStatusPreparing) {
+        if (NSMVideoPlayerStatusWaitBufferingToPlay == self.currentStatus || NSMVideoPlayerStatusPaused == self.currentStatus || NSMVideoPlayerStatusPlaying == self.currentStatus || NSMVideoPlayerStatusLevelReadyToPlay == self.currentStatus || NSMVideoPlayerStatusPreparing == self.currentStatus) {
             restoration.restoredStatus = self.intentToPlay ? NSMVideoPlayerStatusPlaying : NSMVideoPlayerStatusPaused;
         } else {
             restoration.restoredStatus = self.currentStatus;

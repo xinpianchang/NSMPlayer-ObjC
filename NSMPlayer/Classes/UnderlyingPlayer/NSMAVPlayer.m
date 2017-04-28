@@ -199,9 +199,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
     BFTaskCompletionSource *tcs = [BFTaskCompletionSource taskCompletionSource];
     [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
-        if (finished) {
-            [tcs setResult:nil];
-        }
+        [tcs setResult:@(finished)];
     }];
     //workaround
     dispatch_async(dispatch_get_main_queue(), ^{

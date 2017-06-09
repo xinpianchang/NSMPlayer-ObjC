@@ -1,9 +1,4 @@
 PODS:
-  - Bolts (1.8.4):
-    - Bolts/AppLinks (= 1.8.4)
-    - Bolts/Tasks (= 1.8.4)
-  - Bolts/AppLinks (1.8.4):
-    - Bolts/Tasks
   - Bolts/Tasks (1.8.4)
   - CocoaLumberjack (3.1.0):
     - CocoaLumberjack/Default (= 3.1.0)
@@ -21,10 +16,8 @@ PODS:
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
-  - Masonry (1.0.2)
   - NSMPlayer (0.2.1):
-    - Bolts
-    - Masonry
+    - Bolts/Tasks
     - NSMStateMachine
     - Reachability
   - NSMStateMachine (0.1.9):
@@ -49,8 +42,7 @@ SPEC CHECKSUMS:
   Expecta: e1c022fcd33910b6be89c291d2775b3fe27a89fe
   Expecta+Snapshots: dcff217eef506dabd6dfdc7864ea2da321fafbb8
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  Masonry: 7c429b56da9d4ee0bbb3ed77a5ea710d6a5df39e
-  NSMPlayer: 7dde28c5c14f61d0fbe6ce3ba7a4ed6b77578f62
+  NSMPlayer: 6c4bb16f130e357494a9c044ae85699469e2950d
   NSMStateMachine: 4d753631d299cf7977ff254a43a387dd897b854d
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   Specta: f506f3a8361de16bc0dcf3b17b75e269072ba465

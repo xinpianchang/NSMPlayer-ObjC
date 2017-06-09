@@ -39,4 +39,6 @@ static const DDLogLevel NSMPlayerLogLevel = DDLogLevelWarning;
 
 + (DDLog *)sharedLog;
 
++ (void)setLogEnabled:(BOOL)enabled;
+
 @end

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'NSMPlayer'
-  s.version          = '0.2.0'
+  s.version          = '0.2.1'
   s.summary          = 'NSMPlayer is a library of playing video.'
 
   s.homepage         = 'https://git.vmovier.cc/projects/NSM/repos/nsmplayer'

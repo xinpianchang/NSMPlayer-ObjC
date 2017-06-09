@@ -20,4 +20,12 @@
     return sharedLog;
 }
 
++ (void)setLogEnabled:(BOOL)logEnabled {
+    if (logEnabled) {
+        [[NSMPlayerLogging sharedLog] addLogger:[DDTTYLogger sharedInstance]];
+    } else {
+        [[NSMPlayerLogging sharedLog] removeAllLoggers];
+    }
+}
+
 @end

@@ -1,14 +1,27 @@
+// NSMStateMachine.m
 //
-//  CPState.m
-//  Model
+// Copyright (c) 2017 NSMStateMachine
 //
-//  Created by cnepayzx on 15-1-21.
-//  Copyright (c) 2015年 cnepay. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #import "NSMStateMachine.h"
 #import "NSMState.h"
-#import "NSMMessagesQueue.h"
 #import "NSMMessageOperation.h"
 #import "NSMSMHandler.h"
 #import "NSMStateMachineLogging.h"
@@ -26,9 +39,8 @@ NSInteger const NSMMessageTypeActionInit = -2;
 
 @interface NSMStateMachine()
 
-@property(nonatomic,strong) NSMState *currentState;
-@property (readwrite, nonatomic, strong) NSMSMHandler *smHandler;
-@property (readwrite, nonatomic, strong) NSMSMQuittingState *quittingState;
+@property (nonatomic, strong) NSMSMHandler *smHandler;
+@property (nonatomic, strong) NSMSMQuittingState *quittingState;
 
 @end
 
@@ -41,6 +53,10 @@ NSInteger const NSMMessageTypeActionInit = -2;
 - (void)transitionToState:(NSMState *)destState
 {
     [self.smHandler transitionToState:destState];
+}
+
+- (NSMState *)currentState {
+    return self.smHandler.currentState;
 }
 
 + (instancetype)stateMachine {
@@ -56,7 +72,6 @@ NSInteger const NSMMessageTypeActionInit = -2;
 }
 
 - (BOOL)isQuit:(NSMMessage *)msg {
-    
     if (self.smHandler) {
         return [self.smHandler isQuit:msg];
     }else {
@@ -65,8 +80,7 @@ NSInteger const NSMMessageTypeActionInit = -2;
 }
 
 - (instancetype)init {
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         _quittingState = [[NSMSMQuittingState alloc] initWithStateMachine:self];
         _smHandler = [[NSMSMHandler alloc] init];
         [_smHandler addState:_quittingState parentState:nil];
@@ -76,10 +90,8 @@ NSInteger const NSMMessageTypeActionInit = -2;
 }
 
 - (void)start {
-    NSMSMLogDebug(@"self %@ %@",self,[NSThread currentThread]);
     [self.smHandler completeConstruction];
 }
-
 
 - (BOOL)hasDeferredMessage:(NSInteger)type {
     for (NSMMessage *msg in self.smHandler.deferredMessages) {
@@ -88,7 +100,6 @@ NSInteger const NSMMessageTypeActionInit = -2;
         }
     }
     return NO;
-    
 }
 
 - (void)removeDeferredMessage:(NSInteger)type {
@@ -103,31 +114,27 @@ NSInteger const NSMMessageTypeActionInit = -2;
 }
 
 - (void)sendMessage:(NSMMessage *)message {
-    [self.smHandler addOperationAtEndOfQueue:message];
+    [self.smHandler addMessage:message];
 }
 
 - (void)sendMessageType:(NSInteger)type {
-    [self.smHandler addOperationAtEndOfQueue:[NSMMessage messageWithType:type]];
+    [self.smHandler addMessage:[NSMMessage messageWithType:type]];
 }
 
 - (void)sendMessageFront:(NSMMessage *)message {
-    [self.smHandler addOperationAtFrontOfQueue:message];
+    [self.smHandler addMessageAtFront:message];
 }
 
 - (void)sendMessageFrontType:(NSInteger)type {
-    [self.smHandler addOperationAtFrontOfQueue:[NSMMessage messageWithType:type]];
+    [self.smHandler addMessageAtFront:[NSMMessage messageWithType:type]];
 }
 
 - (void)removeMessageWithType:(NSInteger)type {
-    [self.smHandler.operations enumerateObjectsUsingBlock:^(__kindof NSMMessageOperation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (obj.message.messageType == type && ![obj isExecuting]) {
-            [obj cancel];
-        }
-    }];
+    [self.smHandler removeMessageWithType:type];
 }
 
 - (void)sendMessageDelayed:(NSMMessage *)msg delay:(NSTimeInterval)delay {
-    [self.smHandler delayOperationAtEndOfQueue:msg delay:delay];
+    [self.smHandler delayMessage:msg delay:delay];
 }
 
 - (void)deferredMessage:(NSMMessage *)message {

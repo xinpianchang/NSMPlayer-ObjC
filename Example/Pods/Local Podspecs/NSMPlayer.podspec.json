@@ -28,5 +28,6 @@
     "Reachability": [
 
     ]
-  }
+  },
+  "resources": "NSMPlayer/Assets/**/*"
 }

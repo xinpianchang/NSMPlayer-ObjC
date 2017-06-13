@@ -10,11 +10,9 @@
 #import "NSMStateMachineLogging.h"
 
 @interface NSMMessageOperation ()
-/*
- * 利用无名扩展 让readOnly属性,在内部可以变成可读可写属性。
- */
-@property (assign, nonatomic, getter=isExecuting) BOOL executing;
-@property (assign, nonatomic, getter=isFinished) BOOL finished;
+
+@property (nonatomic, assign, getter=isExecuting) BOOL executing;
+@property (nonatomic, assign, getter=isFinished) BOOL finished;
 
 @end
 
@@ -26,7 +24,6 @@
 + (instancetype)sendMessageOperationWithTask:(NSMMessage *)message {
     return [[self alloc] initWithTask:message];
 }
-
 
 - (instancetype)initWithTask:(NSMMessage *)message {
     self = [super init];
@@ -51,12 +48,10 @@
 
 - (void)start {
     @synchronized(self) {
-        if(self.isCancelled)
-        {
+        if(self.isCancelled) {
             self.finished = YES;
             return;
-
-        } else if ([self isReady]){
+        } else if ([self isReady]) {
             self.executing = YES;
             [self performSelector:@selector(operationDidStart) onThread:[self runloopThread] withObject:nil waitUntilDone:NO modes:@[NSRunLoopCommonModes]];
         }
@@ -80,7 +75,6 @@
 }
 
 @end
-
 
 @implementation NSMMessage
 

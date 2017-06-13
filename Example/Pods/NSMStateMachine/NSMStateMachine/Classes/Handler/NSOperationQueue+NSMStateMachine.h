@@ -1,6 +1,6 @@
-// NSMVideoPlayerController.m
+// NSOperationQueue+NSMStateMachine.h
 //
-// Copyright (c) 2017 NSMPlayer
+// Copyright (c) 2017 NSMStateMachine
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import "NSMVideoPlayerController.h"
-#import "NSMVideoPlayer.h"
-@import MediaPlayer;
+#import <Foundation/Foundation.h>
 
-@implementation NSMVideoPlayerController
+@interface NSOperationQueue (NSMStateMachine)
 
-- (instancetype)init {
-    if (self = [super init]) {
-        _videoPlayer = [[NSMVideoPlayer alloc] initWithPlayerType:NSMVideoPlayerAVPlayer];
-        [_videoPlayer setAutoPlay:YES];
-    }
-    return self;
-}
+- (void)nsm_addOperationAtFrontOfQueue:(NSOperation *)op;
+
+- (void)nsm_addOperation:(NSOperation *)op;
+
+- (void)nsm_removeOperationWithType:(NSInteger)type;
 
 @end

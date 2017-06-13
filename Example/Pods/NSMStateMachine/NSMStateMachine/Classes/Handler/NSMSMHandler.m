@@ -1,16 +1,31 @@
+// NSMSMHandler.m
 //
-//  SmHandler.m
-//  Pods
+// Copyright (c) 2017 NSMStateMachine
 //
-//  Created by chengqihan on 16/4/7.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #import "NSMSMHandler.h"
 #import "NSMState.h"
 #import "NSMMessageOperation.h"
 #import "NSMStateMachine.h"
 #import "NSMStateMachineLogging.h"
+#import "NSOperationQueue+NSMStateMachine.h"
 
 @implementation NSMStateInfo
 
@@ -27,20 +42,58 @@
 
 @end
 
+@interface NSMSMHandler () <NSMMessageOperationDelegate>
 
-@interface NSMSMHandler ()
-
-@property (readwrite, nonatomic, strong) NSMutableDictionary *mapStateInfo;
-@property (readwrite, nonatomic, strong) NSMutableArray *stateStack;
-@property (readwrite, nonatomic, strong) NSMutableArray *tempStateStack;
-@property (readwrite, nonatomic, assign) BOOL isConstructionCompleted;
-@property (readwrite, nonatomic, assign) NSInteger stateStackTopIndex;
-@property (readwrite, nonatomic, assign) NSInteger tempStateStackCount;
-@property (readwrite, nonatomic, strong) NSMState *destState;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMStateInfo *> *mapStateInfo;
+@property (nonatomic, strong) NSMutableArray<NSMStateInfo *> *stateStack;
+@property (nonatomic, strong) NSMutableArray<NSMStateInfo *> *tempStateStack;
+@property (nonatomic, assign) BOOL isConstructionCompleted;
+@property (nonatomic, assign) NSInteger stateStackTopIndex;
+@property (nonatomic, assign) NSInteger tempStateStackCount;
+@property (nonatomic, strong) NSMState *destState;
+@property (nonatomic, strong) NSOperationQueue *operationQueue;
 
 @end
 
 @implementation NSMSMHandler
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _operationQueue = [[NSOperationQueue alloc] init];
+        _operationQueue.maxConcurrentOperationCount = 1;
+    }
+    return self;
+}
+
+- (void)addMessage:(NSMMessage *)message {
+    NSMMessageOperation *op = [NSMMessageOperation sendMessageOperationWithTask:message];
+    op.runloopThread = self.runloopThread;
+    op.delegate = self;
+    [self.operationQueue nsm_addOperation:op];
+}
+
+- (void)addMessageAtFront:(NSMMessage *)message {
+    NSMMessageOperation *op = [NSMMessageOperation sendMessageOperationWithTask:message];
+    op.runloopThread = self.runloopThread;
+    op.delegate = self;
+    [self.operationQueue nsm_addOperationAtFrontOfQueue:op];
+}
+
+- (void)delayMessage:(NSMMessage *)message delay:(NSTimeInterval)delay {
+    NSMMessageOperation *op = [NSMMessageOperation sendMessageOperationWithTask:message];
+    op.runloopThread = self.runloopThread;
+    op.delegate = self;
+    op.delayTime = delay;
+    [self.operationQueue nsm_addOperation:op];
+}
+
+- (void)removeMessage:(NSMMessage *)message {
+    [self removeMessageWithType:message.messageType];
+}
+
+- (void)removeMessageWithType:(NSInteger)type {
+    [self.operationQueue nsm_removeOperationWithType:type];
+}
 
 - (NSMutableArray *)deferredMessages {
     if (!_deferredMessages) {
@@ -55,7 +108,6 @@
     }
     return _mapStateInfo;
 }
-
 
 /**
  *
@@ -86,7 +138,7 @@
     
     NSMMessage *msg = [NSMMessage messageWithType:NSMMessageTypeActionInit];
     msg.messageDescription = @"Init";
-    [self addOperationAtFrontOfQueue:msg];
+    [self addMessageAtFront:msg];
 }
 
 
@@ -99,18 +151,20 @@
     
     //1、根据初始状态获取 状态对应的StateInfo
     NSMStateInfo *curStateInfo = self.mapStateInfo[NSStringFromClass(self.initialState.class)];
-    __block NSString *tempStateStackLog = @"临时状态栈构建完成:\n[";
+    NSMutableString *log = [[NSMutableString alloc] initWithString:@"Finish constructing initially temporary state stack:["];
     
     //2、构建临时状态栈
     while (curStateInfo != nil) {
-        tempStateStackLog = [tempStateStackLog stringByAppendingFormat:@"index:%zd state:%@,\n",_tempStateStackCount,NSStringFromClass(curStateInfo.state.class)];
-        _tempStateStack[_tempStateStackCount++] = curStateInfo;
+        [log appendString:@"\n"];
+        [log appendFormat:@"index:%zd state:%@,",self.tempStateStackCount,NSStringFromClass(curStateInfo.state.class)];
+        self.tempStateStack[self.tempStateStackCount++] = curStateInfo;
         curStateInfo = curStateInfo.parentStateInfo;
     }
-    NSMSMLogDebug(@"%@]",tempStateStackLog);
+    [log appendString:@"\n]"];
+    NSMSMLogDebug(@"%@",log);
     
     //3、通过将栈顶的Index赋值为-1的方式,状态栈滞空。
-    _stateStackTopIndex = -1;
+    self.stateStackTopIndex = -1;
     
     //4、将临时状态栈的状态 reverse之后,存放至状态栈中
     [self moveTempStateStackToStateStack];
@@ -119,7 +173,7 @@
 
 - (NSMMessage *)currentMessage {
     __block NSMMessage *msg = nil;
-    [self.operations enumerateObjectsUsingBlock:^(__kindof NSMMessageOperation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [self.operationQueue.operations enumerateObjectsUsingBlock:^(__kindof NSMMessageOperation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if(obj.isExecuting) {
             msg = obj.message;
             *stop = YES;
@@ -129,6 +183,7 @@
 }
 
 #pragma mark - CPMessageOperationDelegate 消息队列的消息出口
+
 - (void)sendMessageOperationDidStart:(NSMMessageOperation *)operation message:(NSMMessage *)message {
     NSMState *msgProcessedState = nil;
     if (self.isConstructionCompleted) {
@@ -138,19 +193,21 @@
         //以栈底作为起始位置,依次将状态栈中的所有状态都激活同时调用Enter方法
         [self invokeEnterMethods:0];
     } else {
-        //        VMStateMachineLogger(@"未初始化");
+        NSMSMLogWarn(@"Constuction of state machine has not completed");
     }
     [self performTransitions:msgProcessedState message:message];
-    NSMSMLogDebug(@">>>>>>>>>>>>>>>>>>任务%@------------结束------------\n\n",message.messageDescription);
     
-//    NSAssert(self.handlerDelegate != nil, @"StateMachine is nil");
+    //    NSAssert(self.handlerDelegate != nil, @"StateMachine is nil");
     if ([self.handlerDelegate respondsToSelector:@selector(smHandlerProcessFinalMessage:)]) {
         [self.handlerDelegate smHandlerProcessFinalMessage:message];
     }
+    NSMSMLogDebug(@"Finish handling message: %@",message.messageDescription);
 }
 
 - (void)performTransitions:(NSMState *)msgProcessedState message:(NSMMessage *)msg {
     NSMState *tempDestState = self.destState;
+    NSMState *fromState = self.currentState;
+    NSMSMLogDebug(@"Start state transition from %@ to %@", NSStringFromClass(fromState.class), NSStringFromClass(tempDestState.class));
     
     if (tempDestState != nil) {
         while (true) {
@@ -158,6 +215,7 @@
             
             //1、根据目的状态,构建临时状态栈[I,G,nil,nil],根据目的状态向上追溯父状态,返回第一个没有被激活的父状态
             NSMStateInfo *commonStateInfo = [self setupTempStateStackWithStatesToEnter:tempDestState];
+            NSMSMLogDebug(@"Common state info:%@", NSStringFromClass(commonStateInfo.state.class));
             
             //2、状态栈依次退出H-E变成A-C,调整状态栈栈顶的Index,此例中:指向C的位置,也就是1。状态栈的那个数组还是A-C-E-H,只不过H/E的active已经被至为NO,并且调用了对应状态的Enter方法
             [self invokeExitMethods:commonStateInfo];
@@ -174,7 +232,7 @@
             if (tempDestState != self.destState) {
                 tempDestState = self.destState;
             } else {
-                NSMSMLogDebug(@"状态切换成 %@", self.destState);
+                NSMSMLogDebug(@"Finish state transition from %@ to %@", NSStringFromClass(fromState.class), NSStringFromClass(tempDestState.class));
                 break;
             }
         }
@@ -187,6 +245,10 @@
             [self cleanupAfterQuitting];
         }
     }
+}
+
+- (NSMState *)currentState {
+    return self.stateStack[self.stateStackTopIndex].state;
 }
 
 - (void)cleanupAfterQuitting {
@@ -202,30 +264,30 @@
  */
 - (NSInteger)moveTempStateStackToStateStack {
     
-    NSInteger startIndex =  _stateStackTopIndex + 1;
+    NSInteger startIndex =  self.stateStackTopIndex + 1;
     
     //1、确定临时状态栈,取出的状态的起始Index
-    NSInteger i = _tempStateStackCount - 1;
+    NSInteger i = self.tempStateStackCount - 1;
     
     //2、确定状态栈,存放的状态的起始Index
     NSInteger j = startIndex;
     while (i >= 0) {
         //3、将临时状态栈中的状态 倒序 存放至 状态栈中
-        _stateStack[j] = _tempStateStack[i];
+        self.stateStack[j] = self.tempStateStack[i];
         j += 1;
         i -= 1;
     }
     
-#ifdef DEBUG
-    __block NSString* acturalStateStackDesc = @"实际状态栈结构切成:\n[";
-    [_stateStack enumerateObjectsUsingBlock:^(NSMStateInfo *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        acturalStateStackDesc = [acturalStateStackDesc stringByAppendingFormat:@"index:%zd state:%@,\n",idx,NSStringFromClass([obj.state class])];
+    NSMutableString* log = [[NSMutableString alloc] initWithString:@"Finish constructing state stack:["];
+    [self.stateStack enumerateObjectsUsingBlock:^(NSMStateInfo *  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [log appendString:@"\n"];
+        [log appendFormat:@"index:%zd state:%@,",idx,NSStringFromClass([obj.state class])];
     }];
-    NSMSMLogDebug(@"%@]",acturalStateStackDesc);
-#endif
+    [log appendString:@"\n]"];
+    NSMSMLogDebug(@"%@",log);
     
     //4、调整状态栈的栈顶的Index,指向状态栈的栈顶位置
-    _stateStackTopIndex = j - 1;
+    self.stateStackTopIndex = j - 1;
     
     //5、将状态栈的栈顶 return出去
     return startIndex;
@@ -248,32 +310,33 @@
  
  */
 - (NSMStateInfo *)setupTempStateStackWithStatesToEnter:(NSMState *)destState {
-    _tempStateStackCount = 0;
+    self.tempStateStackCount = 0;
     
     //1、获取目的状态的StateInfo
     NSMStateInfo *destStateInfo = self.mapStateInfo[NSStringFromClass(destState.class)];
-    NSString *log = @"构建需要Enter的State的临时状态栈:\n[";
+    NSMutableString *log = [[NSMutableString alloc] initWithString:@"Finish constructing temporary state stack:["];
     do {
         //2、首先将目的状态存放至临时状态栈中
-        log = [log stringByAppendingFormat:@"index:%zd state:%@,\n active:%@",_tempStateStackCount, destStateInfo.state, destStateInfo.active ? @"激活过了" : @"未激活"];
-        self.tempStateStack[_tempStateStackCount++] = destStateInfo;
+        [log appendString:@"\n"];
+        [log appendFormat:@"index:%zd state:%@ active:%@,", self.tempStateStackCount, destStateInfo.state, destStateInfo.active ? @"YES" : @"NO"];
+        self.tempStateStack[self.tempStateStackCount++] = destStateInfo;
         destStateInfo = destStateInfo.parentStateInfo;
         //3、如果目的状态有父状态,并且父状态没有active的话,继续做第二步的事情
     } while (destStateInfo != nil && !(destStateInfo.active));
-    NSMSMLogDebug(@"%@ destStateInfo:%@ state:%@ active:%@]\n", log, destStateInfo, destStateInfo.state, [destStateInfo active] ? @"激活过了" : @"未激活");
+    [log appendString:@"\n]"];
+    NSMSMLogDebug(@"%@", log);
     return destStateInfo;
     
 }
 /**
- *  从消息对类中移出之前Deferred的消息
+ *  从消息队列中移出之前Deferred的消息
  */
 - (void)moveDeferredMessageAtFrontOfQueue {
     for (NSInteger i = 0; i < self.deferredMessages.count; i++) {
         NSMMessage *msg = self.deferredMessages[i];
         
-        NSMStateInfo *topStackStateInfo = self.stateStack[_stateStackTopIndex];
-        NSMSMLogDebug(@"currentState: %@ ------即将优先处理的消息---%@", topStackStateInfo.state, msg.messageDescription);
-        [self addOperationAtFrontOfQueue:msg];
+        NSMSMLogDebug(@"Move deferred message to front of queue: %@", msg.messageDescription);
+        [self addMessageAtFront:msg];
     }
     [self.deferredMessages removeAllObjects];
 }
@@ -282,8 +345,8 @@
  * 沿着状态栈 不断向根节点追溯以判断是否能解决message
  */
 - (NSMState *)processMsg:(NSMMessage *)msg {
-    NSMStateInfo *curStateInfo = self.stateStack[_stateStackTopIndex];
-    NSMSMLogDebug(@">>>>curState:%@------EVENT:---%@", curStateInfo.state, msg.messageDescription);
+    NSMStateInfo *curStateInfo = self.stateStack[self.stateStackTopIndex];
+    NSMSMLogDebug(@"State: %@ processing message: %@", curStateInfo.state, msg.messageDescription);
     if ([self isQuit:msg]) {
         NSAssert(self.handlerDelegate != nil, @"StateMachine is nil");
         [self transitionToState:self.handlerDelegate.quittingState];
@@ -291,7 +354,7 @@
         while (![curStateInfo.state processMessage:msg]) {
             if (curStateInfo.parentStateInfo != nil) {
                 curStateInfo = curStateInfo.parentStateInfo;
-                NSMSMLogDebug(@">>>>>>curState's ParentState:%@------EVENT:---%@", curStateInfo.state, msg.messageDescription);
+                NSMSMLogDebug(@"State's parentState: %@ processing message: %@", curStateInfo.state, msg.messageDescription);
             }else {
                 [self unhandledMessage:msg];
                 break;
@@ -311,7 +374,7 @@
     for (NSInteger index = startIndex; index <= self.stateStackTopIndex; index++) {
         NSMStateInfo *stateInfo = self.stateStack[index];
         [stateInfo.state enter];
-        NSMSMLogDebug(@"%@ ENTER....",NSStringFromClass([stateInfo.state class]));
+        NSMSMLogDebug(@"Enter state: %@", NSStringFromClass([stateInfo.state class]));
         [stateInfo setActive:YES];
     }
 }
@@ -324,20 +387,19 @@
  */
 - (void)invokeExitMethods:(NSMStateInfo *)stateInfo {
     
-    while (_stateStackTopIndex >= 0 && self.stateStack[_stateStackTopIndex] != stateInfo) {
-        NSMStateInfo *curStateInfo =  self.stateStack[_stateStackTopIndex];
+    while (self.stateStackTopIndex >= 0 && self.stateStack[self.stateStackTopIndex] != stateInfo) {
+        NSMStateInfo *curStateInfo =  self.stateStack[self.stateStackTopIndex];
         NSMState *curState = [curStateInfo state];
         [curState exit];
-        NSMSMLogDebug(@"%@ EXIT....",NSStringFromClass([curState class]));
+        NSMSMLogDebug(@"Exit state: %@", NSStringFromClass([curState class]));
         [curStateInfo setActive:NO];
-        _stateStackTopIndex -= 1;
+        self.stateStackTopIndex -= 1;
     }
 }
 
 - (void)unhandledMessage:(NSMMessage *)message {
     
 }
-
 
 /**
  *  构造状态树
@@ -378,7 +440,6 @@
  *  @param state 目的状态
  */
 - (void)transitionToState:(NSMState *)state {
-    NSMSMLogDebug(@"状态机的目的状态切换成 %@", state);
     self.destState = state;
 }
 
@@ -388,7 +449,7 @@
 - (void)quitNow {
     NSMMessage *msg = [NSMMessage messageWithType:NSMMessageTypeActionQuit userInfo:self];
     msg.messageDescription = @"Quit";
-    [self addOperationAtFrontOfQueue:msg];
+    [self addMessageAtFront:msg];
 }
 
 - (BOOL)isQuit:(NSMMessage *)msg {
@@ -397,4 +458,5 @@
     }
     return NO;
 }
+
 @end

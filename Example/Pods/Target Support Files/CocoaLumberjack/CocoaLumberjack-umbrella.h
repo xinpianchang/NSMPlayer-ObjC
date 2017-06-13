@@ -20,6 +20,7 @@
 #import "DDLog+LOGV.h"
 #import "DDLog.h"
 #import "DDLogMacros.h"
+#import "DDOSLogger.h"
 #import "DDTTYLogger.h"
 #import "DDContextFilterLogFormatter.h"
 #import "DDDispatchQueueLogFormatter.h"

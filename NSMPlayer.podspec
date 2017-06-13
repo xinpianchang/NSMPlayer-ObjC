@@ -15,4 +15,5 @@ Pod::Spec.new do |s|
   s.dependency 'Bolts/Tasks'
   s.dependency 'NSMStateMachine'
   s.dependency 'Reachability'
+  s.resource = 'NSMPlayer/Assets/**/*'
 end

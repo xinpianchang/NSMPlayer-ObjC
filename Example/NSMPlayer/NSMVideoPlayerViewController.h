@@ -10,6 +10,9 @@
 @import NSMPlayer;
 
 @interface NSMVideoPlayerViewController : UIViewController
+
 @property (weak, nonatomic) IBOutlet NSMAVPlayerView *playerRenderingView;
+
+@property (nonatomic, readonly, strong) NSMVideoPlayerController *playerController;
 
 @end

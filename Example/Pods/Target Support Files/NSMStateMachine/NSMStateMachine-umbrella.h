@@ -11,8 +11,8 @@
 #endif
 
 #import "NSMMessageOperation.h"
-#import "NSMMessagesQueue.h"
 #import "NSMSMHandler.h"
+#import "NSOperationQueue+NSMStateMachine.h"
 #import "NSMStateMachineLogging.h"
 #import "NSMState.h"
 #import "NSMStateMachine.h"

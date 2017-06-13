@@ -1,6 +1,6 @@
-// NSMPlayerAccessoryView.h
+// NSOperationQueue+NSMStateMachine.h
 //
-// Copyright (c) 2017 NSMPlayer
+// Copyright (c) 2017 NSMStateMachine
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-#import "NSMPlayerAccessoryViewProtocol.h"
+#import <Foundation/Foundation.h>
 
-@interface NSMPlayerAccessoryView : UIView <NSMPlayerAccessoryViewProtocol>
+@interface NSOperationQueue (NSMStateMachine)
 
-@property (nonatomic, readonly, weak) UIButton *startOrPauseButton;
-@property (nonatomic, readonly, weak) UILabel *elapsedLabel;
-@property (nonatomic, readonly, weak) UILabel *durationLabel;
-@property (nonatomic, readonly, weak) UISlider *sliderView;
-@property (nonatomic, readonly, weak) UIProgressView *progressView;
+- (void)nsm_addOperationAtFrontOfQueue:(NSOperation *)op;
+
+- (void)nsm_addOperation:(NSOperation *)op;
+
+- (void)nsm_removeOperationWithType:(NSInteger)type;
 
 @end

@@ -7,31 +7,124 @@
 //
 
 #import "NSMVideoPlayerViewController.h"
+@import NSMPlayer;
+@import Bolts;
 
 @interface NSMVideoPlayerViewController ()
+
+@property (nonatomic, strong) NSMVideoPlayerController *playerController;
+@property (weak, nonatomic) IBOutlet NSMPlayerAccessoryView *accessoryView;
+@property (nonatomic, getter=isSrubbing) BOOL srubbing;
 
 @end
 
 @implementation NSMVideoPlayerViewController
 
+#pragma mark - Init
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        [self configureDefaults];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self = [super initWithCoder:coder]) {
+        [self configureDefaults];
+    }
+    return self;
+}
+
+- (void)configureDefaults {
+    NSMVideoPlayerController *playerController = [[NSMVideoPlayerController alloc] init];
+    self.playerController = playerController;
+    playerController.videoPlayer.allowWWAN = NO;
+    [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(totalUnitCount)) options:0 context:nil];
+    [playerController.videoPlayer.playbackProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
+    [playerController.videoPlayer.bufferProgress addObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount)) options:0 context:nil];
+}
+
+#pragma mark - UIViewController
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    [self.accessoryView.sliderView addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown];
+    [self.accessoryView.sliderView addTarget:self action:@selector(sliderValueChange:) forControlEvents:UIControlEventValueChanged];
+    [self.accessoryView.sliderView addTarget:self action:@selector(endSrubbing:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
+    
+    [self.accessoryView.startOrPauseButton addTarget:self action:@selector(startOrPauseAction:) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)dealloc {
+    [self.playerController.videoPlayer.playbackProgress removeObserver:self forKeyPath:NSStringFromSelector(@selector(totalUnitCount))];
+    [self.playerController.videoPlayer.playbackProgress removeObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount))];
+    [self.playerController.videoPlayer.bufferProgress removeObserver:self forKeyPath:NSStringFromSelector(@selector(completedUnitCount))];
+    [self.playerController.videoPlayer releasePlayer];
+    //NSLog(@"MFVideoPlayerViewController  dealloc");
 }
 
-/*
-#pragma mark - Navigation
+#pragma mark - Actions
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)beginSrubbing:(UISlider *)sender {
+    self.srubbing = YES;
 }
-*/
 
+- (void)sliderValueChange:(UISlider *)sender {
+    NSTimeInterval currentTime = sender.value;
+    NSInteger currentMinutes = (int)trunc(currentTime / 60);
+    self.accessoryView.elapsedLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)currentMinutes, (long)((int)trunc(currentTime) - currentMinutes * 60)];
+}
+
+- (void)endSrubbing:(UISlider *)sender {
+    
+    [[self.playerController.videoPlayer seekToTime:sender.value] continueWithExecutor:[BFExecutor mainThreadExecutor] withBlock:^id _Nullable(BFTask * _Nonnull t) {
+        self.srubbing = NO;
+        return nil;
+    }];
+}
+
+- (void)startOrPauseAction:(UIButton *)sender {
+    sender.selected = !sender.isSelected;
+    if (sender.selected) {
+        [self.playerController.videoPlayer pause];
+    } else {
+        if (self.playerController.videoPlayer.currentStatus == NSMVideoPlayerStatusPlayToEndTime) {
+            [self.playerController.videoPlayer seekToTime:0];
+            [self.playerController.videoPlayer play];
+        } else {
+            [self.playerController.videoPlayer play];
+        }
+    }
+}
+
+#pragma mark - KVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    
+    //playbackProgress
+    if (object == self.playerController.videoPlayer.playbackProgress) {
+        NSProgress *playbackProgress = (NSProgress *)object;
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(totalUnitCount))]) {
+            NSTimeInterval douration = playbackProgress.totalUnitCount;
+            NSInteger wholeMinutes = (int)trunc(douration / 60);
+            self.accessoryView.durationLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)wholeMinutes, (long)((int)trunc(douration) - wholeMinutes * 60)];
+            self.accessoryView.sliderView.maximumValue = playbackProgress.totalUnitCount;
+            
+        } else if ([keyPath isEqualToString:NSStringFromSelector(@selector(completedUnitCount))]) {
+            if (!self.isSrubbing) {
+                NSTimeInterval currentTime = playbackProgress.completedUnitCount;
+                NSInteger currentMinutes = (int)trunc(currentTime / 60);
+                self.accessoryView.elapsedLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", (long)currentMinutes, (long)((int)trunc(currentTime) - currentMinutes * 60)];
+                self.accessoryView.sliderView.value = playbackProgress.completedUnitCount;
+            }
+        }
+    } else {
+        if ([keyPath isEqualToString:NSStringFromSelector(@selector(completedUnitCount))]) {
+            NSProgress *bufferProgress = (NSProgress *)object;
+            self.accessoryView.progressView.progress = bufferProgress.fractionCompleted;
+        }
+    }
+}
 @end

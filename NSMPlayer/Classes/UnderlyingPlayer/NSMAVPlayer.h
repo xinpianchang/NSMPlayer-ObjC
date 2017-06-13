@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-/* Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered. */
-
 #import <AVFoundation/AVFoundation.h>
 #import "NSMUnderlyingPlayerProtocol.h"
 

@@ -25,8 +25,7 @@
 @interface NSMPlayerAccessoryView ()
 
 @property (nonatomic, weak) UIButton *startOrPauseButton;
-@property (nonatomic, weak) UILabel *elapsedLabel;
-@property (nonatomic, weak) UILabel *durationLabel;
+@property (nonatomic, weak) UILabel *progressLabel;
 @property (nonatomic, weak) UISlider *sliderView;
 @property (nonatomic, weak) UIProgressView *progressView;
 
@@ -70,21 +69,15 @@
     UIFont *timingFont = [UIFont systemFontOfSize:15.0 weight:UIFontWeightMedium];
     UIColor *tintColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5];
     
-    UILabel *elapsedLabel = [[UILabel alloc] init];
-    elapsedLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    self.elapsedLabel = elapsedLabel;
-    elapsedLabel.text = @"00:00";
-    elapsedLabel.font = timingFont;
-    elapsedLabel.textColor = tintColor;
-    [self addSubview:elapsedLabel];
+    UILabel *progressLabel = [[UILabel alloc] init];
+    progressLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.progressLabel = progressLabel;
+    progressLabel.text = @"00:00/00:00";
+    progressLabel.textAlignment = NSTextAlignmentRight;
+    progressLabel.font = timingFont;
+    progressLabel.textColor = tintColor;
+    [self addSubview:progressLabel];
     
-    UILabel *durationLabel = [[UILabel alloc] init];
-    durationLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    self.durationLabel = durationLabel;
-    durationLabel.text = @"00:00";
-    durationLabel.font = timingFont;
-    durationLabel.textColor = tintColor;
-    [self addSubview:durationLabel];
     
     UIColor *sunYellowColor = [UIColor colorWithRed:1.0 green:204.0 / 255.0 blue:0.0 alpha:1.0];
     UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
@@ -102,8 +95,8 @@
     [self addSubview:sliderView];
 
     UIView *superview = self;
-    NSDictionary *views = NSDictionaryOfVariableBindings(superview, sliderView, progressView, elapsedLabel, durationLabel);
-    NSArray *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-30-[progressView]-30-[elapsedLabel(==45)]-[durationLabel(==elapsedLabel)]-|" options:NSLayoutFormatAlignAllCenterY metrics:nil views:views];
+    NSDictionary *views = NSDictionaryOfVariableBindings(superview, sliderView, progressView, progressLabel);
+    NSArray *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-30-[progressView]-30-[progressLabel(==90)]-|" options:NSLayoutFormatAlignAllCenterY metrics:nil views:views];
     for (NSLayoutConstraint *constraint in horizontalConstraints) {
         constraint.active = YES;
     }
@@ -120,11 +113,23 @@
 }
 
 - (void)show:(BOOL)animated {
-    
+    if (animated) {
+        [UIView animateWithDuration:0.3 animations:^{
+            self.alpha = 1.0;
+        }];
+    } else {
+        self.alpha = 1.0;
+    }
 }
 
 - (void)hide:(BOOL)animated {
-    
+    if (animated) {
+        [UIView animateWithDuration:0.3 animations:^{
+            self.alpha = 0.0;
+        }];
+    } else {
+        self.alpha = 0.0;
+    }
 }
 
 @end

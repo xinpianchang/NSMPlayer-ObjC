@@ -938,8 +938,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         restoration.muted = self.isMuted;
         restoration.allowWWAN = self.isAllowWWAN;
         restoration.volume = self.volume;
-//        restoration.rate = self.rate;
-        NSMPlayerLogError(@"restoration.seekTime:%@",@(restoration.seekTime));
+
         return restoration;
     }
 }

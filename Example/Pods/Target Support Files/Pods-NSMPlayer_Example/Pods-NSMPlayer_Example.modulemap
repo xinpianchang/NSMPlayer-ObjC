@@ -1,0 +1,6 @@
+framework module Pods_NSMPlayer_Example {
+  umbrella header "Pods-NSMPlayer_Example-umbrella.h"
+
+  export *
+  module * { export * }
+}

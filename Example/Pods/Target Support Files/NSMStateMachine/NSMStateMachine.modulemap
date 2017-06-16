@@ -1,0 +1,6 @@
+framework module NSMStateMachine {
+  umbrella header "NSMStateMachine-umbrella.h"
+
+  export *
+  module * { export * }
+}

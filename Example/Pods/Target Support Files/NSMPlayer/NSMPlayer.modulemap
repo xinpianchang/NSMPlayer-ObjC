@@ -1,0 +1,6 @@
+framework module NSMPlayer {
+  umbrella header "NSMPlayer-umbrella.h"
+
+  export *
+  module * { export * }
+}

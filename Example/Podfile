@@ -1,0 +1,13 @@
+use_frameworks!
+
+target 'NSMPlayer_Example' do
+  pod 'NSMPlayer', :path => '../'
+  target 'NSMPlayer_Tests' do
+    inherit! :search_paths
+
+    pod 'Specta'
+  pod 'Expecta'
+  pod 'FBSnapshotTestCase'
+  pod 'Expecta+Snapshots'
+  end
+end

@@ -96,7 +96,7 @@
 
     UIView *superview = self;
     NSDictionary *views = NSDictionaryOfVariableBindings(superview, sliderView, progressView, progressLabel);
-    NSArray *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-30-[progressView]-30-[progressLabel(==90)]-|" options:NSLayoutFormatAlignAllCenterY metrics:nil views:views];
+    NSArray *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-30-[progressView]-30-[progressLabel(==100)]-|" options:NSLayoutFormatAlignAllCenterY metrics:nil views:views];
     for (NSLayoutConstraint *constraint in horizontalConstraints) {
         constraint.active = YES;
     }

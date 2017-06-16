@@ -81,7 +81,7 @@
         if ([playerViewController isKindOfClass:[NSMVideoPlayerViewController class]]) {
             self.playerViewController = playerViewController;
             NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
-            playerAsset.assetURL = [NSURL URLWithString:@"http://video.xinpianchang.com/58744ca3bf757.mp4"];
+            playerAsset.assetURL = [NSURL URLWithString:@"http://vjs.zencdn.net/v/oceans.mp4"];
             [self.playerViewController.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
         }
     }
@@ -198,13 +198,6 @@
 }
 
 - (void)videoPlayerStatusDidChange:(NSNotification *)notification {
-    
-    NSMVideoPlayerStatus oldStatus = [notification.userInfo[NSMVideoPlayerOldStatusKey] intValue];
-    NSMVideoPlayerStatus newStatus = [notification.userInfo[NSMVideoPlayerNewStatusKey] intValue];
-    
-    if (oldStatus == NSMVideoPlayerStatusPreparing && (newStatus & NSMVideoPlayerStatusLevelReadyToPlay)) {
-        self.playerViewController.playerController.videoPlayer.playerView = self.playerViewController.playerRenderingView;
-    }
     
     if (self.playerViewController.playerController.videoPlayer.currentStatus == NSMVideoPlayerStatusFailed) {
         self.failReasonLabel.text = [self.playerViewController.playerController.videoPlayer.playerError.error localizedDescription];

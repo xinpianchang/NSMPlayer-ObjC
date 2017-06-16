@@ -62,7 +62,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.playerController.videoPlayer.playerView = self.playerRenderingView;
     [self.accessoryView.sliderView addTarget:self action:@selector(beginSrubbing:) forControlEvents:UIControlEventTouchDown];
     [self.accessoryView.sliderView addTarget:self action:@selector(sliderValueChange:) forControlEvents:UIControlEventValueChanged];
     [self.accessoryView.sliderView addTarget:self action:@selector(endSrubbing:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
@@ -145,4 +145,5 @@
         }
     }
 }
+
 @end

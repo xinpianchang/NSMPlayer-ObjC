@@ -199,3 +199,4 @@ NSPlayer 使用 MIT 许可证，详情见 LICENSE 文件。
 
 ## Architecture
 
+![Architecture](https://raw.githubusercontent.com/xinpianchang/NSMPlayer-ObjC/master/NSMVideoPlayer.png)

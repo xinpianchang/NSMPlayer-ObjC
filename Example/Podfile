@@ -1,6 +1,3 @@
-source 'https://github.com/CocoaPods/Specs.git'
-source 'https://git.vmovier.cc/scm/nsm/specs.git'
-
 use_frameworks!
 
 target 'NSMPlayer_Example' do

@@ -21,9 +21,12 @@
 // THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 #import "NSMVideoPlayerViewProtocol.h"
 
 @interface NSMAVPlayerView : UIView <NSMVideoPlayerViewProtocol>
+
+@property (nonatomic, readonly, strong) AVPlayerLayer *playerLayer;
 
 @end
 

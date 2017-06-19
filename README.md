@@ -72,11 +72,11 @@ self.playerController.videoPlayer.playerView = playerRenderingView;
 播放一个视频源
 
 ```objective-c
-NSMVideoPlayerController *playerController = [[NSMVideoPlayerController alloc] init];
+self.playerController = [[NSMVideoPlayerController alloc] init];
 
 NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
-[playerAsset.assetURL = [NSURL URLWithString:@"http://vjs.zencdn.net/v/oceans.mp4"]
-[playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
+playerAsset.assetURL = [NSURL URLWithString:@"http://vjs.zencdn.net/v/oceans.mp4"];
+[self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 ```
 
 ### NSMVideoPlayerProtocol

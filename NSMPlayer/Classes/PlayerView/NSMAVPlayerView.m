@@ -30,7 +30,11 @@
 }
 
 - (void)setPlayer:(id)player {
-    ((AVPlayerLayer *)[self layer]).player = (AVPlayer *)player;
+    ((AVPlayerLayer *)self.layer).player = (AVPlayer *)player;
+}
+
+- (AVPlayerLayer *)playerLayer {
+    return (AVPlayerLayer *)self.layer;
 }
 
 @end

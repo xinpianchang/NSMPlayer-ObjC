@@ -49,15 +49,15 @@ Coming soon
 ## Getting Started
 
 ```objective-c
-NSMVideoPlayerController *playerController = [[NSMVideoPlayerController alloc] init];
+self.playerController = [[NSMVideoPlayerController alloc] init];
 
 NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
-[playerAsset.assetURL = [NSURL URLWithString:@"http://vjs.zencdn.net/v/oceans.mp4"]
-[playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
+playerAsset.assetURL = [NSURL URLWithString:@"http://vjs.zencdn.net/v/oceans.mp4"];
+[self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 
 NSMAVPlayerView *playerRenderingView = [[NSMAVPlayerView alloc] init];
 NSMPlayerAccessoryView *accessoryView = [[NSMPlayerAccessoryView alloc] init];
-playerController.videoPlayer.playerView = playerRenderingView;
+self.playerController.videoPlayer.playerView = playerRenderingView;
 
 [self.view addSubview:playerRenderingView];
 [self.view addSubview:accessoryView];

@@ -357,19 +357,18 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     [playerRenderView setPlayer:self];
 }
 
-//- (UIImage *)thumnailImageWithTime:(CMTime)requestTime {
-//    AVAsset *myAsset = self.asset;
-//    if ([[myAsset tracksWithMediaType:AVMediaTypeVideo] count] > 0) {
-//        AVAssetImageGenerator *imageGenerator =
-//        [AVAssetImageGenerator assetImageGeneratorWithAsset:myAsset];
-//        NSError *error;
-//        CMTime actualTime;
-//        CGImageRef halfWayImage = [imageGenerator copyCGImageAtTime:requestTime actualTime:&actualTime error:&error];
-//        if (halfWayImage != NULL) {
-//            return [UIImage imageWithCGImage:halfWayImage];
-//        }
-//    }
-//    return nil;
-//}
+- (UIImage *)thumnailImageWithTime:(CMTime)requestTime {
+    AVAsset *myAsset = self.avplayer.currentItem.asset;
+    if ([[myAsset tracksWithMediaType:AVMediaTypeVideo] count] > 0) {
+        AVAssetImageGenerator *imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:myAsset];
+        NSError *error;
+        CMTime actualTime;
+        CGImageRef halfWayImage = [imageGenerator copyCGImageAtTime:requestTime actualTime:&actualTime error:&error];
+        if (halfWayImage != NULL) {
+            return [UIImage imageWithCGImage:halfWayImage];
+        }
+    }
+    return nil;
+}
 
 @end

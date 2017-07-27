@@ -24,10 +24,11 @@
 
 @interface NSMPlayerAccessoryView ()
 
-@property (nonatomic, weak) UIButton *startOrPauseButton;
-@property (nonatomic, weak) UILabel *progressLabel;
-@property (nonatomic, weak) UISlider *sliderView;
-@property (nonatomic, weak) UIProgressView *progressView;
+@property (nonatomic, strong) UIButton *startOrPauseButton;
+@property (nonatomic, strong) UILabel *progressLabel;
+@property (nonatomic, strong) UISlider *sliderView;
+@property (nonatomic, strong) UIProgressView *progressView;
+@property (nonatomic, strong) UIButton *zoomInOutButton;
 
 @end
 
@@ -56,15 +57,14 @@
     self.backgroundColor = [UIColor clearColor];
     
     UIButton *startOrPauseButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    startOrPauseButton.translatesAutoresizingMaskIntoConstraints = NO;
     [startOrPauseButton setImage:[UIImage imageNamed:@"pauseBtno50" inBundle:[NSBundle bundleForClass:[NSMPlayerAccessoryView class]] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
     [startOrPauseButton setImage:[UIImage imageNamed:@"playBtn50" inBundle:[NSBundle bundleForClass:[NSMPlayerAccessoryView class]] compatibleWithTraitCollection:nil] forState:UIControlStateSelected];
-    startOrPauseButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.startOrPauseButton = startOrPauseButton;
     [self addSubview:startOrPauseButton];
     
     [NSLayoutConstraint constraintWithItem:startOrPauseButton attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:startOrPauseButton.superview attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0].active = YES;
     [NSLayoutConstraint constraintWithItem:startOrPauseButton attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:startOrPauseButton.superview attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0.0].active = YES;
-    
     
     UIFont *timingFont = [UIFont systemFontOfSize:15.0 weight:UIFontWeightMedium];
     UIColor *tintColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5];
@@ -77,7 +77,6 @@
     progressLabel.font = timingFont;
     progressLabel.textColor = tintColor;
     [self addSubview:progressLabel];
-    
     
     UIColor *sunYellowColor = [UIColor colorWithRed:1.0 green:204.0 / 255.0 blue:0.0 alpha:1.0];
     UIProgressView *progressView = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
@@ -94,17 +93,22 @@
     sliderView.maximumTrackTintColor = [UIColor clearColor];
     [self addSubview:sliderView];
 
+    UIButton *zoomInOutButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    zoomInOutButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.zoomInOutButton = zoomInOutButton;
+    [zoomInOutButton setImage:[UIImage imageNamed:@"fullSize" inBundle:[NSBundle bundleForClass:[NSMPlayerAccessoryView class]] compatibleWithTraitCollection:nil] forState:UIControlStateNormal];
+    [self addSubview:zoomInOutButton];
+    
     UIView *superview = self;
-    NSDictionary *views = NSDictionaryOfVariableBindings(superview, sliderView, progressView, progressLabel);
-    NSArray *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-30-[progressView]-30-[progressLabel(==100)]-|" options:NSLayoutFormatAlignAllCenterY metrics:nil views:views];
-    for (NSLayoutConstraint *constraint in horizontalConstraints) {
-        constraint.active = YES;
-    }
+    NSDictionary *views = NSDictionaryOfVariableBindings(superview, sliderView, progressView, progressLabel, zoomInOutButton);
+    NSDictionary *metrics = @{@"horizontalPadding" : @16, @"progressWidth" : @100};
+    [NSLayoutConstraint activateConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-horizontalPadding-[progressView]-horizontalPadding-[progressLabel(==progressWidth)]-horizontalPadding-[zoomInOutButton]-horizontalPadding-|" options:NSLayoutFormatAlignAllCenterY metrics:metrics views:views]];
     
     [NSLayoutConstraint constraintWithItem:progressView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:sliderView attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0].active = YES;
     [NSLayoutConstraint constraintWithItem:progressView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:sliderView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0].active = YES;
     [NSLayoutConstraint constraintWithItem:progressView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:progressView.superview attribute:NSLayoutAttributeBottom multiplier:1.0 constant:-30.0].active = YES;
     [NSLayoutConstraint constraintWithItem:progressView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:sliderView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:1.0].active = YES;
+    [NSLayoutConstraint constraintWithItem:progressView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:zoomInOutButton attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0].active = YES;
     
     [sliderView setContentHuggingPriority:UILayoutPriorityDefaultLow - 1.0 forAxis:UILayoutConstraintAxisHorizontal];
     [progressView setContentHuggingPriority:UILayoutPriorityDefaultLow - 1.0 forAxis:UILayoutConstraintAxisHorizontal];

@@ -382,7 +382,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 //    self.videoPlayer.underlyingPlayer.rate = self.videoPlayer.rate;
     self.videoPlayer.underlyingPlayer.volume = self.videoPlayer.volume;
     self.videoPlayer.underlyingPlayer.muted = self.videoPlayer.isMuted;
-    [self.videoPlayer.underlyingPlayer setPlayerView:[self.videoPlayer playerView]];
+    [self.videoPlayer.underlyingPlayer setPlayerView:self.videoPlayer.playerView];
 }
 
 - (BOOL)processMessage:(NSMMessage *)message {
@@ -692,7 +692,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         
         _currentStatus =  NSMVideoPlayerStatusUnknown;
         self.players = [NSMutableDictionary dictionary];
-        self.stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:self selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];
+        self.stateMachineRunLoopThread = [[NSThread alloc] initWithTarget:[self class] selector:@selector(stateMachineRunLoopThreadThreadEntry) object:nil];
         [self.stateMachineRunLoopThread start];
         self.smHandler.runloopThread = self.stateMachineRunLoopThread;
         [self start];
@@ -711,7 +711,7 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     return self;
 }
 
-- (void)stateMachineRunLoopThreadThreadEntry {
++ (void)stateMachineRunLoopThreadThreadEntry {
     @autoreleasepool {
         NSThread * currentThread = [NSThread currentThread];
         currentThread.name = @"StateMachineOfPlayerThread";

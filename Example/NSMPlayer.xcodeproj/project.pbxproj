@@ -24,6 +24,8 @@
 		6003F5BC195388D20070C39A /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6003F5BB195388D20070C39A /* Tests.m */; };
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
+		AF25335B1F176124003C1D21 /* NSMVideoTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = AF25335A1F176124003C1D21 /* NSMVideoTableViewCell.m */; };
+		AF2533871F18CC29003C1D21 /* NSMDisplayVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF2533861F18CC29003C1D21 /* NSMDisplayVideoViewController.m */; };
 		AF4906121E8A4B2D00B8345E /* NSMVideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF4906111E8A4B2D00B8345E /* NSMVideoPlayerViewController.m */; };
 		AF5E3FAE1E5405E9009325F4 /* NSMVideoSourceController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF5E3FAD1E5405E9009325F4 /* NSMVideoSourceController.m */; };
 		AF807F851E79346800759136 /* NSMVideoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF807F841E79346800759136 /* NSMVideoTableViewController.m */; };
@@ -81,6 +83,10 @@
 		71719F9E1E33DC2100824A3D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9FF6A8AA9AA90156EF86244F /* Pods-NSMPlayer_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NSMPlayer_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-NSMPlayer_Example/Pods-NSMPlayer_Example.release.xcconfig"; sourceTree = "<group>"; };
+		AF2533591F176124003C1D21 /* NSMVideoTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMVideoTableViewCell.h; sourceTree = "<group>"; };
+		AF25335A1F176124003C1D21 /* NSMVideoTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMVideoTableViewCell.m; sourceTree = "<group>"; };
+		AF2533851F18CC29003C1D21 /* NSMDisplayVideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMDisplayVideoViewController.h; sourceTree = "<group>"; };
+		AF2533861F18CC29003C1D21 /* NSMDisplayVideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMDisplayVideoViewController.m; sourceTree = "<group>"; };
 		AF4906101E8A4B2D00B8345E /* NSMVideoPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMVideoPlayerViewController.h; sourceTree = "<group>"; };
 		AF4906111E8A4B2D00B8345E /* NSMVideoPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMVideoPlayerViewController.m; sourceTree = "<group>"; };
 		AF5E3FAC1E5405E9009325F4 /* NSMVideoSourceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMVideoSourceController.h; sourceTree = "<group>"; };
@@ -164,10 +170,14 @@
 				AF5E3FAD1E5405E9009325F4 /* NSMVideoSourceController.m */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
-				AF807F831E79346800759136 /* NSMVideoTableViewController.h */,
-				AF807F841E79346800759136 /* NSMVideoTableViewController.m */,
 				AF4906101E8A4B2D00B8345E /* NSMVideoPlayerViewController.h */,
 				AF4906111E8A4B2D00B8345E /* NSMVideoPlayerViewController.m */,
+				AF807F831E79346800759136 /* NSMVideoTableViewController.h */,
+				AF807F841E79346800759136 /* NSMVideoTableViewController.m */,
+				AF2533591F176124003C1D21 /* NSMVideoTableViewCell.h */,
+				AF25335A1F176124003C1D21 /* NSMVideoTableViewCell.m */,
+				AF2533851F18CC29003C1D21 /* NSMDisplayVideoViewController.h */,
+				AF2533861F18CC29003C1D21 /* NSMDisplayVideoViewController.m */,
 			);
 			name = "Example for NSMPlayer";
 			path = NSMPlayer;
@@ -431,6 +441,8 @@
 				6003F5A7195388D20070C39A /* NSMViewController.m in Sources */,
 				AF4906121E8A4B2D00B8345E /* NSMVideoPlayerViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
+				AF2533871F18CC29003C1D21 /* NSMDisplayVideoViewController.m in Sources */,
+				AF25335B1F176124003C1D21 /* NSMVideoTableViewCell.m in Sources */,
 				AF5E3FAE1E5405E9009325F4 /* NSMVideoSourceController.m in Sources */,
 				AF807F851E79346800759136 /* NSMVideoTableViewController.m in Sources */,
 			);

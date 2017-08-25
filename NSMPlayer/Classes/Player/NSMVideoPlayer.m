@@ -641,7 +641,8 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
         }
         
         case NSMVideoPlayerEventAllowWWANChange: {
-            
+            [self.videoPlayer removeDeferredMessage:NSMVideoPlayerEventAllowWWANChange];
+            [self.videoPlayer deferredMessage:message];
             return YES;
         }
             

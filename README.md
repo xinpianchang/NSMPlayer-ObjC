@@ -72,11 +72,11 @@ self.playerController.videoPlayer.playerView = playerRenderingView;
 播放一个视频源
 
 ```objective-c
-NSMVideoPlayerController *playerController = [[NSMVideoPlayerController alloc] init];
+self.playerController = [[NSMVideoPlayerController alloc] init];
 
 NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
-[playerAsset.assetURL = [NSURL URLWithString:@"http://vjs.zencdn.net/v/oceans.mp4"]
-[playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
+playerAsset.assetURL = [NSURL URLWithString:@"http://vjs.zencdn.net/v/oceans.mp4"];
+[self.playerController.videoPlayer replaceCurrentAssetWithAsset:playerAsset];
 ```
 
 ### NSMVideoPlayerProtocol
@@ -103,32 +103,32 @@ NSMPlayerAsset *playerAsset = [[NSMPlayerAsset alloc] init];
 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(videoPlayerStatusDidChange:) name:NSMVideoPlayerStatusDidChange object:nil];
 
 - (void)videoPlayerStatusDidChange:(NSNotification *)notification {
-NSMVideoPlayerStatus oldStatus = [notification.userInfo[NSMVideoPlayerOldStatusKey] intValue];
-NSMVideoPlayerStatus newStatus = [notification.userInfo[NSMVideoPlayerNewStatusKey] intValue];
+    NSMVideoPlayerStatus oldStatus = [notification.userInfo[NSMVideoPlayerOldStatusKey] intValue];
+    NSMVideoPlayerStatus newStatus = [notification.userInfo[NSMVideoPlayerNewStatusKey] intValue];
 
    // 在播放器状态发生的变化的时候，改变你的控制层的 UI 等一系列上层 UI 
    switch (newStatus) {
-case NSMVideoPlayerStatusFailed:
-break;
+        case NSMVideoPlayerStatusFailed:
+        break;
 
-case NSMVideoPlayerStatusPreparing:
-break;
+        case NSMVideoPlayerStatusPreparing:
+        break;
 
-case NSMVideoPlayerStatusPlaying:            
-break;
+        case NSMVideoPlayerStatusPlaying:            
+        break;
 
-case NSMVideoPlayerStatusWaitBufferingToPlay:
-break;
+        case NSMVideoPlayerStatusWaitBufferingToPlay:
+        break;
 
-case NSMVideoPlayerStatusPaused:
-break;
+        case NSMVideoPlayerStatusPaused:
+        break;
 
-case NSMVideoPlayerStatusPlayToEndTime:
-break;
+        case NSMVideoPlayerStatusPlayToEndTime:
+        break;
 
-default:
-break;
-}
+        default:
+        break;
+    }
 }
 ```
 

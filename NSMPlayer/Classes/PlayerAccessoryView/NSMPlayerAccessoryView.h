@@ -25,9 +25,10 @@
 
 @interface NSMPlayerAccessoryView : UIView <NSMPlayerAccessoryViewProtocol>
 
-@property (nonatomic, readonly, weak) UIButton *startOrPauseButton;
-@property (nonatomic, readonly, weak) UILabel *progressLabel;
-@property (nonatomic, readonly, weak) UISlider *sliderView;
-@property (nonatomic, readonly, weak) UIProgressView *progressView;
+@property (nonatomic, readonly, strong) UIButton *startOrPauseButton;
+@property (nonatomic, readonly, strong) UILabel *progressLabel;
+@property (nonatomic, readonly, strong) UISlider *sliderView;
+@property (nonatomic, readonly, strong) UIProgressView *progressView;
+@property (nonatomic, readonly, strong) UIButton *zoomInOutButton;
 
 @end

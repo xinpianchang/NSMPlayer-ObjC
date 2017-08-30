@@ -39,7 +39,7 @@ FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotif
 
 FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackStallingNotification;
 
-FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackResignStallingNotification;
+//FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPlaybackResignStallingNotification;
 
 // notification userInfo key
 //FOUNDATION_EXPORT NSString *const NSMUnderlyingPlayerPeriodicPlayTimeChangeKey;

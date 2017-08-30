@@ -53,22 +53,15 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackStalling:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackResignStalling:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackStalling:) name:UIApplicationWillResignActiveNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackResignStalling:) name:UIApplicationDidBecomeActiveNotification object:nil];
         _playbackProgress = [NSProgress progressWithTotalUnitCount:0];
         _bufferProgress = [NSProgress progressWithTotalUnitCount:0];
     }
     return self;
 }
 
-
 - (void)underlyingPlayerPlaybackStalling:(NSNotification *)notification {
     [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackStallingNotification object:self userInfo:nil];
-}
-
-- (void)underlyingPlayerPlaybackResignStalling:(NSNotification *)notification {
-    [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackResignStallingNotification object:self userInfo:nil];
 }
 
 // Will attempt load and test these asset keys before playing

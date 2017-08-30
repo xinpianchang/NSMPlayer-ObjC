@@ -1022,7 +1022,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackBufferEmpty:) name:NSMUnderlyingPlayerPlaybackBufferEmptyNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackLikelyToKeepUp:) name:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackStallingNotification:) name:NSMUnderlyingPlayerPlaybackStallingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(underlyingPlayerPlaybackResignStallingNotification:) name:NSMUnderlyingPlayerPlaybackResignStallingNotification object:nil];
 }
 
 - (void)underlyingPlayerDidPlayToEndTime:(NSNotification *)notification {
@@ -1053,12 +1052,6 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (void)underlyingPlayerPlaybackStallingNotification:(NSNotification *)notification {
     NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPause];
-    msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
-    [self sendMessage:msg];
-}
-
-- (void)underlyingPlayerPlaybackResignStallingNotification:(NSNotification *)notification {
-    NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPlay];
     msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
     [self sendMessage:msg];
 }

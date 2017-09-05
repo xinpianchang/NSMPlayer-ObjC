@@ -38,6 +38,7 @@
 @property (nonatomic, strong) NSMPlayerAsset *currentAsset;
 @property (nonatomic, strong) NSProgress *playbackProgress;
 @property (nonatomic, strong) NSProgress *bufferProgress;
+@property (nonatomic, strong) AVPlayerItem *playerItem;
 
 @end
 
@@ -88,6 +89,14 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
          * our handler to the main queue.
          */
         dispatch_async(dispatch_get_main_queue(), ^{
+            
+            if (![newAsset.URL.absoluteString isEqualToString:self.currentAsset.assetURL.absoluteString]) {
+                /*
+                 self.asset has already changed! No point continuing because
+                 another newAsset will come along in a moment.
+                 */
+                return;
+            }
             /**
              * Test whether the values of each of the keys we need have been
              * successfully loaded.
@@ -149,6 +158,8 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
     
+    self.playerItem = playerItem;
+    
     // Invoke callback every one second
     [self addTimeObserverToken];
 }
@@ -181,7 +192,9 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 }
 
 - (BFTask *)seekToTime:(NSTimeInterval)seconds {
-    
+    /**
+     'NSInvalidArgumentException', reason: 'AVPlayerItem cannot service a seek request with a completion handler until its status is AVPlayerItemStatusReadyToPlay.'
+     */
     CMTime time = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
     BFTaskCompletionSource *tcs = [BFTaskCompletionSource taskCompletionSource];
     [self.avplayer seekToTime:time completionHandler:^(BOOL finished) {
@@ -202,6 +215,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self removeCurrentItemObserver];
         [self removeTimeObserverToken];
+        self.playerItem = nil;
         [self.avplayer replaceCurrentItemWithPlayerItem:nil];
         self.avplayer = nil;
         self.playbackProgress.completedUnitCount = self.playbackProgress.totalUnitCount = 0;
@@ -239,7 +253,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     [playerView setPlayer:self.avplayer];
 }
 
-#pragma mark - - NSKeyValueObserving
+#pragma mark - NSKeyValueObserving
 
 // AV Foundation does not specify what thread that the notification is sent on
 // if you want to update the user interface, you must make sure that any relevant code is invoked on the main thread
@@ -338,11 +352,16 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 }
 
 - (void)removeCurrentItemObserver {
-    if (self.avplayer.currentItem) {
+    if (self.playerItem) {
         NSAssert([NSThread currentThread] == [NSThread mainThread], @"You should register for KVO change notifications and unregister from KVO change notifications on the main thread. ");
-        [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(status)) context:NSMAVPlayerKVOContext];
-        [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) context:NSMAVPlayerKVOContext];
-        [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:NSMAVPlayerKVOContext];
+        [self.playerItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(status)) context:NSMAVPlayerKVOContext];
+        [self.playerItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) context:NSMAVPlayerKVOContext];
+        [self.playerItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:NSMAVPlayerKVOContext];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.playerItem];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:self.playerItem];
+        
     }
 }
 

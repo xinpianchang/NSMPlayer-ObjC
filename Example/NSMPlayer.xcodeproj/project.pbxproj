@@ -29,6 +29,7 @@
 		AF4906121E8A4B2D00B8345E /* NSMVideoPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF4906111E8A4B2D00B8345E /* NSMVideoPlayerViewController.m */; };
 		AF5E3FAE1E5405E9009325F4 /* NSMVideoSourceController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF5E3FAD1E5405E9009325F4 /* NSMVideoSourceController.m */; };
 		AF807F851E79346800759136 /* NSMVideoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AF807F841E79346800759136 /* NSMVideoTableViewController.m */; };
+		AFF4AC301F5EA547003EA471 /* NSMQuickSwitchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AFF4AC2F1F5EA547003EA471 /* NSMQuickSwitchViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,8 @@
 		AF5E3FAD1E5405E9009325F4 /* NSMVideoSourceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMVideoSourceController.m; sourceTree = "<group>"; };
 		AF807F831E79346800759136 /* NSMVideoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMVideoTableViewController.h; sourceTree = "<group>"; };
 		AF807F841E79346800759136 /* NSMVideoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMVideoTableViewController.m; sourceTree = "<group>"; };
+		AFF4AC2E1F5EA547003EA471 /* NSMQuickSwitchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMQuickSwitchViewController.h; sourceTree = "<group>"; };
+		AFF4AC2F1F5EA547003EA471 /* NSMQuickSwitchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMQuickSwitchViewController.m; sourceTree = "<group>"; };
 		B7BA2DF6B2999B44B4742F99 /* NSMPlayer.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = NSMPlayer.podspec; path = ../NSMPlayer.podspec; sourceTree = "<group>"; };
 		C75A92C32043E9D5CD17191D /* Pods_NSMPlayer_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NSMPlayer_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -178,6 +181,8 @@
 				AF25335A1F176124003C1D21 /* NSMVideoTableViewCell.m */,
 				AF2533851F18CC29003C1D21 /* NSMDisplayVideoViewController.h */,
 				AF2533861F18CC29003C1D21 /* NSMDisplayVideoViewController.m */,
+				AFF4AC2E1F5EA547003EA471 /* NSMQuickSwitchViewController.h */,
+				AFF4AC2F1F5EA547003EA471 /* NSMQuickSwitchViewController.m */,
 			);
 			name = "Example for NSMPlayer";
 			path = NSMPlayer;
@@ -290,6 +295,7 @@
 				ORGANIZATIONNAME = migrant;
 				TargetAttributes = {
 					6003F589195388D20070C39A = {
+						DevelopmentTeam = 7GL725C6FL;
 						ProvisioningStyle = Manual;
 					};
 					6003F5AD195388D20070C39A = {
@@ -438,6 +444,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6003F59E195388D20070C39A /* NSMAppDelegate.m in Sources */,
+				AFF4AC301F5EA547003EA471 /* NSMQuickSwitchViewController.m in Sources */,
 				6003F5A7195388D20070C39A /* NSMViewController.m in Sources */,
 				AF4906121E8A4B2D00B8345E /* NSMVideoPlayerViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
@@ -585,7 +592,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 7GL725C6FL;
 				ENABLE_BITCODE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -604,7 +611,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9438a14f-1d9a-47b4-bacc-beaddabbb6f9";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = NSMPlayerProfile;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -617,7 +624,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Honorary Academy Ltd. (7GL725C6FL)";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 7GL725C6FL;
 				ENABLE_BITCODE = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "NSMPlayer/NSMPlayer-Prefix.pch";
@@ -627,7 +634,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9438a14f-1d9a-47b4-bacc-beaddabbb6f9";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = NSMPlayerProfile;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

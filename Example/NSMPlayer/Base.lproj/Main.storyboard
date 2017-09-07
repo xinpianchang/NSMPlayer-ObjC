@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="3sr-AM-J5m">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="8CY-8K-7M8">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -302,7 +302,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tc2-Qw-aMS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1528.8" y="445.72713643178412"/>
+            <point key="canvasLocation" x="2468" y="445.72713643178412"/>
         </scene>
         <!--Video Player View Controller-->
         <scene sceneID="kf0-Dd-v85">
@@ -350,6 +350,92 @@
             </objects>
             <point key="canvasLocation" x="2567.1999999999998" y="296.40179910044981"/>
         </scene>
+        <!--View Controller-->
+        <scene sceneID="vOH-I5-9Ca">
+            <objects>
+                <viewController id="Bqs-Ir-yaV" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="zRF-Cd-VU3"/>
+                        <viewControllerLayoutGuide type="bottom" id="LJh-B3-Z48"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="wCK-KY-Sdl">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="iM5-eR-eWg">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="Goa-PA-BnD">
+                            <connections>
+                                <segue destination="zqH-4E-1lF" kind="show" id="Fwf-VI-0lN"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Bxt-u2-9oh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1119" y="1017"/>
+        </scene>
+        <!--Quick Switch View Controller-->
+        <scene sceneID="LYg-SD-Rxk">
+            <objects>
+                <viewController id="zqH-4E-1lF" customClass="NSMQuickSwitchViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="6C2-ab-EMc"/>
+                        <viewControllerLayoutGuide type="bottom" id="HuH-s5-Dc7"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="fjb-1K-hXQ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0bi-64-Qxw" customClass="NSMAVPlayerView">
+                                <rect key="frame" x="0.0" y="64" width="375" height="200"/>
+                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="RPJ-AR-j5a"/>
+                                </constraints>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="CFl-fF-O4q" appends="YES" id="Gjl-Bh-FTr"/>
+                                </connections>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JUP-Cm-Dbt" customClass="NSMAVPlayerView">
+                                <rect key="frame" x="0.0" y="284" width="375" height="200"/>
+                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="200" id="4J3-fh-7PE"/>
+                                </constraints>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="vac-l5-zCp" appends="YES" id="Z1K-72-wAb"/>
+                                </connections>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="0bi-64-Qxw" secondAttribute="trailing" id="A0b-jT-3Ym"/>
+                            <constraint firstItem="JUP-Cm-Dbt" firstAttribute="leading" secondItem="fjb-1K-hXQ" secondAttribute="leading" id="C8F-ye-c36"/>
+                            <constraint firstItem="0bi-64-Qxw" firstAttribute="leading" secondItem="fjb-1K-hXQ" secondAttribute="leading" id="E0a-St-LBD"/>
+                            <constraint firstItem="JUP-Cm-Dbt" firstAttribute="top" secondItem="0bi-64-Qxw" secondAttribute="bottom" constant="20" id="Lm9-s1-IwP"/>
+                            <constraint firstAttribute="trailing" secondItem="JUP-Cm-Dbt" secondAttribute="trailing" id="p5y-PY-dal"/>
+                            <constraint firstItem="0bi-64-Qxw" firstAttribute="top" secondItem="6C2-ab-EMc" secondAttribute="bottom" id="up7-uW-7Xr"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="Kcu-tZ-Znz"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="S3d-qa-ibq" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="CFl-fF-O4q">
+                    <connections>
+                        <action selector="view1DidTap:" destination="zqH-4E-1lF" id="13j-qh-cFe"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer id="vac-l5-zCp">
+                    <connections>
+                        <action selector="view2DidTap:" destination="zqH-4E-1lF" id="Ezz-EY-vMX"/>
+                    </connections>
+                </tapGestureRecognizer>
+            </objects>
+            <point key="canvasLocation" x="1969" y="1017"/>
+        </scene>
         <!--Video Table View Controller-->
         <scene sceneID="6J4-gg-tUI">
             <objects>
@@ -376,7 +462,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ofy-Sz-To3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1554" y="1139"/>
+            <point key="canvasLocation" x="2492" y="1138.3808095952024"/>
         </scene>
         <!--Video Source Controller-->
         <scene sceneID="Wzf-gX-DXI">
@@ -404,7 +490,25 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eCW-Dt-AGV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2620" y="1140"/>
+            <point key="canvasLocation" x="3559.1999999999998" y="1139.2803598200901"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="H4Y-wQ-mUs">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="8CY-8K-7M8" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="2UG-vn-Gpw">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="Bqs-Ir-yaV" kind="relationship" relationship="rootViewController" id="4vy-MP-VPM"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="n9w-x5-rJE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="390" y="1023"/>
         </scene>
     </scenes>
 </document>

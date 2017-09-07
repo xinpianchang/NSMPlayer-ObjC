@@ -38,7 +38,7 @@
 @property (nonatomic, strong) NSMPlayerAsset *currentAsset;
 @property (nonatomic, strong) NSProgress *playbackProgress;
 @property (nonatomic, strong) NSProgress *bufferProgress;
-@property (nonatomic, strong) AVPlayerItem *playerItem;
+@property (nonatomic, strong) AVURLAsset *URLAsset;
 
 @end
 
@@ -90,7 +90,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
          */
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if (![newAsset.URL.absoluteString isEqualToString:self.currentAsset.assetURL.absoluteString]) {
+            if (self.URLAsset != newAsset) {
                 /*
                  self.asset has already changed! No point continuing because
                  another newAsset will come along in a moment.
@@ -132,6 +132,8 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     [self removeTimeObserverToken];
     [self removeCurrentItemObserver];
+    self.playbackProgress.completedUnitCount = self.playbackProgress.totalUnitCount = 0;
+    self.bufferProgress.completedUnitCount = self.bufferProgress.totalUnitCount = 0;
     
     self.prepareSource = source;
     
@@ -158,8 +160,6 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     
     [self.avplayer replaceCurrentItemWithPlayerItem:playerItem];
     
-    self.playerItem = playerItem;
-    
     // Invoke callback every one second
     [self addTimeObserverToken];
 }
@@ -175,8 +175,8 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 }
 
 - (BFTask *)prepare {
-    AVURLAsset *asset = [AVURLAsset URLAssetWithURL:self.currentAsset.assetURL options:nil];
-    return [self asynchronouslyLoadURLAsset:asset];
+    self.URLAsset = [AVURLAsset URLAssetWithURL:self.currentAsset.assetURL options:nil];
+    return [self asynchronouslyLoadURLAsset:self.URLAsset];
 }
 
 - (void)play {
@@ -201,9 +201,9 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         [tcs setResult:@(finished)];
     }];
     //workaround
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.playbackProgress.completedUnitCount = seconds;
-    });
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        self.playbackProgress.completedUnitCount = seconds;
+//    });
     return tcs.task;
 }
 
@@ -215,7 +215,6 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self removeCurrentItemObserver];
         [self removeTimeObserverToken];
-        self.playerItem = nil;
         [self.avplayer replaceCurrentItemWithPlayerItem:nil];
         self.avplayer = nil;
         self.playbackProgress.completedUnitCount = self.playbackProgress.totalUnitCount = 0;
@@ -336,7 +335,6 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 
 - (void)removeTimeObserverToken {
     if (self.timeObserverToken) {
-        // 只能保证调用下面方法的时候，只能保证这个方法 - (id)addPeriodicTimeObserverForInterval:(CMTime)interval queue:(dispatch_queue_t)queue usingBlock:(void (^)(CMTime time))block 中的block不会被再次触发，而不能保证已经触发的 block 中断执行，可以用这个做到 dispatch_sync(queue, ^{}
         [self.avplayer removeTimeObserver:self.timeObserverToken];
         self.timeObserverToken = nil;
     }
@@ -345,23 +343,23 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 - (void)addTimeObserverToken {
     __weak __typeof(self) weakself = self;
     dispatch_queue_t mainQueue = dispatch_get_main_queue();
-    self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
-        NSTimeInterval currenTimeInterval = CMTimeGetSeconds(time);
-        weakself.playbackProgress.completedUnitCount = currenTimeInterval;
+    self.timeObserverToken = [self.avplayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC) queue:mainQueue usingBlock:^(CMTime time) {
+        weakself.playbackProgress.completedUnitCount = CMTimeGetSeconds(time);
+        NSMPlayerLogInfo(@"Player item playback progress: %lld", weakself.playbackProgress.completedUnitCount);
     }];
 }
 
 - (void)removeCurrentItemObserver {
-    if (self.playerItem) {
+    if (self.avplayer.currentItem) {
+        
         NSAssert([NSThread currentThread] == [NSThread mainThread], @"You should register for KVO change notifications and unregister from KVO change notifications on the main thread. ");
-        [self.playerItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(status)) context:NSMAVPlayerKVOContext];
-        [self.playerItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) context:NSMAVPlayerKVOContext];
-        [self.playerItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:NSMAVPlayerKVOContext];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(status)) context:NSMAVPlayerKVOContext];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) context:NSMAVPlayerKVOContext];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:NSMAVPlayerKVOContext];
         
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.playerItem];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:self.playerItem];
-        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.avplayer.currentItem];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.avplayer.currentItem];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemPlaybackStalledNotification object:self.avplayer.currentItem];
     }
 }
 

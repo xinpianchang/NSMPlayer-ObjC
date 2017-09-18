@@ -772,17 +772,19 @@ NSString * const NSMVideoPlayerNewStatusKey = @"NSMVideoPlayerNewStatusKey";
 
 - (BFTask *)prepare {
     [self.underlyingPlayer replaceCurrentAssetWithAsset:self.currentAsset];
+    __weak __typeof(self) weakself = self;
     return [[self.underlyingPlayer prepare] continueWithBlock:^id _Nullable(BFTask * _Nonnull t) {
+        __strong __typeof(weakself)strongself = weakself;
         if (t.result) {
             NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventPreparingCompleted];
             msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
-            [self sendMessage:msg];
+            [strongself sendMessage:msg];
         } else if (t.error) {
             NSMPlayerError *playerError = [[NSMPlayerError alloc] init];
             playerError.error = t.error;
             NSMMessage *msg = [NSMMessage messageWithType:NSMVideoPlayerEventFailure userInfo:playerError];
             msg.messageDescription = NSMVideoPlayerMessageDescription(msg.messageType);
-            [self sendMessage:msg];
+            [strongself sendMessage:msg];
         }
         return nil;
     }];

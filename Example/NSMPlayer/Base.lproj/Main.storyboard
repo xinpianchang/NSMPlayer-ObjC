@@ -421,6 +421,10 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Kcu-tZ-Znz"/>
+                    <connections>
+                        <outlet property="playerView1" destination="0bi-64-Qxw" id="9dk-8Y-9r6"/>
+                        <outlet property="playerView2" destination="JUP-Cm-Dbt" id="9eI-xk-SHl"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="S3d-qa-ibq" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tapGestureRecognizer id="CFl-fF-O4q">

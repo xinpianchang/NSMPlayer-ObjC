@@ -22,6 +22,8 @@
 
 #import "NSMVideoPlayerController.h"
 #import "NSMVideoPlayer.h"
+#import "NSMPlayerLogging.h"
+
 @import MediaPlayer;
 
 @implementation NSMVideoPlayerController

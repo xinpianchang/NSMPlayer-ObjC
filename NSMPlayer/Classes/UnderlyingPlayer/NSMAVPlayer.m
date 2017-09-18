@@ -73,6 +73,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
 #pragma mark - Asset Loading
 
 - (BFTask *)asynchronouslyLoadURLAsset:(AVURLAsset *)newAsset {
+    __weak __typeof(self) weakself = self;
     BFTaskCompletionSource *source = [BFTaskCompletionSource taskCompletionSource];
     /**
      * Using AVAsset now runs the risk of blocking the current thread
@@ -81,6 +82,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
      * we need have been loaded.
      */
     [newAsset loadValuesAsynchronouslyForKeys:self.class.assetKeysRequiredToPlay completionHandler:^{
+        __strong __typeof(weakself)strongself = weakself;
         
         /**
          * The asset invokes its completion handler on an arbitrary queue.
@@ -90,7 +92,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
          */
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            if (self.URLAsset != newAsset) {
+            if (strongself.URLAsset != newAsset) {
                 /*
                  self.asset has already changed! No point continuing because
                  another newAsset will come along in a moment.
@@ -101,7 +103,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
              * Test whether the values of each of the keys we need have been
              * successfully loaded.
              */
-            for (NSString *key in self.class.assetKeysRequiredToPlay) {
+            for (NSString *key in strongself.class.assetKeysRequiredToPlay) {
                 NSError *error = nil;
                 AVKeyValueStatus status = [newAsset statusOfValueForKey:key error:&error];
                 if (status == AVKeyValueStatusFailed) {
@@ -120,7 +122,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
              * We can play this asset. Create a new AVPlayerItem and make it
              * our player's current item.
              */
-            [self setupAVPlayerWithAsset:newAsset prepareSource:source];
+            [strongself setupAVPlayerWithAsset:newAsset prepareSource:source];
             
         });
     }];

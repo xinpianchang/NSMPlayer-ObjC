@@ -10,6 +10,8 @@
 @import NSMPlayer;
 
 @interface NSMQuickSwitchViewController ()
+@property (weak, nonatomic) IBOutlet NSMAVPlayerView *playerView1;
+@property (weak, nonatomic) IBOutlet NSMAVPlayerView *playerView2;
 
 @property (nonatomic, strong) NSMAVPlayerView *playerView;
 @property (nonatomic, strong) NSMVideoPlayerController *videoPlayerController;
@@ -51,7 +53,10 @@
     NSMPlayerAsset *asset1 = [[NSMPlayerAsset alloc] init];
     asset1.assetURL = [NSURL URLWithString:@"http://qiniu.vmovier.molihecdn.com/5783402ed3469_lower.mp4"];
     restoration1.playerAsset = asset1;
-    
+    self.videoPlayerController.videoPlayer.playerView = self.playerView1;
+    self.playerView = self.playerView1;
+    [self.videoPlayerController.videoPlayer replaceCurrentAssetWithAsset:asset1];
+     
     NSMPlayerRestoration *restoration2 = [[NSMPlayerRestoration alloc] init];
     NSMPlayerAsset *asset2 = [[NSMPlayerAsset alloc] init];
     asset2.assetURL = [NSURL URLWithString:@"http://qiniu.vmovier.molihecdn.com/5720929e7600d.mp4"];

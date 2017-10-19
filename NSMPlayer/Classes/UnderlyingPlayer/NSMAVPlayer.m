@@ -146,6 +146,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
     [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(status)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionInitial context:NSMAVPlayerKVOContext];
     [playerItem addObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionInitial context:NSMAVPlayerKVOContext];
     [playerItem addObserver:self forKeyPath:@"playbackLikelyToKeepUp" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionInitial context:NSMAVPlayerKVOContext];
+    [playerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionInitial context:NSMAVPlayerKVOContext];
     
     // Note that NSNotifications posted by AVPlayerItem may be posted on a different thread from the one on which the observer was registered.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:playerItem];
@@ -203,9 +204,9 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         [tcs setResult:@(finished)];
     }];
     //workaround
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        self.playbackProgress.completedUnitCount = seconds;
-//    });
+    //    dispatch_async(dispatch_get_main_queue(), ^{
+    //        self.playbackProgress.completedUnitCount = seconds;
+    //    });
     return tcs.task;
 }
 
@@ -296,11 +297,13 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
             }
         }
         
-    }  else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
+    } else if ([keyPath isEqualToString:@"playbackLikelyToKeepUp"]) {
         // Indicates whether the item will likely play through without stalling
         if (self.avplayer.currentItem.isPlaybackLikelyToKeepUp) {
             [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerPlaybackLikelyToKeepUpNotification object:self userInfo:nil];
-        } else {
+        }
+    } else if ([keyPath isEqualToString:@"playbackBufferEmpty"]) {
+        if (self.avplayer.currentItem.isPlaybackBufferEmpty) {
             // checkout network state
             if(![[Reachability reachabilityForInternetConnection] isReachable]) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:NSMUnderlyingPlayerFailedNotification object:self userInfo:@{NSMUnderlyingPlayerErrorKey : [NSError errorWithDomain:NSURLErrorDomain code:-1005 userInfo:@{NSLocalizedDescriptionKey : @"connection failed"}]}];
@@ -358,6 +361,7 @@ static void * NSMAVPlayerKVOContext = &NSMAVPlayerKVOContext;
         [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(status)) context:NSMAVPlayerKVOContext];
         [self.avplayer.currentItem removeObserver:self forKeyPath:NSStringFromSelector(@selector(loadedTimeRanges)) context:NSMAVPlayerKVOContext];
         [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackLikelyToKeepUp" context:NSMAVPlayerKVOContext];
+        [self.avplayer.currentItem removeObserver:self forKeyPath:@"playbackBufferEmpty" context:NSMAVPlayerKVOContext];
         
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.avplayer.currentItem];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemFailedToPlayToEndTimeNotification object:self.avplayer.currentItem];
